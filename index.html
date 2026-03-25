@@ -562,12 +562,12 @@ function showPipeKpiModal(title,items,showGross){
   const avgGP=tA>0?tG/tA:0;
   let h=`<div style="display:flex;justify-content:flex-end"><button class="am-close-btn" onclick="closePipeKpiModal()">✕</button></div>`;
   h+=`<h3>${escHtml(title)}</h3><div class="big-num">${items.length}</div>`;
-  h+=`<div class="pipe-kpi-summary"><span>${fmtF(tA)}</span><span>${avgGP>0?(avgGP*100).toFixed(1)+'%':'-'}  GP%</span><span>${tG>0?fmtF(tG):'-'}  GP</span></div>`;
+  h+=`<div class="pipe-kpi-summary"><span>${fmtF(tA)}</span><span>${avgGP>0?(avgGP*100).toFixed(1)+'%':'-'}  GP</span><span>${tG>0?fmtF(tG):'-'}  GP</span></div>`;
   h+=`<table><thead><tr><th>Project</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;
   const sorted=[...items].sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
   sorted.forEach((r,i)=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']);h+=`<tr class="anim-fade" style="animation-delay:${(i*0.04).toFixed(2)}s;cursor:pointer" onclick="showProjModal(DATA[${r._i}],true)"><td style="font-weight:500;color:var(--text)">${escHtml(r['Project']||r['Client']||'—')}</td><td class="amt">${amt>0?fmtF(amt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga):'—'}</td></tr>`;});
   h+=`</tbody></table>`;
-  if(showGross&&tG>0)h+=`<div class="pipe-kpi-gross">Gross Revenue if 30% Win Rate: <strong style="color:var(--gold)">${fmtF(tG*0.3)}</strong></div>`;
+  if(showGross&&tA>0)h+=`<div class="pipe-kpi-gross">Gross Revenue if 30% Win Rate: <strong style="color:var(--gold)">${fmtF(tA*0.3)}</strong></div>`;
   box.innerHTML=h;document.getElementById('pipeKpiModal').classList.add('open');
 }
 // AM segment tooltip
@@ -704,7 +704,7 @@ function renderPipeline(cw){
     // Summary at top
     let h=`<div class="pipeline-total" style="display:flex;justify-content:space-between;border-top:none;border-bottom:2px solid var(--border)"><span>${fmt(tA)}</span><span style="font-size:11px;color:var(--text-muted)">${tG>0?`GP: ${(avgGP*100).toFixed(1)}% · ${fmt(tG)}`:'—'}</span></div>`;
     sorted.forEach(r=>{const a=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),di=r._i!=null?r._i:'';h+=`<div class="pipeline-item clickable" onclick="showProjModal(DATA[${di}])" onmouseenter="tipIn(event,${di})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><div class="proj-name">${r['Project']||r['Client']}</div><div class="proj-meta"><span>${sp(r['Status'])}</span><span style="font-size:13px;font-weight:600;color:var(--text-dim)">${fmt(a)}</span></div>${gp>0||ga>0?`<div class="proj-meta"><span class="proj-gp">GP: ${gp>0?(gp*100).toFixed(1)+'%':'—'}</span><span class="proj-gp">${ga>0?fmt(ga):'—'}</span></div>`:''}</div>`;});
-    if(tG>0&&!skipGross)h+=`<div class="pipeline-gross">Gross Revenue if 30% Win Rate: <strong style="color:var(--gold)">${fmt(tG*0.3)}</strong></div>`;return h;}
+    if(tA>0&&!skipGross)h+=`<div class="pipeline-gross">Gross Revenue if 30% Win Rate: <strong style="color:var(--gold)">${fmt(tA*0.3)}</strong></div>`;return h;}
   document.getElementById('pipelineCols').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:16px">
       <div ${afc('pipeline-col won',5)}><div class="pipeline-col-header"><span>Recent Wins (Wk ${cw})</span><span class="count">${rw.length}</span></div>${ci(rw,true)}</div>
