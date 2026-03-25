@@ -1,0 +1,49 @@
+{
+  "theme": "system",
+  "debugKey": "TWluZXNraTIwMjYh",
+  "defaultCSV": "20260325_AMBD_Universe_Raw.enc",
+  "lastWeekCSV": "20260318_AMBD_Universe_Raw.enc",
+  "currency": "PHP",
+  "usdRate": 57,
+  "overview": {
+    "visible": true,
+    "ov-kpis": true,
+    "ov-totalSales": true,
+    "ov-tribeAtt": true,
+    "ov-ytdPipeline": true
+  },
+  "pipeline": {
+    "visible": true,
+    "pl-kpis": true
+  },
+  "am": {
+    "visible": true,
+    "am-chart": true,
+    "am-detail": true
+  },
+  "bd": {
+    "visible": true,
+    "bd-charts": true,
+    "bd-filter": true
+  },
+  "winrate": {
+    "visible": false,
+    "wr-kpis": true,
+    "wr-count": true,
+    "wr-value": true,
+    "wr-trend": true,
+    "wr-tribe": true,
+    "wr-table": true
+  },
+  "attainment": {
+    "visible": true,
+    "at-kpis": true,
+    "at-attChart": true,
+    "at-ytdPipe": true,
+    "at-table": true,
+    "at-wonTable": true
+  },
+  "encrypt": {
+    "visible": false
+  }
+}
