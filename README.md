@@ -336,9 +336,6 @@ toggleQDetail(i)            // Toggle quarterly detail panel and overlay
 - Tribe targets are in USD — changing the USD rate recalculates all PHP targets and re-renders
 - BD cards only appear for months where that BD has actual lead data
 - All numbers use DM Sans font (no monospace anywhere)
-- Total target is exactly $6,500,000.00 USD (sum of four tribe targets)
-- Quarterly cumulative targets: Q1 $1,277,001.02 (19.65%), Q2 $2,790,257.20 (42.93%), Q3 $5,269,982.97 (81.08%), Q4 $6,500,000.00 (100%)
-- Per-quarter pipeline targets: Q1 $1,277,001.02, Q2 $1,513,256.19, Q3 $2,479,725.76, Q4 $1,230,017.03
 - Pipeline Required in quarterly detail = quarter target / 30% (shown alongside current pipeline value)
 - All Wins 2026 table and Tribe Attainment Projects Won table use `fmtF()` for full exact amounts instead of `fmt()` abbreviated amounts
 - Global `user-select: none` prevents text selection and caret on non-interactive elements; tables and inputs are exempt
