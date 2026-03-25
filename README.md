@@ -1,5 +1,5 @@
 # INT Revenue Dashboard — MANCOM Weekly
-## Comprehensive Project Summary (for continuing in a new chat)
+## Comprehensive Project Summary
 
 ---
 
