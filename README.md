@@ -42,45 +42,9 @@ Qualified Lead, % Collected, Amount Collected (PHP)
 
 ## Constants & Business Logic
 
-### Tribe Targets (stored in USD, converted to PHP at runtime via USD_RATE)
-```javascript
-TRIBE_TARGETS_USD = {
-  'PDEI - Moonton': 982737.88,
-  'PDEI - Tencent': 862996.28,
-  'PDEI - Esports': 516434.10,
-  'PDEI - Marketing': 4137831.73
-}
-// Total = $6,500,000.00 USD exactly
-// rebuildTargets() multiplies by USD_RATE to produce TRIBE_TARGETS in PHP
-```
-
-### Quarterly Cumulative Targets (USD)
-```javascript
-Q_TARGETS_USD = [
-  { label: 'Q1', amount: 1277001.02, pct: 19.65, qtrPip: 1277001.02 },
-  { label: 'Q2', amount: 2790257.20, pct: 42.93, qtrPip: 1513256.19 },
-  { label: 'Q3', amount: 5269982.97, pct: 81.08, qtrPip: 2479725.76 },
-  { label: 'Q4', amount: 6500000.00, pct: 100.00, qtrPip: 1230017.03 }
-]
-// amount = cumulative target through that quarter
-// pct = cumulative % of full-year target
-// qtrPip = per-quarter pipeline target (Q amount minus previous Q amount)
-```
-
-### AM Targets (in PHP, static)
-```javascript
-AM_TARGETS = {
-  'Alvaro Miguel Dela Vega Santos': 0,        // Iggy
-  'Carla Andrea Calma Crespo': 25650000,      // Carla
-  'Carlos Roberto Francisco, David, IV Coscolluela': 25650000, // CC
-  'Marcus Joaquin Viray Gonzales': 57000000,   // Marcus
-  'Shanna Mae Alindada Sacsi': 25650000        // Shanna
-}
-```
-
 ### BD Goals (dynamic discovery system)
 - **Default goal per BD per month:** 15 leads
-- **Exception:** Jorge Luis Tesoro (H) has a special goal of 10
+- **Exceptions:** Jorge Luis Tesoro (H) has a special goal of 10; Vince has a goal of 0
 - Goals are calculated dynamically based on which BDs have data for each Lead Month
 - Diana (Diana Lou Perocho Gosamo) left in early Feb but her Jan/Feb historical data still shows
 - New BDs are auto-discovered from CSV — no code changes needed
@@ -94,7 +58,8 @@ BD_NICKS = {
   'Diana Lou Perocho Gosamo': 'Diana',
   'Marinella M. Casabuena': 'Ella',
   'Kewen Ysan Tolentino Sy': 'Kewen',
-  'Jorge Luis Tesoro': 'H'
+  'Jorge Luis Tesoro': 'H',
+  'Vince': 'Vince'
 }
 ```
 
@@ -114,15 +79,15 @@ WS = ['Signed CE', 'Won - Awaiting CE Signature', 'Collected - For Closing',
 
 ### 1. Overview (`sec-overview`)
 - **KPI Strip** (5 cards with staggered fade-in): Total Wins 2026 (clickable — scrolls to wins table), Target, CEs Submitted, Pipeline, For Submission. Each shows delta triangles vs prev CSV.
-- **Total Sales YTD**: Custom horizontal bar with gold fill, barbershop pole animation (diagonal stripes), last-week marker line, 5-point axis. Amount shown in black text on yellow badge (also with barbershop animation). Percentage in plain yellow text.
-- **Quarterly Split Indicator**: Row of colored segments below Total Sales YTD bar (Q1 blue, Q2 green, Q3 amber, Q4 gold). Each segment is clickable and:
+- **Year-to-Date (YTD) Sales**: Custom horizontal bar with gold fill, barbershop pole animation (diagonal stripes), last-week marker line, 5-point axis. Gap to target shown in gray parentheses next to the target amount (e.g. "(₱285M to go)"). Amount and percentage animate in with the gold bar via a `.sales-bar-slider` element that shares the same `growBar` animation. Amount renders inside the bar when `barPctVal > 18%`; forced outside on mobile via `@media(max-width:600px)`. Percentage displayed in thin weight (`font-weight:300`) with `var(--text)` color (no background box).
+- **Quarterly Targets Skew**: Title label ("Quarterly Targets Skew") appears above the row of colored segments below the YTD Sales bar (Q1 blue, Q2 green, Q3 amber, Q4 gold). Each segment is clickable and:
   - Dims non-active quarters to 35% opacity
   - Shows colored overlay on the main sales bar proportional to the quarter's cumulative %
-  - Expands a detail panel below with: Q target, YTD sales (with % of quarter target), gap (or "Exceeded By" if target met), and pipeline required (quarter target / 30% vs current pipeline). When target is exceeded, the pipeline column is hidden and the grid becomes 3-column.
+  - Expands a detail panel below with: Q target, YTD sales (with % of quarter target), YTD Gap (or "Exceeded By" if target met), and pipeline required (quarter target / 30% vs current pipeline). When target is exceeded, the pipeline column is hidden and the grid becomes 3-column.
   - Click same quarter again to toggle off
 - **Sales Attainment by Tribe**: Custom horizontal bars scaled to a shared axis (max of all targets x 1.05). Labels positioned inside bars (black) or outside (yellow) depending on bar width. Target marker line at correct position per tribe. Staggered grow-in + fade animations.
 - **YTD + Pipeline by Tribe**: Chart.js horizontal stacked bar (gold = won, blue = pipeline)
-- **All Wins — 2026**: Table sorted by month with monthly subtotals shown inline (count + amount). Uses `fmtF()` for full exact amounts (thousands separator + 2 decimal places). Clicking Total Wins KPI scrolls here.
+- **All Wins — 2026**: Table sorted by month with monthly subtotals shown inline (count + amount). Uses `fmtF()` for full exact amounts (thousands separator + 2 decimal places). Clicking Total Wins KPI scrolls here. Delta triangles (▲/▼) shown per-project for Amount and GP columns comparing to previous week data via `prevMap()` lookup by Project+Client key. Unchanged values show no indicator.
 - Sections: `ov-kpis`, `ov-totalSales`, `ov-tribeAtt`, `ov-ytdPipeline`, `ov-winsTable`
 
 ### 2. Sales Pipeline (`sec-pipeline`)
@@ -132,8 +97,9 @@ WS = ['Signed CE', 'Won - Awaiting CE Signature', 'Collected - For Closing',
   - CEs Submitted, For Submission, New RFPs each in their own column
   - Each card shows **summary at top** (total amount, GP%, GP amount) with yellow-tinted background
   - Individual projects listed below with status pills, amounts, GP
-  - Gross Revenue if 30% Win Rate shown on non-wins columns only
+  - Gross Revenue if 30% Win Rate shown on non-wins columns only — uses `tA*0.3` (total amount x 30%) instead of GP-based calculation
   - Staggered entrance animations on all cards
+- **Pipeline KPI Modal**: Clicking a KPI card opens a modal with project list, summary strip showing total amount, GP% label (displayed as "GP" not "GP%"), and GP amount. Non-wins modals include Gross Revenue if 30% Win Rate line using `tA*0.3`.
 - Sections: `pl-kpis`
 
 ### 3. AM Performance (`sec-am`)
@@ -145,19 +111,29 @@ WS = ['Signed CE', 'Won - Awaiting CE Signature', 'Collected - For Closing',
   - Red target marker line
 - Account count shown next to each AM name (excludes Talks In Progress)
 - **Click to expand**: Shows phase value grid (4 colored cards with exact amounts) AND accounts table simultaneously
-- **Accounts table**: Excludes Talks In Progress, shows Account/Client/Status/Amount/Pitch/Awarded/Collection/Actual columns
+- **Accounts table**: Excludes Talks In Progress, shows Account/Client/Status/Amount/Pitch/Awarded/Collection/Actual columns. Delta triangles (▲/▼) shown per-project for Amount and phase columns comparing to previous week data via `prevMap()` lookup. Unchanged values show no indicator.
+- **Phase cards**: Delta triangles shown on each phase value comparing to previous week.
 - Click again to collapse both
 - Staggered row entrance animations
 - Sections: `am-chart`, `am-detail`
 
-### 4. BD Leads (`sec-bd`)
+### 4. BD Performance (`sec-bd`)
+- **Tab name**: "BD Performance" (displayed in nav tab as "BD Performance"; internal TAB_NAMES key still reads "BD Leads")
 - **Stacked bar chart**: Qualified (#f1c232) + For Qualification (#3a74d0) per BD. Red dashed goal marker lines (no number labels — axis shows scale). Count labels inside bars.
 - **Donut chart**: Total leads vs dynamic goal with percentage in center. Theme-aware text (reads CSS vars live in afterDraw).
 - **Month filter**: Lead Month buttons. Current calendar month highlighted by default. Clicking filters re-renders everything including button highlights.
 - **BD Cards**: Only show BDs that have leads for the selected month. Alphabetically sorted by nickname. Shows count, goal, progress bar, qualified/for-qualification split. Staggered entrance animations.
 - **Click card** -> detail table with Client, Project, Lead Phase, Lead Progress, Projected Budget, Month
 - BD discovery is fully dynamic — new BDs auto-appear when they have Lead Month data
-- Sections: `bd-charts`, `bd-filter`
+- **BD Wins — 2026** (`bd-wins`): A new section at the bottom of the BD Performance tab:
+  - **Summary strip**: Row of BD cards showing each BD's total won amount and win count, sorted descending by amount
+  - **Clickable filter cards**: Cards are clickable to filter the table to that BD (toggle behavior — click again to deselect). Active card gets blue border highlight (`var(--accent)`) and accent-glow background
+  - **Wins table**: Columns are Month, BD, Project, Client, Tribe, Status, Amount
+  - **Sort order**: Ascending by Sign Date (oldest first, most recent at bottom); rows without Sign Date fall to the end sorted by amount
+  - **Month grouping**: Month column groups rows — only the first row of each month shows the month label; subsequent rows hide it via transparent color
+  - **Footer**: Shows total wins count and total amount
+  - `bd-wins` is included in `TAB_SECTIONS` for visibility toggles
+- Sections: `bd-charts`, `bd-filter`, `bd-wins`
 
 ### 5. Win Rate (`sec-winrate`, hidden by default)
 - **KPI Strip** (4 cards, animated): Win Rate %, Value Win Rate %, Won count, Lost count
@@ -171,7 +147,7 @@ WS = ['Signed CE', 'Won - Awaiting CE Signature', 'Collected - For Closing',
 - **Attainment by Tribe**: Chart.js horizontal bar (gold won vs gray/transparent target)
 - **YTD vs Pipeline**: Chart.js horizontal bar (gold YTD vs `rgba(100,116,139,.25)` pipeline — visible in both themes)
 - **Tribe breakdown table** with progress bars and attainment %
-- **Projects Won table** with tribe filter (filter only updates table, not charts — no animation replay). Uses `fmtF()` for full exact amounts (thousands separator + 2 decimal places).
+- **Projects Won table** with tribe filter (filter only updates table, not charts — no animation replay). Uses `fmtF()` for full exact amounts (thousands separator + 2 decimal places). Delta triangles (▲/▼) shown per-project for Amount and GP columns comparing to previous week data via `prevMap()` lookup. Unchanged values show no indicator.
 - Sections: `at-kpis`, `at-attChart`, `at-ytdPipe`, `at-table`, `at-wonTable`
 
 ### 7. Encrypt/Decrypt (`sec-encrypt`, hidden by default)
@@ -223,7 +199,7 @@ WS = ['Signed CE', 'Won - Awaiting CE Signature', 'Collected - For Closing',
   "overview": { "visible": true, "ov-kpis": true, "ov-totalSales": true, "ov-tribeAtt": true, "ov-ytdPipeline": true, "ov-winsTable": true },
   "pipeline": { "visible": true, "pl-kpis": true },
   "am": { "visible": true, "am-chart": true, "am-detail": true },
-  "bd": { "visible": true, "bd-charts": true, "bd-filter": true },
+  "bd": { "visible": true, "bd-charts": true, "bd-filter": true, "bd-wins": true },
   "winrate": { "visible": false, "wr-kpis": true, "wr-count": true, "wr-value": true, "wr-trend": true, "wr-tribe": true, "wr-table": true },
   "attainment": { "visible": true, "at-kpis": true, "at-attChart": true, "at-ytdPipe": true, "at-table": true, "at-wonTable": true },
   "encrypt": { "visible": false }
@@ -233,10 +209,18 @@ WS = ['Signed CE', 'Won - Awaiting CE Signature', 'Collected - For Closing',
 ---
 
 ## Dual CSV Comparison System
-- Two CSV slots: current week and last week (optional)
-- Filenames parsed for date pattern `YYYYMMDD` — newer = current, older = prev
-- Delta indicators (triangle up/triangle down/dash) appear on KPIs and values when prev CSV is loaded
+- Two CSV slots: current week (slot 1) and last week (slot 2)
+- `reconcile()` uses explicit slot keys — slot 1 is always current, slot 2 is always last week (no date-based sorting)
+- Delta indicators (▲/▼) appear on KPIs and values when prev CSV is loaded. Unchanged values show no indicator (no dash symbol).
+- **Per-row delta indicators**: All Wins 2026 table, AM Performance accounts table, AM Performance phase cards, and Tribe Attainment Projects Won table all show ▲/▼ delta triangles comparing per-project amounts/GP to previous week data. Uses `prevMap()` lookup by Project+Client key.
 - Last-week marker line shown on Total Sales YTD bar
+
+---
+
+## CE Link Parsing
+- `ceLink` (Signed CE PDF) and `intCE` (Internal CE Sheet) fields are filtered to only pass through values containing `http(s)` URLs
+- PDF filenames or other non-URL values are excluded (regex: `/https?:\/\//`)
+- This prevents non-link values like bare PDF filenames from appearing in the project detail modal
 
 ---
 
@@ -263,8 +247,8 @@ WS = ['Signed CE', 'Won - Awaiting CE Signature', 'Collected - For Closing',
 - **BD cards**: Stagger at 80ms intervals
 - **Win Rate / Attainment KPIs**: Stagger at 50ms intervals
 - **Tribe attainment bars**: `growBar .8s` grow-in + staggered `fadeUp` per row
-- **Total Sales bar**: `growBar .8s` + barbershop pole idle animation (`barberPole 1s linear infinite`)
-- **Total Sales amount badge**: Same barbershop pole animation overlay
+- **Total Sales bar**: `growBar 1.8s` + barbershop pole idle animation (`barberPole 1s linear infinite`)
+- **Sales bar slider**: `.sales-bar-slider` element shares the same `growBar 1.8s` animation as the fill bar, causing the amount and percentage to animate in alongside the gold bar
 - **Quarterly detail panel**: Slides open with `max-height .4s ease` + `opacity .4s ease` transition
 - **Quarterly overlay on main bar**: `opacity .3s ease` + `width .5s cubic-bezier(.16,1,.3,1)` transition
 - **Helper functions**: `af(i)` returns `class="anim-fade" style="animation-delay:Xs"`, `afc(cls,i)` adds extra classes
@@ -280,7 +264,8 @@ cs()            // Currency symbol (PHP or USD)
 fmt(n)          // Format with K/M/B abbreviation
 fmtF(n)         // Format with thousands separator + 2 decimal places (full exact amounts)
 pct(v,t)        // Percentage string
-dv(cur,prev,sm) // Delta indicator (up/down/flat triangle)
+dv(cur,prev,sm) // Delta indicator (up/down triangle — no flat/dash symbol)
+dvRow(cur,prev) // Per-row delta: returns empty string if unchanged, otherwise calls dv()
 sp(st)          // Status pill HTML
 gw()            // Current week number
 dm(r)           // Derive month string from row
@@ -294,11 +279,16 @@ afc(cls,i)      // Animation helper with extra class
 verifyCSV(text) // Check required columns exist
 showCSVInvalidModal(text) // Show invalid CSV modal with missing columns
 rebuildTargets()// Recompute TRIBE_TARGETS from USD x rate
-getBDGoal(bd)   // Get goal for a BD (15 default, 10 for H)
+getBDGoal(bd)   // Get goal for a BD (15 default, 10 for H, 0 for Vince)
 getActiveBDsForMonth(month) // Discover BDs with data
 getMonthGoal(month)         // Sum goals for active BDs
 getTotalGoalAllMonths()     // Sum all month goals
 toggleQDetail(i)            // Toggle quarterly detail panel and overlay
+prevMap()       // Build/return lookup map of prev-week rows keyed by Project+Client
+getPrev(r)      // Get matching prev-week row for a given row
+invalidatePrevMap()         // Clear cached prevMap (called on data reload)
+renderBDWins()  // Render BD Wins — 2026 section with summary strip and table
+toggleBDWinsFilter(bd)      // Toggle BD filter on wins table (click to select, click again to deselect)
 ```
 
 ---
@@ -313,7 +303,7 @@ toggleQDetail(i)            // Toggle quarterly detail panel and overlay
 7. For `.csv` files: verify columns -> load
 8. If enc decryption fails: re-show password modal with error
 9. If CSV verification fails: show invalid CSV modal with missing columns (blurred backdrop)
-10. `reconcile()` sorts slots by date -> sets DATA/DATA_PREV -> `renderAll()`
+10. `reconcile()` uses explicit slot keys (1=current, 2=last week) -> sets DATA/DATA_PREV -> `renderAll()`
 11. Loading modal dismissed -> dashboard visible
 
 ---
@@ -339,3 +329,9 @@ toggleQDetail(i)            // Toggle quarterly detail panel and overlay
 - Pipeline Required in quarterly detail = quarter target / 30% (shown alongside current pipeline value)
 - All Wins 2026 table and Tribe Attainment Projects Won table use `fmtF()` for full exact amounts instead of `fmt()` abbreviated amounts
 - Global `user-select: none` prevents text selection and caret on non-interactive elements; tables and inputs are exempt
+- CE link fields (ceLink, intCE) only pass through values containing http(s) URLs — bare PDF filenames are excluded
+- Gross Revenue if 30% Win Rate in pipeline uses total amount (`tA*0.3`) not GP-based calculation
+- Pipeline KPI modal summary shows GP label as "GP" (not "GP%") alongside the percentage value
+- CSV reconciliation uses explicit slot keys (slot 1 = current week, slot 2 = last week) rather than sorting by filename date
+- Delta row indicators use `prevMap()` keyed by Project+Client; unchanged values show no indicator (no dash symbol)
+- BD Wins table sorted ascending by Sign Date so oldest entries appear first and most recent at the bottom
