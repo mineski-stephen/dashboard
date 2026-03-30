@@ -1,12 +1,25 @@
 <!DOCTYPE html><html lang="en" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>INT Revenue Dashboard — MANCOM Weekly</title>
+<meta name="description" content="Weekly revenue dashboard for INT team MANCOM meetings. Tracks sales pipeline, BD leads, AM performance, win rates, and tribe attainment.">
+<meta name="author" content="INT Revenue Team">
+<!-- Open Graph (Facebook, LinkedIn, Slack, Discord, etc.) -->
+<meta property="og:title" content="INT Revenue Dashboard — MANCOM Weekly">
+<meta property="og:description" content="Weekly revenue dashboard tracking sales pipeline, BD performance, AM attainment, and win rates.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="INT Revenue Dashboard — MANCOM Weekly">
+<meta name="twitter:description" content="Weekly revenue dashboard tracking sales pipeline, BD performance, AM attainment, and win rates.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="js/papaparse.min.js"></script>
+<script src="js/chart.umd.min.js"></script>
+<script src="js/jspdf.umd.min.js"></script>
+<script src="js/jspdf.plugin.autotable.min.js"></script>
 <style>
 [data-theme="dark"]{--bg:#0B0E11;--surface:#141920;--surface2:#1B2230;--surface3:#222B3A;--border:#2A3545;--text:#E8ECF1;--text-dim:#8B95A5;--text-muted:#5A6577;--accent:#3B82F6;--accent-glow:rgba(59,130,246,.15);--green:#10B981;--green-dim:rgba(16,185,129,.12);--amber:#F59E0B;--amber-dim:rgba(245,158,11,.12);--red:#EF4444;--red-dim:rgba(239,68,68,.12);--purple:#8B5CF6;--purple-dim:rgba(139,92,246,.12);--cyan:#06B6D4;--cyan-dim:rgba(6,182,212,.12);--gold:#f1c232;--radius:12px;--radius-sm:8px;--overlay:rgba(0,0,0,.6)}
 [data-theme="light"]{--bg:#F3F4F6;--surface:#FFF;--surface2:#F0F1F3;--surface3:#E5E7EB;--border:#D1D5DB;--text:#111827;--text-dim:#4B5563;--text-muted:#9CA3AF;--accent:#2563EB;--accent-glow:rgba(37,99,235,.1);--green:#059669;--green-dim:rgba(5,150,105,.1);--amber:#D97706;--amber-dim:rgba(217,119,6,.1);--red:#DC2626;--red-dim:rgba(220,38,38,.1);--purple:#7C3AED;--purple-dim:rgba(124,58,237,.1);--cyan:#0891B2;--cyan-dim:rgba(8,145,178,.1);--gold:#f1c232;--radius:12px;--radius-sm:8px;--overlay:rgba(0,0,0,.3)}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}td,th,input,textarea{-webkit-user-select:text;user-select:text}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;cursor:default}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}td,th,input,textarea{-webkit-user-select:text;user-select:text;cursor:auto}button,a,[onclick]{cursor:pointer;-webkit-user-select:none;user-select:none}input,textarea,select{cursor:text}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .app{max-width:1440px;margin:0 auto;padding:24px 32px 48px}@media(max-width:600px){.app{padding:16px 12px 32px}}
 .header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 24px;border-bottom:1px solid var(--border);margin-bottom:28px;flex-wrap:wrap;gap:12px}
@@ -80,7 +93,14 @@ body.settings-open{overflow:hidden}
 .kpi .kpi-value{font-size:26px;font-weight:700;letter-spacing:-.5px}.kpi .kpi-sub{font-size:13px;color:var(--text-dim);margin-top:4px}
 .delta{font-weight:700;font-size:13px;margin-left:6px}.delta.up{color:var(--green)}.delta.down{color:var(--red)}.delta.flat{color:var(--text-muted)}
 .delta-sm{font-weight:600;font-size:11px;margin-left:4px}.delta-sm.up{color:var(--green)}.delta-sm.down{color:var(--red)}.delta-sm.flat{color:var(--text-muted)}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;position:relative}
+.caption-toggle{position:absolute;top:14px;right:14px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;transition:background .15s,transform .25s;color:var(--text-muted);font-size:10px;z-index:1;border:none;background:none;padding:0}
+.caption-toggle:hover{background:var(--surface2);color:var(--text-dim)}
+.caption-toggle.open{transform:rotate(180deg)}
+.card-caption{max-height:0;overflow:hidden;transition:max-height .4s ease,opacity .4s ease,margin .3s ease;opacity:0;margin-top:0}
+.card-caption.open{max-height:500px;opacity:1;margin-top:16px}
+.card-caption-inner{padding:14px 18px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border);font-size:13px;line-height:1.7;color:var(--text-dim);-webkit-user-select:text;user-select:text}
+.card-caption-inner strong{color:var(--text);font-weight:600}
 .card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title .dot{width:8px;height:8px;border-radius:50%}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:1100px){.grid-2{grid-template-columns:1fr}}
@@ -288,17 +308,18 @@ body.settings-open{overflow:hidden}
     <div class="header-meta">
       <div class="currency-controls"><span class="rate-label">USD Rate</span><input type="number" class="rate-input" id="usdRateInput" value="57" min="1" step="0.1"><div class="currency-toggle"><button class="currency-toggle-btn active" id="btnPHP" onclick="setCurrency('PHP')">PHP</button><button class="currency-toggle-btn" id="btnUSD" onclick="setCurrency('USD')">USD</button></div></div>
       <div class="tag" id="weekTag">Week —</div><div class="tag" id="dateTag">—</div><div class="tag live" id="statusTag">● LIVE</div>
+      <button class="settings-btn" onclick="downloadPDF()" title="Download PDF report">⬇</button>
       <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
     </div>
   </div>
   <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)toggleSettings()"><div class="settings-panel" id="settingsPanel"></div></div>
   <div class="nav-tabs" id="navTabs">
-    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales Pipeline</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Leads</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
+    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales Pipeline</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
   </div>
-  <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Total Sales YTD</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
+  <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
   <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="pipeline-cols" id="pipelineCols"></div></div>
   <div class="section" id="sec-am"><div class="card vis-section" data-vis="am-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Account Manager Weighted Performance</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#cc0000"></div>Actual Collection</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#ffd966;border:1px solid #ccc"></div>Collection Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f0c132"></div>Awarded Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3c78d8"></div>Pitch Phase</div><div class="am-legend-item"><div style="width:10px;height:2px;background:var(--red)"></div>Target</div></div><div id="amBars"></div></div><div id="amDetailContainer" class="vis-section" data-vis="am-detail"></div></div>
-  <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid" id="bdGrid"></div><div class="bd-detail" id="bdDetail"></div></div>
+  <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid" id="bdGrid"></div><div class="bd-detail" id="bdDetail"></div><div class="card vis-section" data-vis="bd-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>BD Wins — 2026</div><div class="table-wrap" id="bdWinsTable"></div></div></div>
   <div class="section" id="sec-winrate"><div class="kpi-strip vis-section" data-vis="wr-kpis" id="winrateKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="wr-count"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Win vs Loss (Count)</div><div class="chart-container"><canvas id="winLossCountChart"></canvas></div></div><div class="card vis-section" data-vis="wr-value"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Win vs Loss (Value)</div><div class="chart-container"><canvas id="winLossValueChart"></canvas></div></div></div><div class="grid-2"><div class="card vis-section" data-vis="wr-trend"><div class="card-title"><div class="dot" style="background:var(--amber)"></div>Win Rate Trend</div><div class="chart-container short"><canvas id="winRateTrendChart"></canvas></div></div><div class="card vis-section" data-vis="wr-tribe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Win Rate by Tribe</div><div class="chart-container short"><canvas id="winRateTribeChart"></canvas></div></div></div><div class="card vis-section" data-vis="wr-table" id="wrLostCard"><div class="card-title"><div class="dot" style="background:var(--red)"></div>Lost Projects</div><div class="filter-row" id="winrateMonthFilter"></div><div class="table-wrap" id="lossTable"></div></div></div>
   <div class="section" id="sec-attainment"><div class="kpi-strip vis-section" data-vis="at-kpis" id="attainKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="at-attChart"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Attainment by Tribe</div><div class="chart-container"><canvas id="attainChart"></canvas></div></div><div class="card vis-section" data-vis="at-ytdPipe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>YTD vs Pipeline</div><div class="chart-container"><canvas id="ytdPipeChart"></canvas></div></div></div><div class="card vis-section" data-vis="at-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div></div><div class="card vis-section" data-vis="at-wonTable" id="atWonCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Projects Won</div><div class="filter-row" id="tribeWinsFilter"></div><div class="table-wrap" id="tribeWinsTable"></div></div></div>
   <!-- ENCRYPT TAB -->
@@ -414,7 +435,7 @@ async function doEncAction(){
 
 // ═══ SETTINGS CONFIG ═══
 const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-ytdPipeline':'YTD + Pipeline Chart','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-table':'Tribe Breakdown','at-wonTable':'Projects Won'};
-const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-ytdPipeline','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-table','at-wonTable']};
+const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-ytdPipeline','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-table','at-wonTable']};
 const TAB_NAMES={overview:'Overview',pipeline:'Sales Pipeline',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',encrypt:'Encrypt/Decrypt'};
 const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',currency:'PHP',usdRate:57,
   overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-ytdPipeline':true,'ov-winsTable':true},
@@ -493,6 +514,12 @@ function twpT(d,t){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'
 function hp(){return DATA_PREV.length>0;}
 function curLeadMonth(){const m=new Date().getMonth(),n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return(m+1)+' - '+n[m];}
 function extractDate(n){const m=(n||'').match(/(\d{4})(\d{2})(\d{2})/);return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
+// Lookup previous-week row by Project+Client key
+let _prevMap=null;
+function prevMap(){if(_prevMap)return _prevMap;_prevMap={};DATA_PREV.forEach(r=>{const k=(r['Project']||'')+'|||'+(r['Client']||'');_prevMap[k]=r;});return _prevMap;}
+function getPrev(r){if(!hp())return null;return prevMap()[(r['Project']||'')+'|||'+(r['Client']||'')]||null;}
+function dvRow(cur,prev){if(prev===null||cur===prev)return '';return dv(cur,prev,true);}
+function invalidatePrevMap(){_prevMap=null;}
 
 // ═══ CSV LOADING ═══
 let csvSlots={};
@@ -502,10 +529,14 @@ async function loadFileFromData(name,slot){
     if(ext==='enc'){const buf=new Uint8Array(await r.arrayBuffer());const text=await decryptBuf(buf,ENC_PW);if(!text||!verifyCSV(text))throw 'decrypt';csvSlots[slot]={name,data:Papa.parse(text,{header:true,skipEmptyLines:true}).data,date:extractDate(name)};return true;}
     else{const text=await r.text();if(!verifyCSV(text))throw 'verify';csvSlots[slot]={name,data:Papa.parse(text,{header:true,skipEmptyLines:true}).data,date:extractDate(name)};return true;}
   }catch(e){return false;}}
-function reconcile(){const slots=Object.values(csvSlots);
-  if(slots.length>=2){slots.sort((a,b)=>(b.date||0)-(a.date||0));DATA=slots[0].data;DATA_PREV=slots[1].data;}
-  else if(slots.length===1){DATA=slots[0].data;DATA_PREV=[];}
+function reconcile(){
+  // Slot 1 = current week, Slot 2 = last week (explicit, no date sorting)
+  if(csvSlots[1]&&csvSlots[2]){DATA=csvSlots[1].data;DATA_PREV=csvSlots[2].data;}
+  else if(csvSlots[1]){DATA=csvSlots[1].data;DATA_PREV=[];}
+  else if(csvSlots[2]){DATA=csvSlots[2].data;DATA_PREV=[];}
+  else{DATA=[];DATA_PREV=[];}
   DATA.forEach((r,i)=>r._i=i);
+  invalidatePrevMap();
   renderAll();}
 
 // ═══ PROJECT DETAIL MODAL & TOOLTIP ═══
@@ -516,7 +547,7 @@ function linkifyOther(v){if(!v)return '—';const lines=v.split(/\r?\n/).filter(
 function showProjModal(r,fromPipeKpi){
   const box=document.getElementById('projModalContent');
   const amt=pn(r['Amount (VAT-Ex.) (PHP)']),amtI=pn(r['Amount (VAT-Inc.)']),gp=pn(r['GP%']),ga=pn(r['GP']);
-  const remarks=(r['Quick Remarks']||'').trim(),signDate=r['Sign Date']||'',ceLink=r['Signed CE (PDF)']||'',intCE=r['Internal CE (Sheet)']||'',otherLinks=r['Other Links']||'',rfpDate=r['RFP Received Date']||'';
+  const remarks=(r['Quick Remarks']||'').trim(),signDate=r['Sign Date']||'',rawCE=r['Signed CE (PDF)']||'',ceLink=/https?:\/\//.test(rawCE)?rawCE:'',rawIntCE=r['Internal CE (Sheet)']||'',intCE=/https?:\/\//.test(rawIntCE)?rawIntCE:'',otherLinks=r['Other Links']||'',rfpDate=r['RFP Received Date']||'';
   const closeAction=fromPipeKpi?'closeProjModal(true)':'closeProjModal()';
   let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div><div>${sp(r['Status'])}</div></div><button class="am-close-btn" onclick="${closeAction}">✕</button></div>`;
   // Project Code
@@ -608,12 +639,510 @@ function showPWModal(errMsg){
 window.matchMedia('(prefers-color-scheme:light)').addEventListener('change',()=>{if(CFG.theme==='system')applyTheme();});
 applyTheme();
 
+// ═══ PDF REPORT EXPORT ═══
+async function downloadPDF(){
+  if(!DATA.length)return;
+  const ov=document.createElement('div');ov.id='pdfOverlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+  ov.innerHTML='<div style="background:#fff;padding:28px 48px;border-radius:12px;text-align:center;font-family:DM Sans,sans-serif"><div style="font-size:16px;font-weight:600;color:#111;margin-bottom:8px">Generating PDF Report...</div><div style="font-size:13px;color:#666">This may take a moment</div></div>';
+  document.body.appendChild(ov);
+  await new Promise(r=>setTimeout(r,50));
+
+  try{
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+  // Sanitize text for PDF (jsPDF helvetica only supports Latin-1 / WinAnsi)
+  const pf=s=>String(s).replace(/₱/g,'P').replace(/\$/g,'$').replace(/▲/g,' +').replace(/▼/g,' -').replace(/·/g,'.').replace(/—/g,'-').replace(/–/g,'-').replace(/[^\x00-\xFF]/g,'');
+  // Auto-sanitize doc.text
+  const _origText=doc.text.bind(doc);
+  doc.text=function(text,...args){
+    if(typeof text==='string')text=pf(text);
+    else if(Array.isArray(text))text=text.map(t=>typeof t==='string'?pf(t):t);
+    return _origText(text,...args);
+  };
+  // Global autoTable hook to sanitize all cell text
+  const _origAutoTable=doc.autoTable.bind(doc);
+  doc.autoTable=function(opts){
+    const origHook=opts.didParseCell;
+    opts.didParseCell=function(data){
+      if(data.cell&&data.cell.text){data.cell.text=data.cell.text.map(t=>pf(t));}
+      if(origHook)origHook(data);
+    };
+    return _origAutoTable(opts);
+  };
+  const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
+  const ml=14,mr=14,mt=14,mb=14,cw=pw-ml-mr;
+  let y=mt;
+  const gray='#6b7280',dark='#111827',gold='#b8860b',green='#059669',red='#DC2626';
+
+  function checkPage(need){if(y+need>ph-mb){doc.addPage();y=mt;}}
+  function addSep(){y+=2;doc.setDrawColor('#e5e7eb');doc.line(ml,y,pw-mr,y);y+=4;}
+  function stripHtml(s){return s.replace(/<[^>]*>/g,'');}
+
+  // ── HEADER ──
+  const wk=gw(),dt=new Date().toLocaleDateString('en',{month:'long',day:'numeric',year:'numeric'});
+  doc.setFontSize(22);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+  doc.text('Sales Report',ml,y+7);
+  doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(gray);
+  doc.text(`MANCOM Weekly — Week ${wk} . ${dt}`,ml,y+13);
+  doc.setFontSize(8);doc.setTextColor('#9ca3af');
+  doc.text(`${DATA.length} records . ${CURRENCY} . Rate: ${USD_RATE}`,pw-mr,y+7,{align:'right'});
+  y+=18;doc.setDrawColor('#f1c232');doc.setLineWidth(1);doc.line(ml,y,pw-mr,y);y+=10;
+
+  // ── HELPER: add Chart.js canvas as image ──
+  function addChartImage(canvasId,maxH){
+    const cv=document.getElementById(canvasId);if(!cv)return;
+    try{
+      const imgData=cv.toDataURL('image/png');
+      const ratio=cv.width/cv.height;
+      let iw=cw,ih=cw/ratio;
+      if(maxH&&ih>maxH){ih=maxH;iw=ih*ratio;}
+      if(iw>cw){iw=cw;ih=iw/ratio;}
+      checkPage(ih+4);
+      doc.addImage(imgData,'PNG',ml,y,iw,ih);
+      y+=ih+4;
+    }catch(e){}
+  }
+
+  // ── HELPER: add caption text ──
+  function addCaption(visKey){
+    if(!CAPTIONS[visKey])return;const raw=CAPTIONS[visKey]();if(!raw)return;
+    const txt=stripHtml(raw);
+    doc.setFontSize(8);doc.setFont('helvetica','italic');doc.setTextColor('#9ca3af');
+    const lines=doc.splitTextToSize(txt,cw-8);
+    const bh=lines.length*3.5+6;
+    checkPage(bh);
+    doc.setFillColor('#f9fafb');doc.setDrawColor('#e5e7eb');
+    doc.roundedRect(ml,y,cw,bh,2,2,'FD');
+    doc.text(lines,ml+4,y+4);
+    y+=bh+4;
+  }
+
+  // ── HELPER: add KPI strip ──
+  function addKPIs(data){
+    // data = [{label,value,sub}]
+    const kw=cw/data.length-2;
+    checkPage(22);
+    data.forEach((k,i)=>{
+      const x=ml+i*(kw+2);
+      doc.setFillColor('#f9fafb');doc.setDrawColor('#e5e7eb');doc.roundedRect(x,y,kw,18,2,2,'FD');
+      doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(gray);doc.text(k.label,x+4,y+5);
+      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(dark);doc.text(k.value,x+4,y+11);
+      if(k.sub){doc.setFontSize(6);doc.setFont('helvetica','normal');doc.setTextColor('#9ca3af');doc.text(k.sub,x+4,y+15);}
+    });
+    y+=22;
+  }
+
+  // ── HELPER: pipeline table ──
+  function addPipeTable(title,items,showGross){
+    if(!items.length)return;
+    const tA=items.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
+    const tG=items.reduce((s,r)=>s+pn(r['GP']),0);
+    const avgGP=tA>0?tG/tA:0;
+    checkPage(20);
+    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(dark);doc.text(title+' ('+items.length+')',ml,y+5);
+    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(gray);
+    doc.text(`${fmtF(tA)}  ·  ${avgGP>0?(avgGP*100).toFixed(1)+'%':'-'} GP  ·  ${tG>0?fmtF(tG):'-'} GP`,ml,y+10);
+    y+=13;
+    const rows=[...items].sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)'])).map(r=>[
+      r['Project']||r['Client']||'—',
+      pn(r['Amount (VAT-Ex.) (PHP)'])>0?fmtF(pn(r['Amount (VAT-Ex.) (PHP)'])):'—',
+      pn(r['GP%'])>0?(pn(r['GP%'])*100).toFixed(1)+'%':'—',
+      pn(r['GP'])>0?fmtF(pn(r['GP'])):'—'
+    ]);
+    doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Project','Amount','GP%','GP']],body:rows,
+      styles:{fontSize:7,cellPadding:2,font:'helvetica'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
+      columnStyles:{1:{halign:'right'},2:{halign:'right'},3:{halign:'right'}}});
+    y=doc.lastAutoTable.finalY+2;
+    if(showGross&&tA>0){doc.setFontSize(7);doc.setTextColor(gold);doc.text('Gross Revenue if 30% Win Rate: '+fmtF(tA*0.3),pw-mr,y,{align:'right'});y+=5;}
+    y+=3;
+  }
+
+  // ── TAB HEADING ──
+  function addTabHeading(name,first){
+    if(!first){doc.addPage();y=mt;}
+    doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(dark);doc.text(name.toUpperCase(),ml,y+5);
+    y+=7;doc.setDrawColor('#e5e7eb');doc.setLineWidth(0.5);doc.line(ml,y,pw-mr,y);y+=6;
+  }
+
+  // Temporarily show all sections and switch to light theme for chart capture
+  const _allSecs=document.querySelectorAll('.section');
+  const _origDisplay=[];
+  _allSecs.forEach(s=>{_origDisplay.push(s.style.display);s.style.display='block';});
+  const _origTheme=document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme','light');
+  Chart.defaults.color='#4B5563';Chart.defaults.borderColor='#D1D5DB';
+  // Re-render everything so Chart.js creates canvases at proper visible dimensions
+  renderAll();
+  await new Promise(r=>setTimeout(r,500));
+
+  const tabOrder=['overview','pipeline','am','bd','winrate','attainment'];
+  let firstTab=true;
+
+  for(const tab of tabOrder){
+    if(!isTabVis(tab))continue;
+    const secs=TAB_SECTIONS[tab]||[];
+    const tabName=TAB_NAMES[tab]||tab;
+    addTabHeading(tabName,firstTab);firstTab=false;
+
+    // ═══ OVERVIEW ═══
+    if(tab==='overview'){
+      if(isSecVis('ov-kpis')){
+        const d=window._ovData;if(d){
+        addKPIs([
+          {label:'Total Wins 2026',value:fmt(d.tw),sub:d.won.length+' projects · '+pct(d.tw,d.tt)+'% att.'},
+          {label:'Target',value:fmt(d.tt)},
+          {label:'CEs Submitted',value:fmt(d.ceT)},
+          {label:'Pipeline',value:fmt(d.pipT)},
+          {label:'For Submission',value:fmt(d.fsT)}
+        ]);}}
+      if(isSecVis('ov-totalSales')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('Year-to-Date (YTD) Sales',ml,y+4);y+=8;
+        // Embed the sales bar chart area as canvas image
+        const sb=document.querySelector('[data-vis="ov-totalSales"]');
+        if(sb){try{
+          // Use the totalSalesBar div which has the bar chart
+          const barEl=document.getElementById('totalSalesBar');
+          if(barEl){
+            // Capture key values
+            const d=window._ovData;if(d){
+              doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+              const ytdLabel=fmtF(d.tw)+' ('+d.ap.toFixed(2)+'%)';
+              doc.text(ytdLabel,ml,y+5);
+              doc.setFontSize(10);doc.setFont('helvetica','normal');doc.setTextColor(gray);
+              doc.text('of '+fmt(d.tt)+' target  ('+fmtF(d.tt-d.tw)+' to go)',pw-mr,y+5,{align:'right'});
+              y+=9;
+              // Draw bar
+              const barW=cw*(Math.min(d.ap,100)/100);
+              doc.setFillColor('#f3f4f6');doc.roundedRect(ml,y,cw,6,1,1,'F');
+              doc.setFillColor('#f1c232');doc.roundedRect(ml,y,barW,6,1,1,'F');
+              y+=10;
+            }
+          }
+        }catch(e){}}
+        addCaption('ov-totalSales');
+      }
+      if(isSecVis('ov-tribeAtt')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('Sales Attainment by Tribe',ml,y+4);y+=8;
+        const d=window._ovData;if(d){
+          for(const[tribe,target]of Object.entries(TRIBE_TARGETS)){
+            const w=d.tws[tribe]||0,att=(w/target*100),name=tribe.replace('PDEI - ','');
+            const col=att>=80?green:att>=40?'#D97706':red;
+            checkPage(12);
+            doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(dark);doc.text(name,ml,y+4);
+            doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(gold);doc.text(fmtF(w),ml+35,y+4);
+            doc.setTextColor(col);doc.text(att.toFixed(1)+'%',pw-mr,y+4,{align:'right'});
+            y+=6;
+            const barW=cw*(Math.min(w/target,1));const targetPos=cw;
+            doc.setFillColor('#f3f4f6');doc.roundedRect(ml,y,cw,4,1,1,'F');
+            doc.setFillColor('#f1c232');doc.roundedRect(ml,y,Math.max(barW,0),4,1,1,'F');
+            y+=7;
+          }
+        }
+        addCaption('ov-tribeAtt');
+      }
+      if(isSecVis('ov-ytdPipeline')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('YTD + Pipeline by Tribe',ml,y+4);y+=8;
+        addChartImage('tribeChart',60);
+        addCaption('ov-ytdPipeline');
+      }
+      if(isSecVis('ov-winsTable')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('All Wins — 2026',ml,y+4);y+=6;
+        const d=window._ovData;if(d){
+          const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const parseSD=r=>{const s=r['Sign Date']||'';const d2=new Date(s);return isNaN(d2)?new Date(0):d2;};
+          const wonSorted=[...d.won].sort((a,b)=>{const ia=mo.indexOf(dm(a)),ib=mo.indexOf(dm(b));if(ia!==ib)return ia-ib;return parseSD(a)-parseSD(b);});
+          // New wins = won this week (matches dashboard gold highlighting)
+          const curWk=String(d.cw);
+          const isNewWin=r=>r['Week Number']==curWk;
+          const rows=wonSorted.map(r=>{const nw=isNewWin(r);return[dm(r),(nw?'(NEW) ':'')+(r['Project']||'—'),r['Client']||'—',(r['Tribe']||'').replace('PDEI - ',''),r['Status']||'—',fmtF(pn(r['Amount (VAT-Ex.) (PHP)'])),pn(r['GP'])>0?fmtF(pn(r['GP'])):'—'];});
+          const newWinFlags=wonSorted.map(r=>isNewWin(r));
+          doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Month','Project','Client','Tribe','Status','Amount','GP']],body:rows,
+            styles:{fontSize:6,cellPadding:1.5,font:'helvetica',overflow:'linebreak'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
+            columnStyles:{5:{halign:'right'},6:{halign:'right'}},
+            didParseCell:function(data){
+              if(data.section==='body'&&newWinFlags[data.row.index]){data.cell.styles.fillColor='#fef3c7';data.cell.styles.textColor='#92400e';data.cell.styles.fontStyle='bold';}}});
+          y=doc.lastAutoTable.finalY+3;
+        }
+        addCaption('ov-winsTable');
+      }
+    }
+
+    // ═══ PIPELINE ═══
+    if(tab==='pipeline'){
+      if(isSecVis('pl-kpis')){
+        const pd=window._pipeData;if(pd){
+          const cwk=gw();
+          addKPIs([
+            {label:'Recent Wins',value:fmt(pd.rw.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0)),sub:pd.rw.length+' · Wk '+cwk},
+            {label:'Last Week',value:fmt(pd.lw.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0)),sub:pd.lw.length+''},
+            {label:'CEs Submitted',value:fmt(pd.ce.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0)),sub:pd.ce.length+''},
+            {label:'For Submission',value:fmt(pd.fs.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0)),sub:pd.fs.length+''},
+            {label:'New RFPs',value:fmt(pd.rfps.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0)),sub:pd.rfps.length+''}
+          ]);
+          addPipeTable('Recent Wins',pd.rw,false);
+          addPipeTable('Last Week Wins',pd.lw,false);
+          addPipeTable('CEs Submitted',pd.ce,true);
+          addPipeTable('For Submission',pd.fs,true);
+          addPipeTable('New RFPs',pd.rfps,true);
+        }
+      }
+    }
+
+    // ═══ AM PERFORMANCE ═══
+    if(tab==='am'){
+      if(isSecVis('am-chart')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('Account Manager Weighted Performance',ml,y+4);y+=8;
+        const d=window._amDataAll;if(d){
+          // Global max scale across all AMs for consistent bar sizing
+          const globalMax=d.ao.reduce((mx,am)=>{const dd=d.ad[am];if(!dd)return mx;const total=dd.p+dd.a+dd.c+dd.d;const tg=AM_TARGETS[am]||0;return Math.max(mx,total,tg);},0)*1.1||1;
+          d.ao.forEach(am=>{
+            const dd=d.ad[am];if(!dd)return;const nk=AM_NICKS[am]||am;const total=dd.p+dd.a+dd.c+dd.d;const tg=AM_TARGETS[am]||0;
+            checkPage(14);
+            doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(dark);doc.text(nk,ml,y+4);
+            doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(gray);doc.text(fmt(total)+(tg>0?' / '+fmt(tg):''),ml+25,y+4);
+            y+=6;
+            // Stacked bar using global scale
+            doc.setFillColor('#f3f4f6');doc.roundedRect(ml,y,cw,4,1,1,'F');
+            let bx=ml;
+            [[dd.d,'#cc0000'],[dd.c,'#ffd966'],[dd.a,'#f0c132'],[dd.p,'#3c78d8']].forEach(([v,c])=>{
+              if(v>0){const bw=cw*(v/globalMax);doc.setFillColor(c);doc.rect(bx,y,bw,4,'F');bx+=bw;}
+            });
+            if(tg>0){const tx=ml+cw*(tg/globalMax);doc.setDrawColor(red);doc.setLineWidth(0.5);doc.line(tx,y-1,tx,y+5);doc.setLineWidth(0.2);}
+            y+=8;
+          });
+        }
+        addCaption('am-chart');
+      }
+    }
+
+    // ═══ BD PERFORMANCE ═══
+    if(tab==='bd'){
+      if(isSecVis('bd-charts')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('BD Leads Attainment',ml,y+4);y+=8;
+        // Bar chart on left (~70%), donut on right (~30%)
+        const barCv=document.getElementById('bdAttainChart');
+        const donutCv=document.getElementById('bdDonutChart');
+        const barW=cw*0.68,donutW=cw*0.28;
+        if(barCv){try{
+          const imgData=barCv.toDataURL('image/png');
+          const ratio=barCv.width/barCv.height;
+          let ih=barW/ratio;if(ih>70){ih=70;}
+          const iw=ih*ratio>barW?barW:ih*ratio;
+          checkPage(ih+4);
+          const barStartY=y;
+          doc.addImage(imgData,'PNG',ml,y,iw,ih);
+          // Donut beside bar
+          if(donutCv){try{
+            const dImg=donutCv.toDataURL('image/png');
+            const dSize=Math.min(donutW,ih);
+            const dx=pw-mr-dSize,dy=barStartY+(ih-dSize)/2;
+            doc.addImage(dImg,'PNG',dx,dy,dSize,dSize);
+          }catch(e){}}
+          y+=ih+4;
+        }catch(e){}}
+        addCaption('bd-charts');
+      }
+      if(isSecVis('bd-wins')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('BD Wins — 2026',ml,y+4);y+=6;
+        const bwd=window._bdWinsData;if(bwd){
+          const y2026=DATA.filter(r=>r['Year']==='2026'),won=y2026.filter(r=>WS.includes(r['Status'])&&(r['BD']||'').trim());
+          const rows=won.sort((a,b)=>{const da=a['Sign Date']||'',db=b['Sign Date']||'';if(da&&db)return da.localeCompare(db);if(da)return 1;if(db)return -1;return 0;}).map(r=>{
+            const bds=(r['BD']||'').split(/[,;]/).map(s=>s.trim()).filter(Boolean).map(b=>BD_NICKS[b]||b.split(' ').slice(0,2).join(' ')).join(', ');
+            return[dm(r),bds,r['Project']||'—',r['Client']||'—',(r['Tribe']||'').replace('PDEI - ',''),fmtF(pn(r['Amount (VAT-Ex.) (PHP)']))];
+          });
+          doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Month','BD','Project','Client','Tribe','Amount']],body:rows,
+            styles:{fontSize:6,cellPadding:1.5,font:'helvetica'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
+            columnStyles:{5:{halign:'right'}}});
+          y=doc.lastAutoTable.finalY+3;
+        }
+        addCaption('bd-wins');
+      }
+    }
+
+    // ═══ WIN RATE ═══
+    if(tab==='winrate'){
+      if(isSecVis('wr-kpis')){
+        const d=window._wrData;if(d){
+          addKPIs([
+            {label:'Win Rate',value:d.wr.toFixed(1)+'%',sub:d.tW+'W / '+d.tL+'L'},
+            {label:'Value Win Rate',value:d.vwr.toFixed(1)+'%',sub:fmt(d.twv)+' of '+fmt(d.twv+d.tlv)},
+            {label:'Won',value:String(d.tW),sub:fmt(d.twv)},
+            {label:'Lost',value:String(d.tL),sub:fmt(d.tlv)}
+          ]);
+        }
+      }
+      if(isSecVis('wr-count')){addChartImage('winLossCountChart',55);addCaption('wr-count');}
+      if(isSecVis('wr-value')){addChartImage('winLossValueChart',55);addCaption('wr-value');}
+      if(isSecVis('wr-trend')){addChartImage('winRateTrendChart',50);addCaption('wr-trend');}
+      if(isSecVis('wr-tribe')){addChartImage('winRateTribeChart',50);addCaption('wr-tribe');}
+      if(isSecVis('wr-table')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('Lost Projects',ml,y+4);y+=6;
+        const d=window._wrData;if(d){
+          const rows=d.losses.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)'])).map(r=>[
+            r['Project']||'—',r['Client']||'—',(r['BD']||'—').split(',')[0].split(' ').slice(0,2).join(' '),
+            (r['Tribe']||'').replace('PDEI - ',''),dm(r),pn(r['Amount (VAT-Ex.) (PHP)'])>0?fmt(pn(r['Amount (VAT-Ex.) (PHP)'])):'—']);
+          doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Project','Client','BD','Tribe','Month','Amount']],body:rows,
+            styles:{fontSize:6,cellPadding:1.5,font:'helvetica'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
+            columnStyles:{5:{halign:'right'}}});
+          y=doc.lastAutoTable.finalY+3;
+        }
+        addCaption('wr-table');
+      }
+    }
+
+    // ═══ ATTAINMENT ═══
+    if(tab==='attainment'){
+      if(isSecVis('at-kpis')){
+        const d=window._atData;if(d){
+          addKPIs([
+            {label:'Total Won',value:fmt(d.totalW),sub:pct(d.totalW,d.totalT)+'% of target'},
+            {label:'Target',value:fmt(d.totalT)},
+            {label:'Pipeline',value:fmt(d.totalP)},
+            {label:'Gap',value:fmt(d.totalT-d.totalW)}
+          ]);
+        }
+      }
+      if(isSecVis('at-attChart')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('Attainment by Tribe',ml,y+4);y+=8;
+        addChartImage('attainChart',60);addCaption('at-attChart');
+      }
+      if(isSecVis('at-ytdPipe')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('YTD vs Pipeline',ml,y+4);y+=8;
+        addChartImage('ytdPipeChart',60);addCaption('at-ytdPipe');
+      }
+      if(isSecVis('at-table')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('2026 YTD Breakdown',ml,y+4);y+=6;
+        const d=window._atData;if(d){
+          const rows=Object.entries(TRIBE_TARGETS).map(([t,target])=>{const w=d.tw[t]||0,p=d.tp[t]||0;return[t.replace('PDEI - ',''),fmtF(target),fmtF(w),fmtF(p),fmtF(target-w),(w/target*100).toFixed(1)+'%'];});
+          doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Tribe','Target','Wins','Pipeline','Gap','Att.']],body:rows,
+            styles:{fontSize:7,cellPadding:2,font:'helvetica'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
+            columnStyles:{1:{halign:'right'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'}}});
+          y=doc.lastAutoTable.finalY+3;
+        }
+        addCaption('at-table');
+      }
+      if(isSecVis('at-wonTable')){
+        doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
+        checkPage(10);doc.text('Projects Won',ml,y+4);y+=6;
+        const yd=DATA.filter(r=>r['Year']==='2026'),wp=yd.filter(r=>WS.includes(r['Status']));
+        const rows=wp.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)'])).map(r=>{
+          const an=(r['AM']||'').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));
+          return[r['Project']||'—',r['Client']||'—',(r['Tribe']||'').replace('PDEI - ',''),r['Status']||'—',sn?sn[1]:an.split(' ').slice(0,2).join(' '),fmtF(pn(r['Amount (VAT-Ex.) (PHP)']))];});
+        doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Project','Client','Tribe','Status','AM','Amount']],body:rows,
+          styles:{fontSize:6,cellPadding:1.5,font:'helvetica'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
+          columnStyles:{5:{halign:'right'}}});
+        y=doc.lastAutoTable.finalY+3;
+        addCaption('at-wonTable');
+      }
+    }
+  }
+
+  // Restore section visibility and theme
+  _allSecs.forEach((s,i)=>{s.style.display=_origDisplay[i];});
+  document.documentElement.setAttribute('data-theme',_origTheme);
+  applyTheme();
+  renderAll();
+
+  // Save PDF
+  doc.save('INT_Revenue_Report_Week'+wk+'.pdf');
+  }catch(e){console.error('PDF generation error:',e);
+    // Restore even on error
+    try{_allSecs.forEach((s,i)=>{s.style.display=_origDisplay[i];});document.documentElement.setAttribute('data-theme',_origTheme);applyTheme();renderAll();}catch(e3){}
+  }
+  finally{ov.remove();}
+}
+
 function setCurrency(c){CURRENCY=c;CFG.currency=c;document.getElementById('btnPHP').classList.toggle('active',c==='PHP');document.getElementById('btnUSD').classList.toggle('active',c==='USD');if(DATA.length)renderAll();}
 document.getElementById('usdRateInput').addEventListener('change',function(){const v=parseFloat(this.value);if(v>0){USD_RATE=v;CFG.usdRate=v;rebuildTargets();if(DATA.length)renderAll();}});
 document.getElementById('usdRateInput').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
 function switchTab(name){const tab=document.querySelector(`.nav-tab[data-tab="${name}"]`);if(tab)tab.click();}
 document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');});});
-function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();}
+// ═══ VERBAL CAPTION SYSTEM ═══
+function toggleCaption(visKey){const card=document.querySelector(`[data-vis="${visKey}"]`);if(!card)return;const t=card.querySelector('.caption-toggle'),c=card.querySelector('.card-caption');if(!t||!c)return;const o=c.classList.toggle('open');t.classList.toggle('open',o);}
+function injectCaptions(){for(const[k,fn]of Object.entries(CAPTIONS)){const card=document.querySelector(`[data-vis="${k}"].card`);if(!card)continue;let cap=card.querySelector('.card-caption');const wasOpen=cap?.classList.contains('open');if(cap)cap.remove();const oldT=card.querySelector('.caption-toggle');if(oldT)oldT.remove();const html=fn();if(!html)continue;const tri=document.createElement('div');tri.className='caption-toggle'+(wasOpen?' open':'');tri.setAttribute('aria-label','Toggle verbal report');tri.innerHTML='&#9660;';tri.onclick=function(e){e.stopPropagation();toggleCaption(k);};card.appendChild(tri);const ce=document.createElement('div');ce.className='card-caption'+(wasOpen?' open':'');ce.setAttribute('role','region');ce.setAttribute('aria-label','Verbal report for this chart');ce.innerHTML=`<div class="card-caption-inner">${html}</div>`;card.appendChild(ce);}}
+const CAPTIONS={
+'ov-totalSales':function(){const d=window._ovData;if(!d)return'';const{tw,tt,ap,pw,won,ceT,fsT,pipT,tws,cw}=d;const gap=tt-tw;const hasPrev=hp();
+  const qIdx=Q_TARGETS_USD.findIndex(q=>q.amount*USD_RATE<=tw);const curQi=qIdx>=0?qIdx:0;const nextQi=Math.min(curQi+1,3);const curQ=Q_TARGETS_USD[curQi];const nextQ=Q_TARGETS_USD[nextQi];
+  const nextQTarget=nextQ.amount*USD_RATE;const curQTarget=curQ.amount*USD_RATE;
+  let t=`As of Week ${cw}, <strong>YTD sales stand at ${fmtF(tw)}</strong>, reaching <strong>${ap.toFixed(1)}% of the ${fmt(tt)} full-year target</strong>. `;
+  if(hasPrev&&pw!==null){const delta=tw-pw;if(delta>0)t+=`This is an increase of <strong>${fmtF(delta)}</strong> from last week's ${fmtF(pw)}. `;else if(delta<0)t+=`This reflects a decrease of <strong>${fmtF(Math.abs(delta))}</strong> from last week. `;else t+=`Sales remain unchanged from last week. `;}
+  if(ap>=100)t+=`We have <strong>exceeded</strong> the annual target by ${fmtF(tw-tt)}. `;else t+=`The remaining gap to target is <strong>${fmtF(gap)}</strong>. `;
+  if(tw>=nextQTarget)t+=`The <strong>${nextQ.label} cumulative target</strong> (${fmtF(nextQTarget)}) has been <strong>exceeded</strong> by ${fmtF(tw-nextQTarget)}. `;
+  else t+=`To meet the <strong>${nextQ.label} target</strong> of ${fmtF(nextQTarget)}, we need <strong>${fmtF(nextQTarget-tw)}</strong> in additional wins. `;
+  if(ap<100){const pipCov=gap>0?(pipT/gap*100):0;if(pipCov>=300)t+=`Pipeline coverage is healthy at <strong>${pipCov.toFixed(0)}%</strong> of the remaining gap (${fmt(pipT)} pipeline). `;else if(pipCov>=100)t+=`Current pipeline of <strong>${fmt(pipT)}</strong> covers the gap, but at 30% win rate, additional pipeline generation is recommended. `;else t+=`Current pipeline of <strong>${fmt(pipT)}</strong> covers only <strong>${pipCov.toFixed(0)}%</strong> of the gap — aggressive pipeline generation is needed. `;}
+  const topTribe=Object.entries(tws).sort((a,b)=>b[1]-a[1])[0];if(topTribe)t+=`<strong>${topTribe[0].replace('PDEI - ','')}</strong> leads with ${fmtF(topTribe[1])}. `;
+  t+=`Total wins: <strong>${won.length} projects</strong>.`;return t;},
+'ov-tribeAtt':function(){const d=window._ovData;if(!d)return'';const{tws,tt}=d;const tribes=Object.entries(TRIBE_TARGETS);let t='';
+  tribes.forEach(([tribe,target])=>{const w=tws[tribe]||0;const att=(w/target*100);const name=tribe.replace('PDEI - ','');
+  if(att>=100)t+=`<strong>${name}</strong> has exceeded its target at ${att.toFixed(1)}% (${fmtF(w)} of ${fmtF(target)}). `;
+  else if(att>=80)t+=`<strong>${name}</strong> is near target at ${att.toFixed(1)}% (${fmtF(w)} of ${fmtF(target)}, gap: ${fmtF(target-w)}). `;
+  else if(att>=40)t+=`<strong>${name}</strong> is at ${att.toFixed(1)}% attainment (${fmtF(w)} of ${fmtF(target)}, gap: ${fmtF(target-w)}). `;
+  else t+=`<strong>${name}</strong> needs attention at ${att.toFixed(1)}% (${fmtF(w)}, gap: ${fmtF(target-w)}). `;});return t;},
+'ov-ytdPipeline':function(){const d=window._ovData;if(!d)return'';const{tws,tpip}=d;const tribes=Object.keys(TRIBE_TARGETS);let t='This chart combines won revenue and active pipeline per tribe. ';
+  tribes.forEach(tribe=>{const name=tribe.replace('PDEI - ',''),w=tws[tribe]||0,p=tpip[tribe]||0;
+  t+=`<strong>${name}</strong>: ${fmt(w)} won + ${fmt(p)} pipeline. `;});return t;},
+'ov-winsTable':function(){const d=window._ovData;if(!d)return'';const{won,tw,cw}=d;const newThisWeek=won.filter(r=>r['Week Number']==String(cw));
+  let t=`<strong>${won.length} projects won</strong> in 2026 totaling <strong>${fmtF(tw)}</strong>. `;
+  if(newThisWeek.length>0)t+=`<strong>${newThisWeek.length} new win${newThisWeek.length>1?'s':''}</strong> added this week (highlighted in gold). `;
+  const byMonth={};won.forEach(r=>{const m=dm(r);byMonth[m]=(byMonth[m]||0)+1;});const months=Object.entries(byMonth);
+  if(months.length>0){t+='Monthly breakdown: ';t+=months.map(([m,c])=>`${m} (${c})`).join(', ')+'. ';}return t;},
+'am-chart':function(){const d=window._amDataAll;if(!d)return'';const{ad,ao}=d;let t='AM performance by weighted pipeline phase: ';
+  ao.forEach(am=>{const nick=AM_NICKS[am]||am;const dd=ad[am];if(!dd)return;const total=dd.p+dd.a+dd.c+dd.d;const target=AM_TARGETS[am]||0;
+  t+=`<strong>${nick}</strong>: ${fmt(total)} total`;if(target>0)t+=` (${(total/target*100).toFixed(1)}% of ${fmt(target)} target)`;t+=` — Pitch: ${fmt(dd.p)}, Awarded: ${fmt(dd.a)}, Collection: ${fmt(dd.c)}, Actual: ${fmt(dd.d)}. `;});return t;},
+'bd-charts':function(){const d=window._bdData;if(!d)return'';const{totalLeads,totalGoal,month,activeBDs}=d;const att=(totalGoal>0?(totalLeads/totalGoal*100):0);
+  let t=`For ${month==='all'?'all months':month}, <strong>${totalLeads} leads</strong> have been generated against a goal of <strong>${totalGoal}</strong> (${att.toFixed(1)}% attainment). `;
+  if(activeBDs&&activeBDs.length>0){t+=`Active BDs: ${activeBDs.length}. `;
+  if(att>=100)t+='The team has met or exceeded its BD lead generation goal. ';
+  else if(att>=70)t+='The team is on track to meet the lead generation target. ';
+  else t+='Additional lead generation effort is needed to meet targets. ';}return t;},
+'bd-wins':function(){const d=window._bdWinsData;if(!d)return'';const{sortedBDs,totalWon,totalAmt}=d;
+  let t=`<strong>${totalWon} projects</strong> won in 2026 with BD involvement, totaling <strong>${fmtF(totalAmt)}</strong>. `;
+  if(sortedBDs.length>0){t+='BD contribution: ';t+=sortedBDs.map(([bd,info])=>{const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');return`<strong>${nick}</strong> ${info.count} win${info.count>1?'s':''} (${fmtF(info.amt)})`;}).join(', ')+'. ';}return t;},
+'wr-count':function(){const d=window._wrData;if(!d)return'';const{tW,tL,wr,am,wm,lm}=d;
+  let t=`Year-to-date win/loss count: <strong>${tW} wins vs ${tL} losses</strong>, for an overall win rate of <strong>${wr.toFixed(1)}%</strong>. `;
+  if(am.length>0){const best=am.reduce((a,m)=>{const w=(wm[m]||{}).c||0,l=(lm[m]||{}).c||0;const r=(w+l)>0?w/(w+l)*100:0;return r>a.r?{m,r,w,l}:a;},{m:'',r:0,w:0,l:0});
+  if(best.m)t+=`Strongest month: <strong>${best.m}</strong> (${best.w}W/${best.l}L, ${best.r.toFixed(0)}% rate). `;}return t;},
+'wr-value':function(){const d=window._wrData;if(!d)return'';const{twv,tlv,vwr}=d;
+  return`By value, <strong>${fmtF(twv)}</strong> won vs <strong>${fmtF(tlv)}</strong> lost, yielding a value win rate of <strong>${vwr.toFixed(1)}%</strong>. ${vwr>50?'We are winning higher-value deals on average.':'Lost deals tend to be higher in value — focus on converting larger opportunities.'} `;},
+'wr-trend':function(){const d=window._wrData;if(!d)return'';const{am,wm,lm}=d;if(am.length<2)return'Insufficient data for trend analysis.';
+  const rates=am.map(m=>{const w=(wm[m]||{}).c||0,l=(lm[m]||{}).c||0;return(w+l)>0?w/(w+l)*100:null;}).filter(r=>r!==null);
+  const latest=rates[rates.length-1],prev=rates[rates.length-2];
+  let t=`Win rate trend across ${am.length} months. Latest month: <strong>${latest.toFixed(1)}%</strong>. `;
+  if(prev!==undefined){if(latest>prev)t+=`Trending <strong>upward</strong> from ${prev.toFixed(1)}%. `;else if(latest<prev)t+=`Trending <strong>downward</strong> from ${prev.toFixed(1)}%. `;else t+='Stable compared to previous month. ';}
+  const avg=rates.reduce((a,b)=>a+b,0)/rates.length;t+=`Average: ${avg.toFixed(1)}%.`;return t;},
+'wr-tribe':function(){const d=window._wrData;if(!d)return'';const{wins,losses}=d;
+  const twc={},tlc={};wins.forEach(r=>{twc[r['Tribe']||'?']=(twc[r['Tribe']||'?']||0)+1;});losses.forEach(r=>{tlc[r['Tribe']||'?']=(tlc[r['Tribe']||'?']||0)+1;});
+  let t='Win rate by tribe: ';Object.keys(TRIBE_TARGETS).forEach(tribe=>{const name=tribe.replace('PDEI - ',''),w=twc[tribe]||0,l=tlc[tribe]||0;if(w+l===0)return;const r=w/(w+l)*100;
+  t+=`<strong>${name}</strong>: ${r.toFixed(0)}% (${w}W/${l}L). `;});return t;},
+'wr-table':function(){const d=window._wrData;if(!d)return'';const{tL,tlv}=d;return`<strong>${tL} lost projects</strong> totaling ${fmtF(tlv)}. Review these for common patterns and learnings.`;},
+'at-attChart':function(){const d=window._atData;if(!d)return'';const{tw,totalW,totalT}=d;const att=(totalW/totalT*100);
+  let t=`Overall attainment: <strong>${att.toFixed(1)}%</strong> (${fmtF(totalW)} of ${fmtF(totalT)}). `;
+  Object.entries(TRIBE_TARGETS).forEach(([tribe,target])=>{const w=tw[tribe]||0;const a=(w/target*100);const name=tribe.replace('PDEI - ','');
+  t+=`<strong>${name}</strong>: ${a.toFixed(1)}% (${fmtF(w)}/${fmtF(target)}). `;});return t;},
+'at-ytdPipe':function(){const d=window._atData;if(!d)return'';const{tw,tp,totalW,totalT,totalP}=d;const gap=totalT-totalW;
+  let t=`YTD wins: <strong>${fmtF(totalW)}</strong>, Pipeline: <strong>${fmtF(totalP)}</strong>. `;
+  if(gap>0){const cov=(totalP/gap*100);t+=`Pipeline covers <strong>${cov.toFixed(0)}%</strong> of the ${fmtF(gap)} gap. `;
+  if(cov>=300)t+='Pipeline depth is strong. ';else if(cov>=100)t+='Pipeline covers the gap but at 30% win rate may be insufficient. ';else t+='Pipeline needs significant growth to close the gap. ';}
+  else t+='Target has been met! ';return t;},
+'at-table':function(){const d=window._atData;if(!d)return'';const{tw,tp,totalW,totalT,totalP}=d;
+  let t='Tribe breakdown summary: ';Object.entries(TRIBE_TARGETS).forEach(([tribe,target])=>{const name=tribe.replace('PDEI - ',''),w=tw[tribe]||0,p=tp[tribe]||0,gap=target-w;
+  t+=`<strong>${name}</strong> — Won: ${fmtF(w)}, Pipeline: ${fmtF(p)}, Gap: ${fmtF(gap)}. `;});return t;},
+'at-wonTable':function(){const d=window._atData;if(!d)return'';const{totalW}=d;const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(r=>WS.includes(r['Status']));return`<strong>${wp.length} won projects</strong> totaling ${fmtF(totalW)}. Filter by tribe to drill into specific team results.`;}
+};
+
+function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();injectCaptions();}
 
 // ═══ 1. OVERVIEW ═══
 let _activeQ=-1;
@@ -642,7 +1171,7 @@ function toggleQDetail(i){
   inner.innerHTML=`
     <div class="q-detail-cell"><div class="q-detail-cell-label">${q.label} Target</div><div class="q-detail-cell-value" style="color:${colors[i]}">${fmtF(qTarget)}</div></div>
     <div class="q-detail-cell"><div class="q-detail-cell-label">YTD Sales</div><div class="q-detail-cell-value" style="color:var(--text)">${fmtF(ytd)} <span style="font-size:11px;font-weight:600;color:var(--text-muted)">(${pctOfQ.toFixed(1)}%)</span></div></div>
-    <div class="q-detail-cell"><div class="q-detail-cell-label">${exceeded?'Exceeded By':'Gap'}</div><div class="q-detail-cell-value" style="color:${exceeded?'var(--green)':'var(--red)'}">${fmtF(Math.abs(gap))}</div></div>${exceeded?'':`
+    <div class="q-detail-cell"><div class="q-detail-cell-label">${exceeded?'Exceeded By':'YTD Gap'}</div><div class="q-detail-cell-value" style="color:${exceeded?'var(--green)':'var(--red)'}">${fmtF(Math.abs(gap))}</div></div>${exceeded?'':`
     <div class="q-detail-cell"><div class="q-detail-cell-label">Pipeline Required</div><div class="q-detail-cell-value" style="color:${colors[i]};font-size:11px;line-height:1.6">${fmtF(qtrPipReq)}<span style="display:block;font-size:10px;color:var(--text-muted);font-weight:500">(${q.label} target ÷ 30%)</span></div><div style="margin:2px 0;border-top:1px solid var(--border);width:80%"></div><div class="q-detail-cell-value" style="color:var(--text);font-size:11px;line-height:1.6">${fmtF(pipTotal)}<span style="display:block;font-size:10px;color:var(--text-muted);font-weight:500">current pipeline</span></div></div>`}`;
   el.classList.add('open');
 }
@@ -655,10 +1184,10 @@ function renderOverview(cw){
   const pw=hp()?twp(DATA_PREV):null,pce=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&r['Status']==='CE/Pitch Submitted').reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
   const pfs=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&r['Status']==='For CE/Pitch Creation').reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
   const pp=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&ps.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
-  document.getElementById('kpiStrip').innerHTML=`<div class="kpi green clickable anim-fade" style="animation-delay:0s" onclick="document.getElementById('ovWinsCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Wins 2026</div><div class="kpi-value">${fmt(tw)} ${dv(tw,pw)}</div><div class="kpi-sub">${won.length} projects · ${pct(tw,tt)}% att.</div></div><div class="kpi blue clickable anim-fade" style="animation-delay:.05s" onclick="switchTab('attainment')"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(tt)}</div></div><div class="kpi amber clickable anim-fade" style="animation-delay:.1s" onclick="switchTab('pipeline')"><div class="kpi-label">CEs Submitted</div><div class="kpi-value">${fmt(ceT)} ${dv(ceT,pce)}</div><div class="kpi-sub">${ce.length} projects</div></div><div class="kpi purple clickable anim-fade" style="animation-delay:.15s" onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(pipT)} ${dv(pipT,pp)}</div><div class="kpi-sub">${pip.length} active</div></div><div class="kpi cyan clickable anim-fade" style="animation-delay:.2s" onclick="switchTab('pipeline')"><div class="kpi-label">For Submission</div><div class="kpi-value">${fmt(fsT)} ${dv(fsT,pfs)}</div><div class="kpi-sub">${fs.length} in prep</div></div>`;
+  document.getElementById('kpiStrip').innerHTML=`<div class="kpi green clickable anim-fade" style="animation-delay:0s" aria-label="Total Wins 2026: ${fmt(tw)}, ${won.length} projects, ${pct(tw,tt)}% attainment" onclick="document.getElementById('ovWinsCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Wins 2026</div><div class="kpi-value">${fmt(tw)} ${dv(tw,pw)}</div><div class="kpi-sub">${won.length} projects · ${pct(tw,tt)}% att.</div></div><div class="kpi blue clickable anim-fade" style="animation-delay:.05s" aria-label="Target: ${fmt(tt)}" onclick="switchTab('attainment')"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(tt)}</div></div><div class="kpi amber clickable anim-fade" style="animation-delay:.1s" aria-label="CEs Submitted: ${fmt(ceT)}, ${ce.length} projects" onclick="switchTab('pipeline')"><div class="kpi-label">CEs Submitted</div><div class="kpi-value">${fmt(ceT)} ${dv(ceT,pce)}</div><div class="kpi-sub">${ce.length} projects</div></div><div class="kpi purple clickable anim-fade" style="animation-delay:.15s" aria-label="Pipeline: ${fmt(pipT)}, ${pip.length} active" onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(pipT)} ${dv(pipT,pp)}</div><div class="kpi-sub">${pip.length} active</div></div><div class="kpi cyan clickable anim-fade" style="animation-delay:.2s" aria-label="For Submission: ${fmt(fsT)}, ${fs.length} in prep" onclick="switchTab('pipeline')"><div class="kpi-label">For Submission</div><div class="kpi-value">${fmt(fsT)} ${dv(fsT,pfs)}</div><div class="kpi-sub">${fs.length} in prep</div></div>`;
   const ap=tw/tt*100,ppct=pw!==null?(pw/tt*100):null;
-  const barPctVal=Math.min(ap,100);const valFitsInBar=barPctVal>25;
-  document.getElementById('totalSalesBar').innerHTML=`${hp()?`<p style="font-size:11px;font-style:italic;color:var(--text-muted);margin:0 0 10px">Previous week: ${fmtF(pw)}</p>`:''}<div class="sales-bar-wrap"><div style="display:flex;justify-content:flex-end;margin-bottom:6px"><div class="sales-bar-target">${fmt(tt)}</div></div><div class="sales-bar-track"><div class="sales-bar-fill" style="width:${barPctVal}%"></div><div class="sales-bar-slider ${valFitsInBar?'val-inside':''}" style="width:${barPctVal}%"><span class="sales-val-in">${fmtF(tw)}</span><div class="sales-bar-edge"><span class="sales-val-out">${fmtF(tw)}</span><span style="font-size:14px;font-weight:700;color:var(--text)">${ap.toFixed(2)}% ${hp()?dv(tw,pw):''}</span></div></div><div id="qOverlay" class="q-overlay"></div>${hp()?`<div class="sales-bar-lw-marker" style="left:${Math.min(ppct,100)}%" data-label="Last Week"></div>`:''}</div><div class="sales-bar-axis"><span>${cs()}0</span><span>${fmt(tt*.25)}</span><span>${fmt(tt*.5)}</span><span>${fmt(tt*.75)}</span><span>${fmt(tt)}</span></div></div><div class="q-quarters">${(()=>{const colors=['#3b82f6','#22c55e','#f59e0b','#f1c232'];let prev=0;return Q_TARGETS_USD.map((q,i)=>{const w=q.pct-prev;prev=q.pct;return`<div class="q-item" style="width:${w}%" onclick="toggleQDetail(${i})"><div class="q-split"><div class="q-seg" style="width:100%;background:${colors[i]}" data-qi="${i}"></div></div><div class="q-lbl">${q.label}<br>${q.pct}%</div></div>`;}).join('');})()}</div><div id="qDetail" class="q-detail"><div class="q-detail-inner" id="qDetailInner"></div></div>`;
+  const barPctVal=Math.min(ap,100);const valFitsInBar=barPctVal>18;
+  document.getElementById('totalSalesBar').innerHTML=`${hp()?`<p style="font-size:11px;font-style:italic;color:var(--text-muted);margin:0 0 10px">Previous week: ${fmtF(pw)}</p>`:''}<div class="sales-bar-wrap"><div style="display:flex;justify-content:flex-end;align-items:baseline;gap:10px;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:var(--text-muted)">(${fmtF(tt-tw)} to go)</span><div class="sales-bar-target">${fmt(tt)}</div></div><div class="sales-bar-track"><div class="sales-bar-fill" style="width:${barPctVal}%"></div><div class="sales-bar-slider ${valFitsInBar?'val-inside':''}" style="width:${barPctVal}%"><span class="sales-val-in">${fmtF(tw)}</span><div class="sales-bar-edge"><span class="sales-val-out">${fmtF(tw)}</span><span style="font-size:14px;font-weight:300;color:var(--text)">${ap.toFixed(2)}% ${hp()?dv(tw,pw):''}</span></div></div><div id="qOverlay" class="q-overlay"></div>${hp()?`<div class="sales-bar-lw-marker" style="left:${Math.min(ppct,100)}%" data-label="Last Week"></div>`:''}</div><div class="sales-bar-axis"><span>${cs()}0</span><span>${fmt(tt*.25)}</span><span>${fmt(tt*.5)}</span><span>${fmt(tt*.75)}</span><span>${fmt(tt)}</span></div></div><div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">Quarterly Targets Skew</div><div class="q-quarters">${(()=>{const colors=['#3b82f6','#22c55e','#f59e0b','#f1c232'];let prev=0;return Q_TARGETS_USD.map((q,i)=>{const w=q.pct-prev;prev=q.pct;return`<div class="q-item" style="width:${w}%" onclick="toggleQDetail(${i})"><div class="q-split"><div class="q-seg" style="width:100%;background:${colors[i]}" data-qi="${i}"></div></div><div class="q-lbl">${q.label}<br>${q.pct}%</div></div>`;}).join('');})()}</div><div id="qDetail" class="q-detail"><div class="q-detail-inner" id="qDetailInner"></div></div>`;
   const tws={};won.forEach(r=>{const t=r['Tribe']||'?';tws[t]=(tws[t]||0)+pn(r['Amount (VAT-Ex.) (PHP)']);});
   // Scale all bars to the same axis: max of all targets or all values
   const maxScale=Math.max(...Object.values(TRIBE_TARGETS),...Object.values(tws))*1.05;
@@ -682,12 +1211,13 @@ function renderOverview(cw){
   // Pre-compute monthly totals
   const monthTotals={};wonSorted.forEach(r=>{const m=dm(r);if(!monthTotals[m])monthTotals[m]={count:0,amt:0,gp:0};monthTotals[m].count++;monthTotals[m].amt+=pn(r['Amount (VAT-Ex.) (PHP)']);monthTotals[m].gp+=pn(r['GP']);});
   let wth=`<table><thead><tr><th>Month</th><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th class="amt">Amount</th><th class="amt">GP</th></tr></thead><tbody>`;
-  let lastM='';wonSorted.forEach(r=>{const m=dm(r),amt=pn(r['Amount (VAT-Ex.) (PHP)']),ga=pn(r['GP']);
+  let lastM='';wonSorted.forEach(r=>{const m=dm(r),amt=pn(r['Amount (VAT-Ex.) (PHP)']),ga=pn(r['GP']);const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
     const showM=m!==lastM;lastM=m;const mt=monthTotals[m];const isNew=r['Week Number']==String(cw);
-    wth+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"${isNew?' style="background:rgba(241,194,50,.12)"':''}><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)}</td><td class="amt">${ga>0?fmtF(ga):'—'}</td></tr>`;});
+    wth+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"${isNew?' style="background:rgba(241,194,50,.12)"':''}><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga):'—'} ${ga>0?dvRow(ga,pGa):''}</td></tr>`;});
   const totalWonAmt=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalWonGP=won.reduce((s,r)=>s+pn(r['GP']),0);
   wth+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="5" style="font-weight:700;color:var(--text)">Total — ${won.length} wins</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonGP)}</td></tr></tfoot></table>`;
-  document.getElementById('ovWinsTable').innerHTML=wth;}
+  document.getElementById('ovWinsTable').innerHTML=wth;
+  window._ovData={tw,tt,ap,pw,won,ceT,fsT,pipT,tws,tpip,cw};}
 
 // ═══ 2. PIPELINE (GP + 30% gross) ═══
 function renderPipeline(cw){
@@ -699,7 +1229,7 @@ function renderPipeline(cw){
   const rfps=y.filter(r=>{const w=parseInt(r['RFPR-WeekNum']);return w>=cw-1&&w<=cw&&r['Status']==='For CE/Pitch Creation';}),rfpT=rfps.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   // Store for modal access
   window._pipeData={rw,lw,ce,fs,rfps};
-  document.getElementById('pipelineKpis').innerHTML=`<div ${afc('kpi green clickable',0)} onclick="showPipeKpiModal('Recent Wins',window._pipeData.rw,false)"><div class="kpi-label">Recent Wins</div><div class="kpi-value">${fmt(rwT)}</div><div class="kpi-sub">${rw.length} · Wk ${cw}</div></div><div ${afc('kpi cyan clickable',1)} onclick="showPipeKpiModal('Last Week Wins',window._pipeData.lw,false)"><div class="kpi-label">Last Week</div><div class="kpi-value">${fmt(lwT)}</div><div class="kpi-sub">${lw.length} · Wk ${cw-1}</div></div><div ${afc('kpi blue clickable',2)} onclick="showPipeKpiModal('CEs Submitted',window._pipeData.ce,true)"><div class="kpi-label">CEs Submitted</div><div class="kpi-value">${fmt(ceT)}</div><div class="kpi-sub">${ce.length}</div></div><div ${afc('kpi amber clickable',3)} onclick="showPipeKpiModal('For Submission',window._pipeData.fs,true)"><div class="kpi-label">For Submission</div><div class="kpi-value">${fmt(fsT)}</div><div class="kpi-sub">${fs.length}</div></div><div ${afc('kpi purple clickable',4)} onclick="showPipeKpiModal('New RFPs',window._pipeData.rfps,true)"><div class="kpi-label">New RFPs</div><div class="kpi-value">${fmt(rfpT)}</div><div class="kpi-sub">${rfps.length}</div></div>`;
+  document.getElementById('pipelineKpis').innerHTML=`<div ${afc('kpi green clickable',0)} aria-label="Recent Wins: ${fmt(rwT)}, ${rw.length} projects, Week ${cw}" onclick="showPipeKpiModal('Recent Wins',window._pipeData.rw,false)"><div class="kpi-label">Recent Wins</div><div class="kpi-value">${fmt(rwT)}</div><div class="kpi-sub">${rw.length} · Wk ${cw}</div></div><div ${afc('kpi cyan clickable',1)} aria-label="Last Week Wins: ${fmt(lwT)}, ${lw.length} projects" onclick="showPipeKpiModal('Last Week Wins',window._pipeData.lw,false)"><div class="kpi-label">Last Week</div><div class="kpi-value">${fmt(lwT)}</div><div class="kpi-sub">${lw.length} · Wk ${cw-1}</div></div><div ${afc('kpi blue clickable',2)} aria-label="CEs Submitted: ${fmt(ceT)}, ${ce.length} projects" onclick="showPipeKpiModal('CEs Submitted',window._pipeData.ce,true)"><div class="kpi-label">CEs Submitted</div><div class="kpi-value">${fmt(ceT)}</div><div class="kpi-sub">${ce.length}</div></div><div ${afc('kpi amber clickable',3)} aria-label="For Submission: ${fmt(fsT)}, ${fs.length} projects" onclick="showPipeKpiModal('For Submission',window._pipeData.fs,true)"><div class="kpi-label">For Submission</div><div class="kpi-value">${fmt(fsT)}</div><div class="kpi-sub">${fs.length}</div></div><div ${afc('kpi purple clickable',4)} aria-label="New RFPs: ${fmt(rfpT)}, ${rfps.length} projects" onclick="showPipeKpiModal('New RFPs',window._pipeData.rfps,true)"><div class="kpi-label">New RFPs</div><div class="kpi-value">${fmt(rfpT)}</div><div class="kpi-sub">${rfps.length}</div></div>`;
   function ci(items,skipGross){const sorted=items.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));const tA=sorted.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),tG=sorted.reduce((s,r)=>s+pn(r['GP']),0),avgGP=tA>0?tG/tA:0;
     // Summary at top
     let h=`<div class="pipeline-total" style="display:flex;justify-content:space-between;border-top:none;border-bottom:2px solid var(--border)"><span>${fmt(tA)}</span><span style="font-size:11px;color:var(--text-muted)">${tG>0?`GP: ${(avgGP*100).toFixed(1)}% · ${fmt(tG)}`:'—'}</span></div>`;
@@ -725,7 +1255,8 @@ function renderAM(){const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipel
     const acctCount=DATA.filter(r=>r['Year']==='2026'&&r['AM']===a&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress').length;
     h+=`<div class="am-bar-row anim-fade" style="animation-delay:${(amIdx*0.08).toFixed(2)}s" onclick="expandAM('${a.replace(/'/g,"\\'")}')"><div class="am-bar-name">${nk} <span style="font-size:11px;font-weight:400;color:var(--text-muted)">(${acctCount})</span></div><div class="am-bar-container"><div class="am-bar-bg"><div class="am-bar-seg s-ac" style="width:${cW}%;background:#cc0000" onmouseenter="amSegIn(event,'Actual Collection',${d.d})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg s-col" style="width:${clW}%;background:#ffd966" onmouseenter="amSegIn(event,'Collection Phase',${d.c})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg s-aw" style="width:${aW}%;background:#f0c132" onmouseenter="amSegIn(event,'Awarded Phase',${d.a})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg s-pi" style="width:${pW}%;background:#3c78d8" onmouseenter="amSegIn(event,'Pitch Phase',${d.p})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div>${tp>=0?`<div class="am-bar-target" style="left:${tp}%"></div>`:''}</div></div><div class="am-bar-values"><div class="val" style="color:var(--text)">${fmt(t)} ${dv(t,pt,true)}</div>${tg>0?`<div class="val" style="color:var(--${dc})">${ds}</div>`:''}</div></div><div id="amExpand_${nk}" style="display:none"></div>`;amIdx++;});
   h+=`<div style="text-align:center;margin-top:12px;font-size:11px;color:var(--text-muted)">Tap a name to expand details and accounts</div>`;
-  document.getElementById('amBars').innerHTML=h;document.getElementById('amDetailContainer').innerHTML='<div class="am-detail-drawer" id="amDrawer"></div>';}
+  document.getElementById('amBars').innerHTML=h;document.getElementById('amDetailContainer').innerHTML='<div class="am-detail-drawer" id="amDrawer"></div>';
+  window._amDataAll={ad,ao};}
 let amExpandedName=null;
 function expandAM(am){const nk=AM_NICKS[am],el=document.getElementById('amExpand_'+nk);
   // Toggle off if already expanded
@@ -733,21 +1264,49 @@ function expandAM(am){const nk=AM_NICKS[am],el=document.getElementById('amExpand
   // Collapse previous
   if(amExpandedName){const prev=AM_NICKS[amExpandedName];const pe=document.getElementById('amExpand_'+prev);if(pe)pe.style.display='none';document.getElementById('amDrawer').classList.remove('visible');}
   amExpandedName=am;const d=amDataCache[am];
+  let pd={p:null,a:null,c:null,d:null};
+  if(hp()){const py=DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost');pd={p:py.reduce((s,r)=>s+pn(r['Weighted Pitch Phase (PHP)']),0),a:py.reduce((s,r)=>s+pn(r['Weighted Awarded Phase (PHP)']),0),c:py.reduce((s,r)=>s+pn(r['Weighted Collection Phase (PHP)']),0),d:py.reduce((s,r)=>s+pn(r['Weighted Completed Cycle (PHP)']),0)};}
   el.innerHTML=`<div class="am-expand"><div class="am-expand-grid">
-    <div class="am-expand-item"><div class="phase-color" style="background:#3c78d8"></div><span class="phase-name">Pitch Phase</span><span class="phase-val" style="color:#3c78d8">${fmtF(d.p)}</span></div>
-    <div class="am-expand-item"><div class="phase-color" style="background:#f0c132"></div><span class="phase-name">Awarded Phase</span><span class="phase-val" style="color:#f0c132">${fmtF(d.a)}</span></div>
-    <div class="am-expand-item"><div class="phase-color" style="background:#ffd966"></div><span class="phase-name">Collection Phase</span><span class="phase-val" style="color:#b8860b">${fmtF(d.c)}</span></div>
-    <div class="am-expand-item"><div class="phase-color" style="background:#cc0000"></div><span class="phase-name">Actual Collection</span><span class="phase-val" style="color:#cc0000">${fmtF(d.d)}</span></div>
-  </div><div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-muted)">Total: <strong style="color:var(--text)">${fmtF(d.p+d.a+d.c+d.d)}</strong></div></div>`;
+    <div class="am-expand-item"><div class="phase-color" style="background:#3c78d8"></div><span class="phase-name">Pitch Phase</span><span class="phase-val" style="color:#3c78d8">${fmtF(d.p)} ${hp()?dv(d.p,pd.p,true):''}</span></div>
+    <div class="am-expand-item"><div class="phase-color" style="background:#f0c132"></div><span class="phase-name">Awarded Phase</span><span class="phase-val" style="color:#f0c132">${fmtF(d.a)} ${hp()?dv(d.a,pd.a,true):''}</span></div>
+    <div class="am-expand-item"><div class="phase-color" style="background:#ffd966"></div><span class="phase-name">Collection Phase</span><span class="phase-val" style="color:#b8860b">${fmtF(d.c)} ${hp()?dv(d.c,pd.c,true):''}</span></div>
+    <div class="am-expand-item"><div class="phase-color" style="background:#cc0000"></div><span class="phase-name">Actual Collection</span><span class="phase-val" style="color:#cc0000">${fmtF(d.d)} ${hp()?dv(d.d,pd.d,true):''}</span></div>
+  </div><div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-muted)">Total: <strong style="color:var(--text)">${fmtF(d.p+d.a+d.c+d.d)} ${hp()?dv(d.p+d.a+d.c+d.d,pd.p+pd.a+pd.c+pd.d,true):''}</strong></div></div>`;
   el.style.display='block';
   // Also show accounts table
   showAMAccounts(am);}
-function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection - Invoice Sent':2,'For Collection - For Invoicing':3,'Collected - For Closing':4,'Fully Closed':5,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span><button class="am-close-btn" onclick="expandAM('${am.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(pn(r['Amount (VAT-Ex.) (PHP)']))}</td><td class="amt">${pn(r['Weighted Pitch Phase (PHP)'])?fmt(pn(r['Weighted Pitch Phase (PHP)'])):'—'}</td><td class="amt">${pn(r['Weighted Awarded Phase (PHP)'])?fmt(pn(r['Weighted Awarded Phase (PHP)'])):'—'}</td><td class="amt">${pn(r['Weighted Collection Phase (PHP)'])?fmt(pn(r['Weighted Collection Phase (PHP)'])):'—'}</td><td class="amt">${pn(r['Weighted Completed Cycle (PHP)'])?fmt(pn(r['Weighted Completed Cycle (PHP)'])):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
+function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection - Invoice Sent':2,'For Collection - For Invoicing':3,'Collected - For Closing':4,'Fully Closed':5,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span><button class="am-close-btn" onclick="expandAM('${am.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Weighted Completed Cycle (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Weighted Completed Cycle (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
 
 // ═══ 4. BD LEADS (donut with theme-aware text) ═══
 let bdState={month:null,activeBD:null};
 function renderBD(){const months=[...new Set(DATA.filter(r=>r['Lead Month']).map(r=>r['Lead Month']))].sort();if(bdState.month===null){const cm=curLeadMonth();bdState.month=months.includes(cm)?cm:'all';}
-  let f='<span class="filter-label">Lead Month</span>';f+=`<button class="filter-btn ${bdState.month==='all'?'active':''}" onclick="setBDMonth('all')">All</button>`;months.forEach(m=>{f+=`<button class="filter-btn ${bdState.month===m?'active':''}" onclick="setBDMonth('${m}')">${m.split(' - ')[1]||m}</button>`;});document.getElementById('bdMonthFilter').innerHTML=f;renderBDCharts();renderBDCards();}
+  let f='<span class="filter-label">Lead Month</span>';f+=`<button class="filter-btn ${bdState.month==='all'?'active':''}" onclick="setBDMonth('all')">All</button>`;months.forEach(m=>{f+=`<button class="filter-btn ${bdState.month===m?'active':''}" onclick="setBDMonth('${m}')">${m.split(' - ')[1]||m}</button>`;});document.getElementById('bdMonthFilter').innerHTML=f;renderBDCharts();renderBDCards();renderBDWins();}
+let _bdWinsFilter=null;
+function toggleBDWinsFilter(bd){_bdWinsFilter=_bdWinsFilter===bd?null:bd;renderBDWins();}
+function renderBDWins(){
+  const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(r=>WS.includes(r['Status'])&&(r['BD']||'').trim());
+  // Group by BD
+  const bdTotals={};won.forEach(r=>{const bds=(r['BD']||'').split(/[,;]/).map(s=>s.trim()).filter(Boolean);bds.forEach(bd=>{if(!bdTotals[bd])bdTotals[bd]={count:0,amt:0};bdTotals[bd].count++;bdTotals[bd].amt+=pn(r['Amount (VAT-Ex.) (PHP)']);});});
+  const sortedBDs=Object.entries(bdTotals).sort((a,b)=>b[1].amt-a[1].amt);
+  // Summary strip with clickable cards
+  let h='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">';
+  sortedBDs.forEach(([bd,info])=>{const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');const isActive=_bdWinsFilter===bd;h+=`<div onclick="toggleBDWinsFilter('${bd.replace(/'/g,"\\'")}')" style="cursor:pointer;background:${isActive?'var(--accent-glow)':'var(--surface2)'};border:2px solid ${isActive?'var(--accent)':'transparent'};border-radius:8px;padding:8px 14px;display:flex;flex-direction:column;align-items:center;transition:all .15s"><span style="font-size:11px;font-weight:600;color:var(--text-dim)">${nick}</span><span style="font-size:15px;font-weight:700;color:var(--text)">${fmtF(info.amt)}</span><span style="font-size:10px;color:var(--text-muted)">${info.count} win${info.count!==1?'s':''}</span></div>`;});
+  h+='</div>';
+  // Filter by selected BD
+  const filtered=_bdWinsFilter?won.filter(r=>(r['BD']||'').includes(_bdWinsFilter)):won;
+  // Sort by Sign Date (most recent first), fallback to amount
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const sorted=[...filtered].sort((a,b)=>{const da=a['Sign Date']||'',db=b['Sign Date']||'';if(da&&db)return da.localeCompare(db);if(da)return 1;if(db)return -1;return pn(a['Amount (VAT-Ex.) (PHP)'])-pn(b['Amount (VAT-Ex.) (PHP)']);});
+  h+=`<table><thead><tr><th>Month</th><th>BD</th><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th class="amt">Amount</th></tr></thead><tbody>`;
+  let lastM='';
+  sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),bds=(r['BD']||'').split(/[,;]/).map(s=>s.trim()).filter(Boolean),bdNicks=bds.map(b=>BD_NICKS[b]||b.split(' ').slice(0,2).join(' ')).join(', ');
+    const m=dm(r),showM=m!==lastM;lastM=m;
+    h+=`<tr style="cursor:pointer" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${m}</td><td style="font-weight:600">${bdNicks}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)}</td></tr>`;});
+  const totalAmt=filtered.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
+  h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="6" style="font-weight:700;color:var(--text)">Total — ${filtered.length} wins</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td></tr></tfoot></table>`;
+  document.getElementById('bdWinsTable').innerHTML=h;
+  window._bdWinsData={sortedBDs,totalWon:won.length,totalAmt:won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0)};
+}
 function setBDMonth(m){bdState.month=m;bdState.activeBD=null;renderBD();}
 function getBDLeads(bd){return DATA.filter(r=>r['BD']&&r['BD'].includes(bd)&&r['Lead Month']&&r['Status']!=='Lost'&&(bdState.month==='all'||r['Lead Month']===bdState.month));}
 function getAllBDLeads(bd){return DATA.filter(r=>r['BD']&&r['BD'].includes(bd)&&r['Lead Month']&&r['Status']!=='Lost');}
@@ -789,7 +1348,8 @@ function renderBDCharts(){
   if(CHARTS.bdDonut)CHARTS.bdDonut.destroy();
   const pctD=donutGoal>0?Math.min((totalLeads/donutGoal)*100,100):0;const donutTL=totalLeads;const donutG=donutGoal;
   CHARTS.bdDonut=new Chart(document.getElementById('bdDonutChart'),{type:'doughnut',data:{labels:['Leads','Remaining'],datasets:[{data:[totalLeads,Math.max(donutGoal-totalLeads,0)],backgroundColor:['#f1c232','rgba(100,116,139,.15)'],borderWidth:0}]},options:{responsive:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}}},
-    plugins:[{id:'centerTxt',afterDraw(chart){const{ctx,chartArea:{width:w,height:h,top:t,left:l}}=chart;const style=getComputedStyle(document.documentElement);ctx.save();ctx.textAlign='center';ctx.fillStyle=style.getPropertyValue('--text').trim();ctx.font='700 32px DM Sans';ctx.fillText(pctD.toFixed(0)+'%',l+w/2,t+h/2);ctx.fillStyle=style.getPropertyValue('--text-muted').trim();ctx.font='500 12px DM Sans';ctx.fillText(donutTL+' / '+donutG,l+w/2,t+h/2+20);ctx.restore();}}]});}
+    plugins:[{id:'centerTxt',afterDraw(chart){const{ctx,chartArea:{width:w,height:h,top:t,left:l}}=chart;const style=getComputedStyle(document.documentElement);ctx.save();ctx.textAlign='center';ctx.fillStyle=style.getPropertyValue('--text').trim();ctx.font='700 32px DM Sans';ctx.fillText(pctD.toFixed(0)+'%',l+w/2,t+h/2);ctx.fillStyle=style.getPropertyValue('--text-muted').trim();ctx.font='500 12px DM Sans';ctx.fillText(donutTL+' / '+donutG,l+w/2,t+h/2+20);ctx.restore();}}]});
+  window._bdData={totalLeads,totalGoal:donutGoal,month:bdState.month,activeBDs};}
 function renderBDCards(){
   const activeBDs=getActiveBDsForMonth(bdState.month).sort((a,b)=>(BD_NICKS[a]||a).localeCompare(BD_NICKS[b]||b));
   let h='';let bdIdx=0;activeBDs.forEach(bd=>{
@@ -824,14 +1384,15 @@ function renderWinRate(){const y=DATA.filter(r=>r['Year']==='2026'),wins=y.filte
   const cBorder=sty.getPropertyValue('--border').trim()||'#2A3545';
   wins.forEach(r=>{const m=dm(r);if(!wm[m])wm[m]={c:0,a:0};wm[m].c++;wm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});losses.forEach(r=>{const m=dm(r);if(!lm[m])lm[m]={c:0,a:0};lm[m].c++;lm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});
   const am=mo.filter(m=>wm[m]||lm[m]),tW=wins.length,tL=losses.length,td=tW+tL,wr=td>0?tW/td*100:0,twv=wins.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),tlv=losses.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),vwr=(twv+tlv)>0?twv/(twv+tlv)*100:0;
-  document.getElementById('winrateKpis').innerHTML=`<div ${afc('kpi '+(wr>=60?'green':wr>=40?'amber':'red'),0)}><div class="kpi-label">Win Rate</div><div class="kpi-value">${wr.toFixed(1)}%</div><div class="kpi-sub">${tW}W / ${tL}L</div></div><div ${afc('kpi '+(vwr>=60?'green':vwr>=40?'amber':'red'),1)}><div class="kpi-label">Value Win Rate</div><div class="kpi-value">${vwr.toFixed(1)}%</div><div class="kpi-sub">${fmt(twv)} of ${fmt(twv+tlv)}</div></div><div ${afc('kpi green',2)}><div class="kpi-label">Won</div><div class="kpi-value">${tW}</div><div class="kpi-sub">${fmt(twv)}</div></div><div ${afc('kpi red clickable',3)} onclick="document.getElementById('wrLostCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Lost</div><div class="kpi-value">${tL}</div><div class="kpi-sub">${fmt(tlv)}</div></div>`;
+  document.getElementById('winrateKpis').innerHTML=`<div ${afc('kpi '+(wr>=60?'green':wr>=40?'amber':'red'),0)} aria-label="Win Rate: ${wr.toFixed(1)}%, ${tW} wins, ${tL} losses"><div class="kpi-label">Win Rate</div><div class="kpi-value">${wr.toFixed(1)}%</div><div class="kpi-sub">${tW}W / ${tL}L</div></div><div ${afc('kpi '+(vwr>=60?'green':vwr>=40?'amber':'red'),1)} aria-label="Value Win Rate: ${vwr.toFixed(1)}%, ${fmt(twv)} of ${fmt(twv+tlv)}"><div class="kpi-label">Value Win Rate</div><div class="kpi-value">${vwr.toFixed(1)}%</div><div class="kpi-sub">${fmt(twv)} of ${fmt(twv+tlv)}</div></div><div ${afc('kpi green',2)} aria-label="Won: ${tW} projects, ${fmt(twv)}"><div class="kpi-label">Won</div><div class="kpi-value">${tW}</div><div class="kpi-sub">${fmt(twv)}</div></div><div ${afc('kpi red clickable',3)} aria-label="Lost: ${tL} projects, ${fmt(tlv)}" onclick="document.getElementById('wrLostCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Lost</div><div class="kpi-value">${tL}</div><div class="kpi-sub">${fmt(tlv)}</div></div>`;
   if(CHARTS.wlc)CHARTS.wlc.destroy();CHARTS.wlc=new Chart(document.getElementById('winLossCountChart'),{type:'bar',data:{labels:am,datasets:[{label:'Wins',data:am.map(m=>(wm[m]||{}).c||0),backgroundColor:cGreen,borderRadius:6},{label:'Losses',data:am.map(m=>(lm[m]||{}).c||0),backgroundColor:cRed,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cBorder}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}}}}});
   if(CHARTS.wlv)CHARTS.wlv.destroy();CHARTS.wlv=new Chart(document.getElementById('winLossValueChart'),{type:'bar',data:{labels:am,datasets:[{label:'Won',data:am.map(m=>cx((wm[m]||{}).a||0)),backgroundColor:cGreen,borderRadius:6},{label:'Lost',data:am.map(m=>cx((lm[m]||{}).a||0)),backgroundColor:cRed,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cBorder},ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   if(CHARTS.wrt)CHARTS.wrt.destroy();const wrm=am.map(m=>{const w=(wm[m]||{}).c||0,l=(lm[m]||{}).c||0;return(w+l)>0?w/(w+l)*100:null;});CHARTS.wrt=new Chart(document.getElementById('winRateTrendChart'),{type:'line',data:{labels:am,datasets:[{label:'Win Rate %',data:wrm,borderColor:'#f1c232',backgroundColor:'rgba(241,194,50,.1)',borderWidth:3,pointBackgroundColor:'#f1c232',pointRadius:6,fill:true,tension:.3},{label:'50%',data:am.map(()=>50),borderColor:'rgba(100,116,139,.3)',borderDash:[6,4],borderWidth:1,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{min:0,max:100,grid:{color:cBorder},ticks:{callback:v=>v+'%'}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='50%'?'':ctx.raw?.toFixed(1)+'%'}}}}});
   if(CHARTS.wrtb)CHARTS.wrtb.destroy();const tn0=[...new Set([...wins,...losses].map(r=>r['Tribe']).filter(Boolean))].sort(),twc={},tlc={};wins.forEach(r=>{twc[r['Tribe']||'?']=(twc[r['Tribe']||'?']||0)+1;});losses.forEach(r=>{tlc[r['Tribe']||'?']=(tlc[r['Tribe']||'?']||0)+1;});
   const tn=tn0.filter(t=>(twc[t]||0)>0||(tlc[t]||0)>0);const twr=tn.map(t=>{const w=twc[t]||0,l=tlc[t]||0;return(w+l)>0?w/(w+l)*100:0;});
   CHARTS.wrtb=new Chart(document.getElementById('winRateTribeChart'),{type:'bar',data:{labels:tn.map(t=>t.replace('PDEI - ','')),datasets:[{data:twr,backgroundColor:twr.map(v=>v>=60?cGreen:v>=40?'#f1c232':cRed),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{min:0,max:100,grid:{color:cBorder},ticks:{callback:v=>v+'%'}},y:{grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.toFixed(1)}% — ${twc[tn[ctx.dataIndex]]||0}W / ${tlc[tn[ctx.dataIndex]]||0}L`}}}}});
-  let fH='<span class="filter-label">Month</span>';fH+=`<button class="filter-btn ${wrState.month==='all'?'active':''}" onclick="setWRM('all')">All</button>`;am.forEach(m=>{fH+=`<button class="filter-btn ${wrState.month===m?'active':''}" onclick="setWRM('${m}')">${m}</button>`;});document.getElementById('winrateMonthFilter').innerHTML=fH;renderLT(losses);}
+  let fH='<span class="filter-label">Month</span>';fH+=`<button class="filter-btn ${wrState.month==='all'?'active':''}" onclick="setWRM('all')">All</button>`;am.forEach(m=>{fH+=`<button class="filter-btn ${wrState.month===m?'active':''}" onclick="setWRM('${m}')">${m}</button>`;});document.getElementById('winrateMonthFilter').innerHTML=fH;renderLT(losses);
+  window._wrData={tW,tL,wr,twv,tlv,vwr,am,wm,lm,wins,losses};}
 function setWRM(m){wrState.month=m;
   // Only re-render filter buttons and table, not charts
   const y=DATA.filter(r=>r['Year']==='2026'),losses=y.filter(r=>r['Status']==='Lost');
@@ -846,14 +1407,15 @@ function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>
 let tribeWinsState={tribe:'all'};
 function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp={};y.forEach(r=>{const t=r['Tribe']||'?',php=pn(r['Amount (VAT-Ex.) (PHP)']);if(WS.includes(r['Status']))tw[t]=(tw[t]||0)+php;if(['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'].includes(r['Status']))tp[t]=(tp[t]||0)+php;});
   const totalW=Object.values(tw).reduce((a,b)=>a+b,0),totalT=Object.values(TRIBE_TARGETS).reduce((a,b)=>a+b,0),totalP=Object.values(tp).reduce((a,b)=>a+b,0),pvW=hp()?twp(DATA_PREV):null;
-  document.getElementById('attainKpis').innerHTML=`<div ${afc('kpi green clickable',0)} onclick="document.getElementById('atWonCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Won</div><div class="kpi-value">${fmt(totalW)} ${dv(totalW,pvW)}</div><div class="kpi-sub">${pct(totalW,totalT)}% of target</div></div><div ${afc('kpi blue',1)}><div class="kpi-label">Target</div><div class="kpi-value">${fmt(totalT)}</div></div><div ${afc('kpi amber clickable',2)} onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(totalP)}</div></div><div ${afc('kpi red',3)}><div class="kpi-label">Gap</div><div class="kpi-value">${fmt(totalT-totalW)}</div></div>`;
+  document.getElementById('attainKpis').innerHTML=`<div ${afc('kpi green clickable',0)} aria-label="Total Won: ${fmt(totalW)}, ${pct(totalW,totalT)}% of target" onclick="document.getElementById('atWonCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Won</div><div class="kpi-value">${fmt(totalW)} ${dv(totalW,pvW)}</div><div class="kpi-sub">${pct(totalW,totalT)}% of target</div></div><div ${afc('kpi blue',1)} aria-label="Target: ${fmt(totalT)}"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(totalT)}</div></div><div ${afc('kpi amber clickable',2)} aria-label="Pipeline: ${fmt(totalP)}" onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(totalP)}</div></div><div ${afc('kpi red',3)} aria-label="Gap to target: ${fmt(totalT-totalW)}"><div class="kpi-label">Gap</div><div class="kpi-value">${fmt(totalT-totalW)}</div></div>`;
   const tribes=Object.keys(TRIBE_TARGETS);
   if(CHARTS.ac)CHARTS.ac.destroy();CHARTS.ac=new Chart(document.getElementById('attainChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:cs()+' Won',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:cs()+' Target',data:tribes.map(t=>cx(TRIBE_TARGETS[t])),backgroundColor:'rgba(100,116,139,.15)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   if(CHARTS.yp)CHARTS.yp.destroy();CHARTS.yp=new Chart(document.getElementById('ytdPipeChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:'YTD Wins',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:'Pipeline',data:tribes.map(t=>cx(tp[t]||0)),backgroundColor:'rgba(100,116,139,.25)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   let th=`<table><thead><tr><th>Tribe</th><th class="amt">Target</th><th class="amt">Wins</th><th class="amt">Pipeline</th><th class="amt">Gap</th><th>Att.</th></tr></thead><tbody>`;
   tribes.forEach(t=>{const w=tw[t]||0,p=tp[t]||0,target=TRIBE_TARGETS[t],gap=target-w,att=w/target*100,c=att>=80?'green':att>=40?'amber':'red',pvw=hp()?twpT(DATA_PREV,t):null;th+=`<tr><td style="font-weight:600;color:var(--text)">${t.replace('PDEI - ','')}</td><td class="amt">${fmtF(target)}</td><td class="amt" style="color:var(--green)">${fmtF(w)} ${dv(w,pvw,true)}</td><td class="amt" style="color:var(--purple)">${fmtF(p)}</td><td class="amt" style="color:var(--red)">${fmtF(gap)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:80px"><div class="progress-fill ${c}" style="width:${Math.min(att,100)}%"></div></div><span style="font-size:12px;font-weight:600;color:var(--${c})">${att.toFixed(1)}%</span></div></td></tr>`;});
   th+=`<tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)">TOTAL</td><td class="amt" style="font-weight:700">${fmtF(totalT)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalW)}</td><td class="amt" style="font-weight:700;color:var(--purple)">${fmtF(totalP)}</td><td class="amt" style="font-weight:700;color:var(--red)">${fmtF(totalT-totalW)}</td><td style="font-weight:700;color:var(--amber)">${(totalW/totalT*100).toFixed(1)}%</td></tr></tbody></table>`;document.getElementById('tribeTable').innerHTML=th;
-  const wp=y.filter(r=>WS.includes(r['Status'])),tl=[...new Set(wp.map(r=>r['Tribe']).filter(Boolean))].sort();let tf='<span class="filter-label">Tribe</span>';tf+=`<button class="filter-btn ${tribeWinsState.tribe==='all'?'active':''}" onclick="setTWF('all')">All</button>`;tl.forEach(t=>{tf+=`<button class="filter-btn ${tribeWinsState.tribe===t?'active':''}" onclick="setTWF('${t}')">${t.replace('PDEI - ','')}</button>`;});document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);}
+  const wp=y.filter(r=>WS.includes(r['Status'])),tl=[...new Set(wp.map(r=>r['Tribe']).filter(Boolean))].sort();let tf='<span class="filter-label">Tribe</span>';tf+=`<button class="filter-btn ${tribeWinsState.tribe==='all'?'active':''}" onclick="setTWF('all')">All</button>`;tl.forEach(t=>{tf+=`<button class="filter-btn ${tribeWinsState.tribe===t?'active':''}" onclick="setTWF('${t}')">${t.replace('PDEI - ','')}</button>`;});document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);
+  window._atData={tw,tp,totalW,totalT,totalP};}
 function setTWF(t){tribeWinsState.tribe=t;
   // Only re-render filter buttons and table, not charts
   const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(r=>WS.includes(r['Status']));
@@ -862,6 +1424,6 @@ function setTWF(t){tribeWinsState.tribe=t;
   document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);}
 function renderTWT(wp){const so={'Signed CE':0,'Won - Awaiting CE Signature':1,'Collected - For Closing':2,'Fully Closed':3,'For Collection - Invoice Sent':4,'For Collection - For Invoicing':5},f=tribeWinsState.tribe==='all'?wp:wp.filter(r=>r['Tribe']===tribeWinsState.tribe);const sorted=f.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)'])),totalAmt=sorted.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   let h=`<table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th>AM</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted)">No won projects</td></tr>';
-  sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:300px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga):'—'}</td></tr>`;});
+  sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:300px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;});
   h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)" colspan="5">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(sorted.reduce((s,r)=>s+pn(r['GP']),0))}</td></tr></tfoot></table>`;document.getElementById('tribeWinsTable').innerHTML=h;}
 </script></body></html>

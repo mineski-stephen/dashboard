@@ -42,42 +42,6 @@ Qualified Lead, % Collected, Amount Collected (PHP)
 
 ## Constants & Business Logic
 
-### Tribe Targets (stored in USD, converted to PHP at runtime via USD_RATE)
-```javascript
-TRIBE_TARGETS_USD = {
-  'PDEI - Moonton': 982737.88,
-  'PDEI - Tencent': 862996.28,
-  'PDEI - Esports': 516434.10,
-  'PDEI - Marketing': 4137831.73
-}
-// Total = $6,500,000.00 USD exactly
-// rebuildTargets() multiplies by USD_RATE to produce TRIBE_TARGETS in PHP
-```
-
-### Quarterly Cumulative Targets (USD)
-```javascript
-Q_TARGETS_USD = [
-  { label: 'Q1', amount: 1277001.02, pct: 19.65, qtrPip: 1277001.02 },
-  { label: 'Q2', amount: 2790257.20, pct: 42.93, qtrPip: 1513256.19 },
-  { label: 'Q3', amount: 5269982.97, pct: 81.08, qtrPip: 2479725.76 },
-  { label: 'Q4', amount: 6500000.00, pct: 100.00, qtrPip: 1230017.03 }
-]
-// amount = cumulative target through that quarter
-// pct = cumulative % of full-year target
-// qtrPip = per-quarter pipeline target (Q amount minus previous Q amount)
-```
-
-### AM Targets (in PHP, static)
-```javascript
-AM_TARGETS = {
-  'Alvaro Miguel Dela Vega Santos': 0,        // Iggy
-  'Carla Andrea Calma Crespo': 25650000,      // Carla
-  'Carlos Roberto Francisco, David, IV Coscolluela': 25650000, // CC
-  'Marcus Joaquin Viray Gonzales': 57000000,   // Marcus
-  'Shanna Mae Alindada Sacsi': 25650000        // Shanna
-}
-```
-
 ### BD Goals (dynamic discovery system)
 - **Default goal per BD per month:** 15 leads
 - **Exceptions:** Jorge Luis Tesoro (H) has a special goal of 10; Vince has a goal of 0
