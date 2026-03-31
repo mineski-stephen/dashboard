@@ -245,6 +245,7 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .proj-modal-remarks{margin-top:4px;padding:12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
 .proj-modal-remarks .fld-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:6px}
 .proj-modal-remarks .fld-value{font-size:12px;color:var(--text-dim);white-space:pre-wrap;line-height:1.6;max-height:200px;overflow-y:auto;-webkit-user-select:text;user-select:text}
+.was-badge{display:block;width:fit-content;margin-top:3px;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:500;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border)}
 /* Pipeline KPI modal */
 .pipe-kpi-modal{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:150;display:none;align-items:center;justify-content:center}
 .pipe-kpi-modal.open{display:flex}
@@ -316,12 +317,12 @@ body.settings-open{overflow:hidden}
   <div class="nav-tabs" id="navTabs">
     <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales Pipeline</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
   </div>
-  <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
+  <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div><div id="ovTribeDetail" style="margin-top:12px"></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
   <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="pipeline-cols" id="pipelineCols"></div></div>
   <div class="section" id="sec-am"><div class="card vis-section" data-vis="am-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Account Manager Weighted Performance</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#cc0000"></div>Actual Collection</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#ffd966;border:1px solid #ccc"></div>Collection Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f0c132"></div>Awarded Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3c78d8"></div>Pitch Phase</div><div class="am-legend-item"><div style="width:10px;height:2px;background:var(--red)"></div>Target</div></div><div id="amBars"></div></div><div id="amDetailContainer" class="vis-section" data-vis="am-detail"></div></div>
   <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid" id="bdGrid"></div><div class="bd-detail" id="bdDetail"></div><div class="card vis-section" data-vis="bd-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>BD Wins — 2026</div><div class="table-wrap" id="bdWinsTable"></div></div></div>
   <div class="section" id="sec-winrate"><div class="kpi-strip vis-section" data-vis="wr-kpis" id="winrateKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="wr-count"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Win vs Loss (Count)</div><div class="chart-container"><canvas id="winLossCountChart"></canvas></div></div><div class="card vis-section" data-vis="wr-value"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Win vs Loss (Value)</div><div class="chart-container"><canvas id="winLossValueChart"></canvas></div></div></div><div class="grid-2"><div class="card vis-section" data-vis="wr-trend"><div class="card-title"><div class="dot" style="background:var(--amber)"></div>Win Rate Trend</div><div class="chart-container short"><canvas id="winRateTrendChart"></canvas></div></div><div class="card vis-section" data-vis="wr-tribe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Win Rate by Tribe</div><div class="chart-container short"><canvas id="winRateTribeChart"></canvas></div></div></div><div class="card vis-section" data-vis="wr-table" id="wrLostCard"><div class="card-title"><div class="dot" style="background:var(--red)"></div>Lost Projects</div><div class="filter-row" id="winrateMonthFilter"></div><div class="table-wrap" id="lossTable"></div></div></div>
-  <div class="section" id="sec-attainment"><div class="kpi-strip vis-section" data-vis="at-kpis" id="attainKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="at-attChart"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Attainment by Tribe</div><div class="chart-container"><canvas id="attainChart"></canvas></div></div><div class="card vis-section" data-vis="at-ytdPipe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>YTD vs Pipeline</div><div class="chart-container"><canvas id="ytdPipeChart"></canvas></div></div></div><div class="card vis-section" data-vis="at-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div></div><div class="card vis-section" data-vis="at-wonTable" id="atWonCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Projects Won</div><div class="filter-row" id="tribeWinsFilter"></div><div class="table-wrap" id="tribeWinsTable"></div></div></div>
+  <div class="section" id="sec-attainment"><div class="kpi-strip vis-section" data-vis="at-kpis" id="attainKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="at-attChart"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Attainment by Tribe</div><div class="chart-container"><canvas id="attainChart"></canvas></div></div><div class="card vis-section" data-vis="at-ytdPipe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>YTD vs Pipeline</div><div class="chart-container"><canvas id="ytdPipeChart"></canvas></div></div></div><div class="card vis-section" data-vis="at-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="at-wonTable" id="atWonCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Projects Won</div><div class="filter-row" id="tribeWinsFilter"></div><div class="table-wrap" id="tribeWinsTable"></div></div></div>
   <!-- ENCRYPT TAB -->
   <div class="section" id="sec-encrypt"><div class="card"><div class="card-title"><div class="dot" style="background:var(--red)"></div>File Encryption / Decryption</div>
     <div class="enc-box">
@@ -434,15 +435,15 @@ async function doEncAction(){
   }}
 
 // ═══ SETTINGS CONFIG ═══
-const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-ytdPipeline':'YTD + Pipeline Chart','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-table':'Tribe Breakdown','at-wonTable':'Projects Won'};
-const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-ytdPipeline','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-table','at-wonTable']};
+const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won'};
+const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable']};
 const TAB_NAMES={overview:'Overview',pipeline:'Sales Pipeline',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',encrypt:'Encrypt/Decrypt'};
 const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',currency:'PHP',usdRate:57,
-  overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-ytdPipeline':true,'ov-winsTable':true},
+  overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-table':true,'ov-winsTable':true},
   pipeline:{visible:true,'pl-kpis':true},am:{visible:true,'am-chart':true,'am-detail':true},
   bd:{visible:true,'bd-charts':true,'bd-filter':true},
   winrate:{visible:false,'wr-kpis':true,'wr-count':true,'wr-value':true,'wr-trend':true,'wr-tribe':true,'wr-table':true},
-  attainment:{visible:true,'at-kpis':true,'at-attChart':true,'at-ytdPipe':true,'at-table':true,'at-wonTable':true},
+  attainment:{visible:true,'at-kpis':true,'at-attChart':true,'at-ytdPipe':true,'at-ytdPipeline':true,'at-wonTable':true},
   encrypt:{visible:false}};
 let CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
 function isTabVis(t){return CFG[t]?.visible!==false;}
@@ -544,31 +545,38 @@ function getLastRemark(r){const qr=(r['Quick Remarks']||'').trim();if(!qr)return
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function linkify(v){if(!v||v==='—')return '—';const escaped=escHtml(v);return escaped.replace(/(https?:\/\/[^\s,&lt;]+)/g,'<a href="$1" target="_blank" rel="noopener">Link ↗</a>');}
 function linkifyOther(v){if(!v)return '—';const lines=v.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return '—';return lines.map(line=>{const m=line.match(/^(.+?)\s*-\s*(https?:\/\/\S+)$/);if(m)return `<a class="link-token" href="${escHtml(m[2])}" target="_blank" rel="noopener">${escHtml(m[1].trim())} ↗</a>`;const um=line.match(/(https?:\/\/\S+)/);if(um)return `<a class="link-token" href="${escHtml(um[1])}" target="_blank" rel="noopener">Link ↗</a>`;return escHtml(line);}).join(' ');}
+function wasTag(curVal,prevVal,isMoney){if(prevVal===null||prevVal===undefined)return '';const cv=typeof curVal==='string'?curVal.trim():curVal;const pv=typeof prevVal==='string'?prevVal.trim():prevVal;if(cv===pv)return '';if(isMoney&&typeof cv==='number'&&typeof pv==='number'&&cv===pv)return '';const display=isMoney?fmtF(pv):escHtml(String(pv||'—'));return `<div class="was-badge">was ${display}</div>`;}
+function wasTagPct(cur,prev){if(prev===null||prev===undefined)return '';if(cur===prev)return '';return `<div class="was-badge">was ${(prev*100).toFixed(1)}%</div>`;}
 function showProjModal(r,fromPipeKpi){
   const box=document.getElementById('projModalContent');
   const amt=pn(r['Amount (VAT-Ex.) (PHP)']),amtI=pn(r['Amount (VAT-Inc.)']),gp=pn(r['GP%']),ga=pn(r['GP']);
   const remarks=(r['Quick Remarks']||'').trim(),signDate=r['Sign Date']||'',rawCE=r['Signed CE (PDF)']||'',ceLink=/https?:\/\//.test(rawCE)?rawCE:'',rawIntCE=r['Internal CE (Sheet)']||'',intCE=/https?:\/\//.test(rawIntCE)?rawIntCE:'',otherLinks=r['Other Links']||'',rfpDate=r['RFP Received Date']||'';
-  const closeAction=fromPipeKpi?'closeProjModal(true)':'closeProjModal()';
-  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div><div>${sp(r['Status'])}</div></div><button class="am-close-btn" onclick="${closeAction}">✕</button></div>`;
+  const pr=getPrev(r);
+  const pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pAmtI=pr?pn(pr['Amount (VAT-Inc.)']):null,pGp=pr?pn(pr['GP%']):null,pGa=pr?pn(pr['GP']):null;
+  const pBD=pr?(pr['BD']||''):null,pAM=pr?(pr['AM']||''):null,pPM=pr?(pr['PM']||''):null;
+  const pStatus=pr?(pr['Status']||''):null,pTribe=pr?(pr['Tribe']||''):null;
+  const pRfp=pr?(pr['RFP Received Date']||''):null,pSign=pr?(pr['Sign Date']||''):null;
+  const closeAction='closeProjModal()';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div>${wasTag((r['Tribe']||''),(pTribe),false)}<div>${sp(r['Status'])}</div></div><button class="am-close-btn" onclick="${closeAction}">✕</button></div>`;
   // Project Code
   h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Code: <span style="color:var(--text);font-weight:600">${escHtml(r['Project Code']||'—')}</span></div>`;
   // Numbers block
   h+=`<div class="proj-modal-grid" style="margin-bottom:0">`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">Amount (VAT-Ex.)</span><span class="fld-value">${amt>0?fmtF(amt):'—'}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">Amount (VAT-Inc.)</span><span class="fld-value">${amtI>0?fmtF(amtI):'—'}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">GP%</span><span class="fld-value">${gp>0?(gp*100).toFixed(1)+'%':'—'}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">GP</span><span class="fld-value">${ga>0?fmtF(ga):'—'}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">Amount (VAT-Ex.)</span><span class="fld-value">${amt>0?fmtF(amt):'—'}${wasTag(amt,pAmt,true)}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">Amount (VAT-Inc.)</span><span class="fld-value">${amtI>0?fmtF(amtI):'—'}${wasTag(amtI,pAmtI,true)}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">GP%</span><span class="fld-value">${gp>0?(gp*100).toFixed(1)+'%':'—'}${wasTagPct(gp,pGp)}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">GP</span><span class="fld-value">${ga>0?fmtF(ga):'—'}${wasTag(ga,pGa,true)}</span></div>`;
   h+=`</div><hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
   // People block
   h+=`<div class="proj-modal-grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:0">`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">BD</span><span class="fld-value">${escHtml(r['BD']||'—')}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">AM</span><span class="fld-value">${escHtml(r['AM']||'—')}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">PM</span><span class="fld-value">${escHtml(r['PM']||'—')}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">BD</span><span class="fld-value">${escHtml(r['BD']||'—')}${wasTag(r['BD']||'',pBD,false)}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">AM</span><span class="fld-value">${escHtml(r['AM']||'—')}${wasTag(r['AM']||'',pAM,false)}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">PM</span><span class="fld-value">${escHtml(r['PM']||'—')}${wasTag(r['PM']||'',pPM,false)}</span></div>`;
   h+=`</div><hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
   // Dates block
   h+=`<div class="proj-modal-grid" style="margin-bottom:0">`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">RFP Received Date</span><span class="fld-value">${escHtml(rfpDate||'—')}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">Sign Date</span><span class="fld-value">${escHtml(signDate||'—')}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">RFP Received Date</span><span class="fld-value">${escHtml(rfpDate||'—')}${wasTag(rfpDate,pRfp,false)}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">Sign Date</span><span class="fld-value">${escHtml(signDate||'—')}${wasTag(signDate,pSign,false)}</span></div>`;
   h+=`</div>`;
   // Links block
   const hasLinks=ceLink||intCE||otherLinks;
@@ -579,9 +587,8 @@ function showProjModal(r,fromPipeKpi){
   // Quick Remarks
   if(remarks)h+=`<div class="proj-modal-remarks"><div class="fld-label">Quick Remarks</div><div class="fld-value">${escHtml(remarks)}</div></div>`;
   box.innerHTML=h;document.getElementById('projModal').classList.add('open');}
-function closeProjModal(backToPipeKpi){
+function closeProjModal(){
   document.getElementById('projModal').classList.remove('open');
-  if(backToPipeKpi&&window._lastPipeKpi){const p=window._lastPipeKpi;showPipeKpiModal(p.title,p.items,p.showGross);}
 }
 function closePipeKpiModal(){document.getElementById('pipeKpiModal').classList.remove('open');window._lastPipeKpi=null;}
 let _lastPipeKpi=null;
@@ -843,11 +850,17 @@ async function downloadPDF(){
         }
         addCaption('ov-tribeAtt');
       }
-      if(isSecVis('ov-ytdPipeline')){
+      if(isSecVis('ov-table')){
         doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
-        checkPage(10);doc.text('YTD + Pipeline by Tribe',ml,y+4);y+=8;
-        addChartImage('tribeChart',60);
-        addCaption('ov-ytdPipeline');
+        checkPage(10);doc.text('2026 YTD Breakdown',ml,y+4);y+=6;
+        const dOvTable=window._atData;if(dOvTable){
+          const rows=Object.entries(TRIBE_TARGETS).map(([t,target])=>{const w=(dOvTable.tw[t]||0),p=(dOvTable.tp[t]||0);return[t.replace('PDEI - ',''),fmtF(target),fmtF(w),fmtF(p),fmtF(target-w),(w/target*100).toFixed(1)+'%'];});
+          doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Tribe','Target','Wins','Pipeline','Gap','Att.']],body:rows,
+            styles:{fontSize:7,cellPadding:2,font:'helvetica'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
+            columnStyles:{1:{halign:'right'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'}}});
+          y=doc.lastAutoTable.finalY+3;
+        }
+        addCaption('ov-table');
       }
       if(isSecVis('ov-winsTable')){
         doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
@@ -1021,17 +1034,11 @@ async function downloadPDF(){
         checkPage(10);doc.text('YTD vs Pipeline',ml,y+4);y+=8;
         addChartImage('ytdPipeChart',60);addCaption('at-ytdPipe');
       }
-      if(isSecVis('at-table')){
+      if(isSecVis('at-ytdPipeline')){
         doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
-        checkPage(10);doc.text('2026 YTD Breakdown',ml,y+4);y+=6;
-        const d=window._atData;if(d){
-          const rows=Object.entries(TRIBE_TARGETS).map(([t,target])=>{const w=d.tw[t]||0,p=d.tp[t]||0;return[t.replace('PDEI - ',''),fmtF(target),fmtF(w),fmtF(p),fmtF(target-w),(w/target*100).toFixed(1)+'%'];});
-          doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Tribe','Target','Wins','Pipeline','Gap','Att.']],body:rows,
-            styles:{fontSize:7,cellPadding:2,font:'helvetica'},headStyles:{fillColor:'#f3f4f6',textColor:gray,fontStyle:'bold'},
-            columnStyles:{1:{halign:'right'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'}}});
-          y=doc.lastAutoTable.finalY+3;
-        }
-        addCaption('at-table');
+        checkPage(10);doc.text('YTD + Pipeline by Tribe',ml,y+4);y+=8;
+        addChartImage('tribeChart',60);
+        addCaption('at-ytdPipeline');
       }
       if(isSecVis('at-wonTable')){
         doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
@@ -1090,9 +1097,9 @@ const CAPTIONS={
   else if(att>=80)t+=`<strong>${name}</strong> is near target at ${att.toFixed(1)}% (${fmtF(w)} of ${fmtF(target)}, gap: ${fmtF(target-w)}). `;
   else if(att>=40)t+=`<strong>${name}</strong> is at ${att.toFixed(1)}% attainment (${fmtF(w)} of ${fmtF(target)}, gap: ${fmtF(target-w)}). `;
   else t+=`<strong>${name}</strong> needs attention at ${att.toFixed(1)}% (${fmtF(w)}, gap: ${fmtF(target-w)}). `;});return t;},
-'ov-ytdPipeline':function(){const d=window._ovData;if(!d)return'';const{tws,tpip}=d;const tribes=Object.keys(TRIBE_TARGETS);let t='This chart combines won revenue and active pipeline per tribe. ';
-  tribes.forEach(tribe=>{const name=tribe.replace('PDEI - ',''),w=tws[tribe]||0,p=tpip[tribe]||0;
-  t+=`<strong>${name}</strong>: ${fmt(w)} won + ${fmt(p)} pipeline. `;});return t;},
+'ov-table':function(){const d=window._atData;if(!d)return'';const{tw,tp,totalW,totalT,totalP}=d;
+  let t='Tribe breakdown summary: ';Object.entries(TRIBE_TARGETS).forEach(([tribe,target])=>{const name=tribe.replace('PDEI - ',''),w=tw[tribe]||0,p=tp[tribe]||0,gap=target-w;
+  t+=`<strong>${name}</strong> — Won: ${fmtF(w)}, Pipeline: ${fmtF(p)}, Gap: ${fmtF(gap)}. `;});return t;},
 'ov-winsTable':function(){const d=window._ovData;if(!d)return'';const{won,tw,cw}=d;const newThisWeek=won.filter(r=>r['Week Number']==String(cw));
   let t=`<strong>${won.length} projects won</strong> in 2026 totaling <strong>${fmtF(tw)}</strong>. `;
   if(newThisWeek.length>0)t+=`<strong>${newThisWeek.length} new win${newThisWeek.length>1?'s':''}</strong> added this week (highlighted in gold). `;
@@ -1136,9 +1143,9 @@ const CAPTIONS={
   if(gap>0){const cov=(totalP/gap*100);t+=`Pipeline covers <strong>${cov.toFixed(0)}%</strong> of the ${fmtF(gap)} gap. `;
   if(cov>=300)t+='Pipeline depth is strong. ';else if(cov>=100)t+='Pipeline covers the gap but at 30% win rate may be insufficient. ';else t+='Pipeline needs significant growth to close the gap. ';}
   else t+='Target has been met! ';return t;},
-'at-table':function(){const d=window._atData;if(!d)return'';const{tw,tp,totalW,totalT,totalP}=d;
-  let t='Tribe breakdown summary: ';Object.entries(TRIBE_TARGETS).forEach(([tribe,target])=>{const name=tribe.replace('PDEI - ',''),w=tw[tribe]||0,p=tp[tribe]||0,gap=target-w;
-  t+=`<strong>${name}</strong> — Won: ${fmtF(w)}, Pipeline: ${fmtF(p)}, Gap: ${fmtF(gap)}. `;});return t;},
+'at-ytdPipeline':function(){const d=window._ovData;if(!d)return'';const{tws,tpip}=d;const tribes=Object.keys(TRIBE_TARGETS);let t='This chart combines won revenue and active pipeline per tribe. ';
+  tribes.forEach(tribe=>{const name=tribe.replace('PDEI - ',''),w=tws[tribe]||0,p=tpip[tribe]||0;
+  t+=`<strong>${name}</strong>: ${fmt(w)} won + ${fmt(p)} pipeline. `;});return t;},
 'at-wonTable':function(){const d=window._atData;if(!d)return'';const{totalW}=d;const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(r=>WS.includes(r['Status']));return`<strong>${wp.length} won projects</strong> totaling ${fmtF(totalW)}. Filter by tribe to drill into specific team results.`;}
 };
 
@@ -1411,9 +1418,11 @@ function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp=
   const tribes=Object.keys(TRIBE_TARGETS);
   if(CHARTS.ac)CHARTS.ac.destroy();CHARTS.ac=new Chart(document.getElementById('attainChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:cs()+' Won',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:cs()+' Target',data:tribes.map(t=>cx(TRIBE_TARGETS[t])),backgroundColor:'rgba(100,116,139,.15)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   if(CHARTS.yp)CHARTS.yp.destroy();CHARTS.yp=new Chart(document.getElementById('ytdPipeChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:'YTD Wins',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:'Pipeline',data:tribes.map(t=>cx(tp[t]||0)),backgroundColor:'rgba(100,116,139,.25)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
+  const fmtGap=v=>v<0?'('+fmtF(Math.abs(v))+')':fmtF(v);
   let th=`<table><thead><tr><th>Tribe</th><th class="amt">Target</th><th class="amt">Wins</th><th class="amt">Pipeline</th><th class="amt">Gap</th><th>Att.</th></tr></thead><tbody>`;
-  tribes.forEach(t=>{const w=tw[t]||0,p=tp[t]||0,target=TRIBE_TARGETS[t],gap=target-w,att=w/target*100,c=att>=80?'green':att>=40?'amber':'red',pvw=hp()?twpT(DATA_PREV,t):null;th+=`<tr><td style="font-weight:600;color:var(--text)">${t.replace('PDEI - ','')}</td><td class="amt">${fmtF(target)}</td><td class="amt" style="color:var(--green)">${fmtF(w)} ${dv(w,pvw,true)}</td><td class="amt" style="color:var(--purple)">${fmtF(p)}</td><td class="amt" style="color:var(--red)">${fmtF(gap)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:80px"><div class="progress-fill ${c}" style="width:${Math.min(att,100)}%"></div></div><span style="font-size:12px;font-weight:600;color:var(--${c})">${att.toFixed(1)}%</span></div></td></tr>`;});
-  th+=`<tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)">TOTAL</td><td class="amt" style="font-weight:700">${fmtF(totalT)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalW)}</td><td class="amt" style="font-weight:700;color:var(--purple)">${fmtF(totalP)}</td><td class="amt" style="font-weight:700;color:var(--red)">${fmtF(totalT-totalW)}</td><td style="font-weight:700;color:var(--amber)">${(totalW/totalT*100).toFixed(1)}%</td></tr></tbody></table>`;document.getElementById('tribeTable').innerHTML=th;
+  tribes.forEach(t=>{const w=tw[t]||0,p=tp[t]||0,target=TRIBE_TARGETS[t],gap=target-w,att=w/target*100,c=att>=80?'green':att>=40?'amber':'red',pvw=hp()?twpT(DATA_PREV,t):null;const te=encodeURIComponent(t);th+=`<tr><td style="font-weight:600;color:var(--text)">${t.replace('PDEI - ','')}</td><td class="amt">${fmtF(target)}</td><td class="amt" style="color:var(--green);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('wins','${te}')">${fmtF(w)} ${dv(w,pvw,true)}</td><td class="amt" style="color:var(--purple);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('pipeline','${te}')">${fmtF(p)}</td><td class="amt" style="color:${gap<0?'var(--green)':'var(--red)'}">${fmtGap(gap)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:80px"><div class="progress-fill ${c}" style="width:${Math.min(att,100)}%"></div></div><span style="font-size:12px;font-weight:600;color:var(--${c})">${att.toFixed(1)}%</span></div></td></tr>`;});
+  const totalGap=totalT-totalW;
+  th+=`<tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)">TOTAL</td><td class="amt" style="font-weight:700">${fmtF(totalT)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalW)}</td><td class="amt" style="font-weight:700;color:var(--purple)">${fmtF(totalP)}</td><td class="amt" style="font-weight:700;color:${totalGap<0?'var(--green)':'var(--red)'}">${fmtGap(totalGap)}</td><td style="font-weight:700;color:var(--amber)">${(totalW/totalT*100).toFixed(1)}%</td></tr></tbody></table>`;document.getElementById('tribeTable').innerHTML=th;document.getElementById('ovTribeDetail').innerHTML='';
   const wp=y.filter(r=>WS.includes(r['Status'])),tl=[...new Set(wp.map(r=>r['Tribe']).filter(Boolean))].sort();let tf='<span class="filter-label">Tribe</span>';tf+=`<button class="filter-btn ${tribeWinsState.tribe==='all'?'active':''}" onclick="setTWF('all')">All</button>`;tl.forEach(t=>{tf+=`<button class="filter-btn ${tribeWinsState.tribe===t?'active':''}" onclick="setTWF('${t}')">${t.replace('PDEI - ','')}</button>`;});document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);
   window._atData={tw,tp,totalW,totalT,totalP};}
 function setTWF(t){tribeWinsState.tribe=t;
@@ -1426,4 +1435,91 @@ function renderTWT(wp){const so={'Signed CE':0,'Won - Awaiting CE Signature':1,'
   let h=`<table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th>AM</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted)">No won projects</td></tr>';
   sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:300px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;});
   h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)" colspan="5">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(sorted.reduce((s,r)=>s+pn(r['GP']),0))}</td></tr></tfoot></table>`;document.getElementById('tribeWinsTable').innerHTML=h;}
+
+// ═══ OVERVIEW TRIBE DETAIL (expand wins/pipeline under YTD Breakdown) ═══
+let _ovTribeState={type:null,tribe:null};
+function toggleOvTribeDetail(type,encodedTribe){
+  const tribe=decodeURIComponent(encodedTribe),el=document.getElementById('ovTribeDetail');
+  if(_ovTribeState.type===type&&_ovTribeState.tribe===tribe){el.innerHTML='';_ovTribeState={type:null,tribe:null};return;}
+  _ovTribeState={type,tribe};
+  const y=DATA.filter(r=>r['Year']==='2026'&&r['Tribe']===tribe),name=tribe.replace('PDEI - ','');
+  if(type==='wins'){
+    const won=y.filter(r=>WS.includes(r['Status']));
+    const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const parseSD=r=>{const s=r['Sign Date']||'';const d=new Date(s);return isNaN(d)?new Date(0):d;};
+    const sorted=[...won].sort((a,b)=>{const ia=mo.indexOf(dm(a)),ib=mo.indexOf(dm(b));if(ia!==ib)return ia-ib;return parseSD(a)-parseSD(b);});
+    // Find ghost rows: projects won last week for this tribe but no longer won this week
+    const ghosts=[];
+    if(hp()){
+      const curKeys=new Set(won.map(r=>(r['Project']||'')+'|||'+(r['Client']||'')));
+      const prevTribe=DATA_PREV.filter(r=>r['Year']==='2026'&&r['Tribe']===tribe&&WS.includes(r['Status']));
+      prevTribe.forEach(pr=>{
+        const k=(pr['Project']||'')+'|||'+(pr['Client']||'');
+        if(!curKeys.has(k)){
+          // Find this project in current data to determine what happened
+          const curRow=DATA.find(r=>(r['Project']||'')+'|||'+(r['Client']||'')===k&&r['Year']==='2026');
+          let reason='Removed';
+          if(curRow){
+            const cs=curRow['Status']||'';
+            if(curRow['Tribe']!==tribe) reason='Moved to '+curRow['Tribe'].replace('PDEI - ','');
+            else if(['Archived','Stalled','Lost'].includes(cs)) reason=cs;
+            else reason='Moved to Pipeline';
+          }
+          ghosts.push({proj:pr['Project']||'—',client:pr['Client']||'—',reason,month:dm(pr),di:curRow?curRow._i:null});
+        }
+      });
+    }
+    const monthTotals={};sorted.forEach(r=>{const m=dm(r);if(!monthTotals[m])monthTotals[m]={count:0,amt:0};monthTotals[m].count++;monthTotals[m].amt+=pn(r['Amount (VAT-Ex.) (PHP)']);});
+    let h=`<div style="padding:8px 0 4px;font-weight:700;font-size:14px;color:var(--green)">${name} — Wins (${won.length})</div>`;
+    h+=`<div class="table-wrap"><table><thead><tr><th>Month</th><th>Project</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">GP</th></tr></thead><tbody>`;
+    if(!sorted.length&&!ghosts.length)h+='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">No wins</td></tr>';
+    const curWk=String(gw());
+    let lastM='',idx=0;sorted.forEach((r)=>{const m=dm(r),amt=pn(r['Amount (VAT-Ex.) (PHP)']),ga=pn(r['GP']);
+      const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
+      const showM=m!==lastM;lastM=m;const mt=monthTotals[m];const isNew=r['Week Number']==curWk;
+      h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;cursor:pointer${isNew?';background:rgba(241,194,50,.12)':''}" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;idx++;});
+    ghosts.forEach(g=>{const click=g.di!==null?` onclick="showProjModal(DATA[${g.di}])" onmouseenter="tipIn(event,${g.di})" onmousemove="tipMv(event)" onmouseleave="tipOut()" style="cursor:pointer"`:'';h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;background:var(--surface);opacity:.55"${click}><td style="color:var(--text-muted);font-style:italic">${g.month||''}</td><td colspan="2" style="font-style:italic;color:var(--text-muted)">${g.proj} — ${g.client} <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--red);color:#fff;vertical-align:middle;margin-left:4px">${g.reason.toUpperCase()}</span></td><td colspan="3"></td></tr>`;idx++;});
+    const totalAmt=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalGP=won.reduce((s,r)=>s+pn(r['GP']),0);
+    h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${won.length} win${won.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
+    el.innerHTML=h;
+  } else {
+    const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation'];
+    const pip=y.filter(r=>pipStatuses.includes(r['Status']));
+    const pipOrd={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1};
+    const sorted=[...pip].sort((a,b)=>(pipOrd[a['Status']]??99)-(pipOrd[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
+    // Find ghost rows: projects in pipeline last week for this tribe but no longer in pipeline this week
+    const ghosts=[];
+    if(hp()){
+      const curKeys=new Set(pip.map(r=>(r['Project']||'')+'|||'+(r['Client']||'')));
+      const prevPip=DATA_PREV.filter(r=>r['Year']==='2026'&&r['Tribe']===tribe&&pipStatuses.includes(r['Status']));
+      prevPip.forEach(pr=>{
+        const k=(pr['Project']||'')+'|||'+(pr['Client']||'');
+        if(!curKeys.has(k)){
+          const curRow=DATA.find(r=>(r['Project']||'')+'|||'+(r['Client']||'')===k&&r['Year']==='2026');
+          let reason='Removed';
+          if(curRow){
+            const cs=curRow['Status']||'';
+            if(WS.includes(cs)) reason='Won';
+            else if(curRow['Tribe']!==tribe) reason='Moved to '+curRow['Tribe'].replace('PDEI - ','');
+            else if(['Archived','Stalled','Lost'].includes(cs)) reason=cs;
+            else reason='Moved to '+cs;
+          }
+          ghosts.push({proj:pr['Project']||'—',client:pr['Client']||'—',reason,di:curRow?curRow._i:null});
+        }
+      });
+    }
+    let h=`<div style="padding:8px 0 4px;font-weight:700;font-size:14px;color:var(--purple)">${name} — Pipeline (${pip.length})</div>`;
+    h+=`<div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Status</th><th>AM</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;
+    if(!sorted.length&&!ghosts.length)h+='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">No pipeline projects</td></tr>';
+    let idx=0;
+    sorted.forEach((r)=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));
+      const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
+      h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;cursor:pointer" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;idx++;});
+    ghosts.forEach(g=>{const bg=g.reason==='Won'?'var(--green)':'var(--red)';const click=g.di!==null?` onclick="showProjModal(DATA[${g.di}])" onmouseenter="tipIn(event,${g.di})" onmousemove="tipMv(event)" onmouseleave="tipOut()" style="cursor:pointer"`:'';h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;background:var(--surface);opacity:.55"${click}><td colspan="2" style="font-style:italic;color:var(--text-muted)">${g.proj} — ${g.client} <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:${bg};color:#fff;vertical-align:middle;margin-left:4px">${g.reason.toUpperCase()}</span></td><td colspan="5"></td></tr>`;idx++;});
+    const totalAmt=pip.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalGP=pip.reduce((s,r)=>s+pn(r['GP']),0);
+    h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
+    el.innerHTML=h;
+  }
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 </script></body></html>
