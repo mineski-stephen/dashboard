@@ -1,6 +1,6 @@
 {
   "theme": "system",
-  "defaultCSV": "20260407_AMBD_Universe_Raw.enc",
+  "defaultCSV": "20260410_AMBD_Universe_Raw.enc",
   "lastWeekCSV": "20260331_AMBD_Universe_Raw.enc",
   "currency": "PHP",
   "usdRate": 57,
@@ -41,6 +41,12 @@
     "at-ytdPipe": true,
     "at-ytdPipeline": true,
     "at-wonTable": true
+  },
+  "poc": {
+    "visible": true,
+    "poc-info": true,
+    "poc-chart": true,
+    "poc-table": true
   },
   "encrypt": {
     "visible": false

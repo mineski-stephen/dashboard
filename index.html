@@ -225,6 +225,7 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .hidden-section{display:none !important}
 /* Pipeline text selectable */
 #sec-pipeline,#sec-pipeline *{-webkit-user-select:text;user-select:text}
+#pocQtrTotals,#pocQtrTotals *{-webkit-user-select:text;user-select:text;cursor:auto}
 #sec-pipeline .kpi,#sec-pipeline .kpi *{-webkit-user-select:none;user-select:none}
 /* Project tooltip */
 .proj-tip{position:fixed;z-index:200;max-width:340px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-dim);pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:pre-wrap;line-height:1.5}
@@ -267,6 +268,11 @@ tr[data-di]{cursor:pointer}
 .theme-btn{flex:1;padding:6px 10px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:var(--text-muted);transition:all .15s;text-align:center}
 .theme-btn.active{background:var(--accent);color:#fff}
 body.settings-open,body.modal-open{overflow:hidden}
+.poc-phase-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:12px 0 8px;text-align:center}
+.poc-phase{padding:8px 4px;border-radius:6px;font-size:11px;font-weight:600;line-height:1.4}
+.poc-phase small{display:block;font-size:10px;font-weight:400;color:var(--text-muted);margin-top:2px}
+.poc-prog{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.poc-prog-fill{height:100%;border-radius:4px;transition:width .4s}
 </style></head><body>
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
@@ -315,14 +321,20 @@ body.settings-open,body.modal-open{overflow:hidden}
   </div>
   <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)toggleSettings()"><div class="settings-panel" id="settingsPanel"></div></div>
   <div class="nav-tabs" id="navTabs">
-    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales Pipeline</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
+    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales Pipeline</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
   </div>
   <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div><div id="ovTribeDetail" style="margin-top:12px"></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
-  <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="card" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Monthly Pipeline</div><div style="height:300px"><canvas id="monthlyPipeChart"></canvas></div><div id="monthlyPipeDetail" style="margin-top:12px"></div></div><div class="pipeline-cols" id="pipelineCols"></div></div>
+  <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="card" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Monthly Pipeline</div><div style="position:relative"><div style="height:300px"><canvas id="monthlyPipeChart"></canvas></div><div id="qtrPipeBars" style="position:relative;height:24px;margin-top:2px"></div></div><div id="monthlyPipeDetail" style="margin-top:12px"></div><div id="qtrPipeDetail" style="margin-top:12px"></div></div><div class="pipeline-cols" id="pipelineCols"></div></div>
   <div class="section" id="sec-am"><div class="card vis-section" data-vis="am-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Account Manager Weighted Performance</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#cc0000"></div>Actual Collection</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#ffd966;border:1px solid #ccc"></div>Collection Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f0c132"></div>Awarded Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3c78d8"></div>Pitch Phase</div><div class="am-legend-item"><div style="width:10px;height:2px;background:var(--red)"></div>Target</div></div><div id="amBars"></div></div><div id="amDetailContainer" class="vis-section" data-vis="am-detail"></div></div>
   <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid" id="bdGrid"></div><div class="bd-detail" id="bdDetail"></div><div class="card vis-section" data-vis="bd-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>BD Wins — 2026</div><div class="table-wrap" id="bdWinsTable"></div></div><div class="card vis-section" data-vis="bd-doors" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Doors Opened — 2026</div><div class="table-wrap" id="bdDoorsTable"></div></div></div>
   <div class="section" id="sec-winrate"><div class="kpi-strip vis-section" data-vis="wr-kpis" id="winrateKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="wr-count"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Win vs Loss (Count)</div><div class="chart-container"><canvas id="winLossCountChart"></canvas></div></div><div class="card vis-section" data-vis="wr-value"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Win vs Loss (Value)</div><div class="chart-container"><canvas id="winLossValueChart"></canvas></div></div></div><div class="grid-2"><div class="card vis-section" data-vis="wr-trend"><div class="card-title"><div class="dot" style="background:var(--amber)"></div>Win Rate Trend</div><div class="chart-container short"><canvas id="winRateTrendChart"></canvas></div></div><div class="card vis-section" data-vis="wr-tribe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Win Rate by Tribe</div><div class="chart-container short"><canvas id="winRateTribeChart"></canvas></div></div></div><div class="card vis-section" data-vis="wr-table" id="wrLostCard"><div class="card-title"><div class="dot" style="background:var(--red)"></div>Lost Projects</div><div class="filter-row" id="winrateMonthFilter"></div><div class="table-wrap" id="lossTable"></div></div></div>
   <div class="section" id="sec-attainment"><div class="kpi-strip vis-section" data-vis="at-kpis" id="attainKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="at-attChart"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Attainment by Tribe</div><div class="chart-container"><canvas id="attainChart"></canvas></div></div><div class="card vis-section" data-vis="at-ytdPipe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>YTD vs Pipeline</div><div class="chart-container"><canvas id="ytdPipeChart"></canvas></div></div></div><div class="card vis-section" data-vis="at-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="at-wonTable" id="atWonCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Projects Won</div><div class="filter-row" id="tribeWinsFilter"></div><div class="table-wrap" id="tribeWinsTable"></div></div></div>
+  <!-- POC TAB -->
+  <div class="section" id="sec-poc">
+    <div class="card vis-section" data-vis="poc-info"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Phase Reference</div><div id="pocRefBody"></div></div>
+    <div class="card vis-section" data-vis="poc-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>POC Amounts by Month</div><div style="height:340px"><canvas id="pocChart"></canvas></div><div id="pocQtrTotals" style="margin-top:8px"></div><div id="pocChartDetail" style="margin-top:12px"></div></div>
+    <div class="card vis-section" data-vis="poc-table"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Completion Status</div><div class="table-wrap" id="pocTable"></div></div>
+  </div>
   <!-- ENCRYPT TAB -->
   <div class="section" id="sec-encrypt"><div class="card"><div class="card-title"><div class="dot" style="background:var(--red)"></div>File Encryption / Decryption</div>
     <div class="enc-box">
@@ -435,15 +447,16 @@ async function doEncAction(){
   }}
 
 // ═══ SETTINGS CONFIG ═══
-const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won'};
-const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins','bd-doors'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable']};
-const TAB_NAMES={overview:'Overview',pipeline:'Sales Pipeline',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',encrypt:'Encrypt/Decrypt'};
+const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table'};
+const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins','bd-doors'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],poc:['poc-info','poc-chart','poc-table']};
+const TAB_NAMES={overview:'Overview',pipeline:'Sales Pipeline',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',poc:'POC',encrypt:'Encrypt/Decrypt'};
 const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',currency:'PHP',usdRate:57,
   overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-table':true,'ov-winsTable':true},
   pipeline:{visible:true,'pl-kpis':true},am:{visible:true,'am-chart':true,'am-detail':true},
   bd:{visible:true,'bd-charts':true,'bd-filter':true},
   winrate:{visible:false,'wr-kpis':true,'wr-count':true,'wr-value':true,'wr-trend':true,'wr-tribe':true,'wr-table':true},
   attainment:{visible:true,'at-kpis':true,'at-attChart':true,'at-ytdPipe':true,'at-ytdPipeline':true,'at-wonTable':true},
+  poc:{visible:true,'poc-info':true,'poc-chart':true,'poc-table':true},
   encrypt:{visible:false}};
 let CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
 function isTabVis(t){return CFG[t]?.visible!==false;}
@@ -1158,7 +1171,130 @@ const CAPTIONS={
 'at-wonTable':function(){const d=window._atData;if(!d)return'';const{totalW}=d;const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(r=>WS.includes(r['Status']));return`<strong>${wp.length} won projects</strong> totaling ${fmtF(totalW)}. Filter by tribe to drill into specific team results.`;}
 };
 
-function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();injectCaptions();}
+// ═══ 7. POC ═══
+function renderPOC(){
+  const y=DATA.filter(r=>r['Year']==='2026');
+  // Phase reference card
+  const phases=[
+    {name:'Identify',pct:0,color:'var(--text-muted)',tip:'Identify potential clients and opportunities in the market'},
+    {name:'Initiation',pct:0,color:'var(--text-muted)',tip:'Establish initial contact with the client and understand their needs'},
+    {name:'Approval',pct:0,color:'var(--text-muted)',tip:'Win a proposal or get internal approval to proceed with the project'},
+    {name:'Preparation',pct:50,color:'#3b82f6',tip:'Prepare deliverables, resources, and project plans for execution'},
+    {name:'Execution',pct:80,color:'#f59e0b',tip:'Actively execute the project deliverables and milestones'},
+    {name:'Closure',pct:90,color:'#22c55e',tip:'Finalize deliverables, obtain sign-offs, and close out the project'},
+    {name:'Complete',pct:100,color:'#f1c232',tip:'Project fully completed — all deliverables accepted and invoiced'}
+  ];
+  let refH='<div class="poc-phase-grid">';
+  phases.forEach(p=>{const eTip=p.tip.replace(/'/g,'&#39;');refH+=`<div class="poc-phase" style="background:${p.pct>0?p.color+'20':'var(--card)'};border:1px solid ${p.pct>0?p.color:'var(--border)'};cursor:pointer" onmouseenter="_tip.textContent='${eTip}';_tip.classList.add('show');tipMv(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()"><span style="color:${p.color}">${p.name}</span><small>${p.pct}%</small></div>`;});
+  refH+='</div><div style="font-size:11px;color:var(--text-muted);padding:0 0 8px">Percentage of Completion (POC) reflects the project phase. Hover over each phase for details.</div>';
+  document.getElementById('pocRefBody').innerHTML=refH;
+
+  // Collect POC projects (those with at least Preparation Date filled)
+  const pocRows=y.filter(r=>r['Preparation Date']&&r['Preparation Date'].trim());
+  const moNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const phaseKeys=[
+    {date:'Preparation Date',amt:'Preparation Amount (PHP)',label:'Preparation',color:'#3b82f6'},
+    {date:'Execution Date',amt:'Execution Amount (PHP)',label:'Execution',color:'#f59e0b'},
+    {date:'Closure Date',amt:'Closure Amount (PHP)',label:'Closure',color:'#22c55e'},
+    {date:'Completion Date',amt:'Completion Amount (PHP)',label:'Completion',color:'#f1c232'}
+  ];
+
+  // Monthly chart data: for each phase, sum amounts by month of that phase's date
+  const datasets=phaseKeys.map(pk=>{
+    const moData=new Array(12).fill(0);
+    pocRows.forEach(r=>{
+      const ds=r[pk.date]||'';const d=new Date(ds);
+      if(isNaN(d))return;
+      moData[d.getMonth()]+=pn(r[pk.amt]);
+    });
+    return{label:pk.label,data:moData.map(v=>cx(v)),backgroundColor:pk.color,borderRadius:4};
+  });
+
+  // Build per-month project lists for click-to-expand (with phase+amount per entry)
+  const pocMoData={};moNames.forEach(m=>{pocMoData[m]={entries:[]};});
+  pocRows.forEach(r=>{
+    phaseKeys.forEach(pk=>{
+      const ds=r[pk.date]||'';const d=new Date(ds);
+      if(!isNaN(d)){const m=moNames[d.getMonth()];pocMoData[m].entries.push({r,phase:pk.label,phaseColor:pk.color,amt:pn(r[pk.amt])});}
+    });
+  });
+  window._pocMoData=pocMoData;
+
+  const txtC=getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+  const mutC=getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+  if(CHARTS.poc)CHARTS.poc.destroy();
+  CHARTS.poc=new Chart(document.getElementById('pocChart'),{type:'bar',data:{labels:moNames,datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10}},onHover:(e,els,chart)=>{chart.canvas.style.cursor='pointer';},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{mode:'index',callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:mutC,font:{family:'DM Sans',size:11}}},y:{stacked:true,ticks:{color:mutC,font:{family:'DM Sans',size:11},callback:v=>cs()+Number(v).toLocaleString('en',{notation:'compact',maximumFractionDigits:1})},grid:{color:'rgba(100,116,139,.1)'}}},onClick:(e)=>{const els=CHARTS.poc.getElementsAtEventForMode(e,'index',{intersect:false},false);if(!els.length)return;const idx=els[0].index,m=moNames[idx];togglePocChartDetail(m,pocMoData[m].entries);}}});
+  document.getElementById('pocChartDetail').innerHTML='';
+
+  // Quarterly POC totals
+  const qtrMonths=[['Jan','Feb','Mar'],['Apr','May','Jun'],['Jul','Aug','Sep'],['Oct','Nov','Dec']];
+  const qtrColors=['#3b82f6','#22c55e','#f59e0b','#f1c232'];
+  let qh='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
+  qtrMonths.forEach((ms,qi)=>{
+    let qTotal=0;
+    ms.forEach(m=>{pocMoData[m].entries.forEach(e=>{qTotal+=e.amt;});});
+    qh+=`<div style="text-align:center;padding:8px 4px;border-radius:6px;border:1px solid var(--border);background:${qtrColors[qi]}08">
+      <div style="font-size:10px;font-weight:600;color:${qtrColors[qi]};text-transform:uppercase;letter-spacing:.5px">Q${qi+1}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-top:2px">${fmtF(qTotal)}</div>
+    </div>`;
+  });
+  qh+='</div>';
+  document.getElementById('pocQtrTotals').innerHTML=qh;
+
+  // Completion table — phase determined by comparing today vs phase dates
+  const today=new Date();today.setHours(0,0,0,0);
+  const phaseSteps=[
+    {key:'Completion Date',label:'Complete',color:'#f1c232'},
+    {key:'Closure Date',label:'Closure',color:'#22c55e'},
+    {key:'Execution Date',label:'Execution',color:'#f59e0b'},
+    {key:'Preparation Date',label:'Preparation',color:'#3b82f6'}
+  ];
+  const pocData=pocRows.map(r=>{
+    // Determine current phase: find the latest date that today has passed
+    let phase='Preparation',phaseColor='#3b82f6';
+    for(const ps of phaseSteps){
+      const ds=r[ps.key]||'';const d=new Date(ds);
+      if(!isNaN(d)&&today>=d){phase=ps.label;phaseColor=ps.color;break;}
+    }
+    // Completion %: (today - prepDate) / (completionDate - prepDate), capped at 100
+    const prepD=new Date(r['Preparation Date']);const compD=new Date(r['Completion Date']);
+    let pct=0;
+    if(!isNaN(prepD)&&!isNaN(compD)&&compD>prepD){
+      if(today>=compD)pct=100;
+      else pct=Math.max(0,Math.min(100,((today-prepD)/(compD-prepD))*100));
+    }
+    const amt=pn(r['Amount (VAT-Ex.) (PHP)']);
+    return{r,phase,phaseColor,pct,amt};
+  }).sort((a,b)=>b.pct-a.pct||b.amt-a.amt);
+
+  let th=`<table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th>Phase</th><th style="min-width:140px">Progress</th><th class="amt">Amount</th></tr></thead><tbody>`;
+  if(!pocData.length)th+='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">No POC data available</td></tr>';
+  pocData.forEach((d,i)=>{
+    const c=d.phaseColor;
+    th+=`<tr class="anim-fade" style="animation-delay:${(i*0.03).toFixed(2)}s;cursor:pointer" onclick="showProjModal(DATA[${d.r._i}])" onmouseenter="tipIn(event,${d.r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${d.r['Project']||'—'}</td><td>${d.r['Client']||'—'}</td><td>${(d.r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(d.r['Status'])}</td><td><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:${c}20;color:${c}">${d.phase}</span></td><td><div style="display:flex;align-items:center;gap:6px"><div class="poc-prog" style="flex:1"><div class="poc-prog-fill" style="width:${d.pct.toFixed(0)}%;background:${c}"></div></div><span style="font-size:11px;font-weight:600;color:${c};min-width:32px">${d.pct.toFixed(0)}%</span></div></td><td class="amt">${fmtF(d.amt)}</td></tr>`;
+  });
+  th+='</tbody></table>';
+  document.getElementById('pocTable').innerHTML=th;
+}
+
+let _pocChartMonth=null;
+function togglePocChartDetail(month,entries){
+  const el=document.getElementById('pocChartDetail');
+  if(_pocChartMonth===month){el.innerHTML='';_pocChartMonth=null;return;}
+  _pocChartMonth=month;
+  const phaseOrder={Preparation:0,Execution:1,Closure:2,Completion:3,Complete:4};
+  const sorted=[...entries].sort((a,b)=>(phaseOrder[a.phase]??99)-(phaseOrder[b.phase]??99)||b.amt-a.amt);
+  const totalAmt=sorted.reduce((s,e)=>s+e.amt,0);
+  let h=`<div style="padding:8px 0 4px;font-weight:700;font-size:14px;color:var(--purple)">${month} — POC Projects (${sorted.length})</div>`;
+  h+=`<div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th>Phase</th><th class="amt">Amount</th></tr></thead><tbody>`;
+  if(!sorted.length)h+='<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">No projects</td></tr>';
+  sorted.forEach((e,i)=>{const r=e.r;
+    h+=`<tr class="anim-fade" style="animation-delay:${(i*0.03).toFixed(2)}s;cursor:pointer" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:${e.phaseColor}20;color:${e.phaseColor}">${e.phase}</span></td><td class="amt">${fmtF(e.amt)}</td></tr>`;});
+  h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="5" style="font-weight:700;color:var(--text)">Total — ${sorted.length} entr${sorted.length!==1?'ies':'y'}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td></tr></tfoot></table></div>`;
+  el.innerHTML=h;el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();injectCaptions();}
 
 // ═══ 1. OVERVIEW ═══
 let _activeQ=-1;
@@ -1182,10 +1318,12 @@ function toggleQDetail(i){
   document.querySelectorAll('.q-item').forEach((s,si)=>{s.style.opacity=si===i?'1':'0.35';});
   // Show overlay on main bar
   if(ov){ov.style.background=colors[i];ov.style.opacity='0.3';ov.style.width=Math.min(q.pct,100)+'%';ov.classList.add('show');}
-  const cols=exceeded?3:4;
+  const qtrTarget=q.qtrPip*USD_RATE;
+  const cols=exceeded?5:6;
   inner.style.gridTemplateColumns=`repeat(${cols},1fr)`;
   inner.innerHTML=`
-    <div class="q-detail-cell"><div class="q-detail-cell-label">${q.label} Target</div><div class="q-detail-cell-value" style="color:${colors[i]}">${fmtF(qTarget)}</div></div>
+    <div class="q-detail-cell"><div class="q-detail-cell-label">${q.label} Target</div><div class="q-detail-cell-value" style="color:${colors[i]}">${fmtF(qtrTarget)}</div></div>
+    <div class="q-detail-cell"><div class="q-detail-cell-label">Cumulative Target</div><div class="q-detail-cell-value" style="color:${colors[i]}">${fmtF(qTarget)}</div></div>
     <div class="q-detail-cell"><div class="q-detail-cell-label">YTD Sales</div><div class="q-detail-cell-value" style="color:var(--text)">${fmtF(ytd)} <span style="font-size:11px;font-weight:600;color:var(--text-muted)">(${pctOfQ.toFixed(1)}%)</span></div></div>
     <div class="q-detail-cell"><div class="q-detail-cell-label">${exceeded?'Exceeded By':'YTD Gap'}</div><div class="q-detail-cell-value" style="color:${exceeded?'var(--green)':'var(--red)'}">${fmtF(Math.abs(gap))}</div></div>${exceeded?'':`
     <div class="q-detail-cell"><div class="q-detail-cell-label">Pipeline Required</div><div class="q-detail-cell-value" style="color:${colors[i]};font-size:11px;line-height:1.6">${fmtF(qtrPipReq)}<span style="display:block;font-size:10px;color:var(--text-muted);font-weight:500">(${q.label} target ÷ 30%)</span></div><div style="margin:2px 0;border-top:1px solid var(--border);width:80%"></div><div class="q-detail-cell-value" style="color:var(--text);font-size:11px;line-height:1.6">${fmtF(pipTotal)}<span style="display:block;font-size:10px;color:var(--text-muted);font-weight:500">current pipeline</span></div></div>`}`;
@@ -1264,7 +1402,7 @@ function renderPipeline(cw){
 
 let _monthlyPipeState={month:null};
 function renderMonthlyPipe(y){
-  const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'];
+  const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation'];
   const pip=y.filter(r=>pipStatuses.includes(r['Status']));
   const moNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const moData={};moNames.forEach(m=>{moData[m]={amt:0,projects:[]};});
@@ -1275,9 +1413,11 @@ function renderMonthlyPipe(y){
   if(CHARTS.mp)CHARTS.mp.destroy();
   const curMoIdx=new Date().getMonth();
   const barColor=(m,i)=>{if(m===_monthlyPipeState.month)return '#f1c232';return i<curMoIdx?'rgba(100,116,139,.25)':'#f1c232';};
-  const mpLabelPlugin={id:'mpLabels',afterDatasetsDraw(chart){const ctx=chart.ctx,ds=chart.data.datasets[0],meta=chart.getDatasetMeta(0);meta.data.forEach((bar,i)=>{const v=ds.data[i];if(!v)return;ctx.save();ctx.font='600 10px DM Sans';ctx.fillStyle=txtC;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmt(v),bar.x,bar.y-4);ctx.restore();});}};
-  CHARTS.mp=new Chart(document.getElementById('monthlyPipeChart'),{type:'bar',data:{labels:moNames,datasets:[{label:'Pipeline '+cs(),data:amounts,backgroundColor:moNames.map((m,i)=>barColor(m,i)),borderRadius:4}]},plugins:[mpLabelPlugin],options:{responsive:true,maintainAspectRatio:false,onHover:(e,els,chart)=>{chart.canvas.style.cursor='pointer';},plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},scales:{x:{grid:{display:false},ticks:{color:mutC,font:{family:'DM Sans',size:11}}},y:{ticks:{color:mutC,font:{family:'DM Sans',size:11},callback:v=>cs()+Number(v).toLocaleString('en',{notation:'compact',maximumFractionDigits:1})},grid:{color:'rgba(100,116,139,.1)'}}},onClick:(e)=>{const els=CHARTS.mp.getElementsAtEventForMode(e,'index',{intersect:false},false);if(!els.length)return;const idx=els[0].index,m=moNames[idx];toggleMonthlyPipeDetail(m,moData[m].projects);CHARTS.mp.data.datasets[0].backgroundColor=moNames.map((mo,i)=>barColor(mo,i));CHARTS.mp.update();}}});
-  window._monthlyPipeData=moData;document.getElementById('monthlyPipeDetail').innerHTML='';}
+  const fmtPre=(v)=>{const s=cs();if(Math.abs(v)>=1e9)return s+(v/1e9).toFixed(2)+'B';if(Math.abs(v)>=1e6)return s+(v/1e6).toFixed(2)+'M';if(Math.abs(v)>=1e3)return s+(v/1e3).toFixed(1)+'K';return s+v.toLocaleString('en',{maximumFractionDigits:0});};
+  const mpLabelPlugin={id:'mpLabels',afterDatasetsDraw(chart){const ctx=chart.ctx,ds=chart.data.datasets[0],meta=chart.getDatasetMeta(0);meta.data.forEach((bar,i)=>{const v=ds.data[i];if(!v)return;ctx.save();ctx.font='600 10px DM Sans';ctx.fillStyle=txtC;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmtPre(v),bar.x,bar.y-4);ctx.restore();});}};
+  const mpQtrPlugin={id:'mpQtrSync',afterRender(){if(window._monthlyPipePip)renderQtrPipeBars(window._monthlyPipePip);}};
+  CHARTS.mp=new Chart(document.getElementById('monthlyPipeChart'),{type:'bar',data:{labels:moNames,datasets:[{label:'Pipeline '+cs(),data:amounts,backgroundColor:moNames.map((m,i)=>barColor(m,i)),borderRadius:4}]},plugins:[mpLabelPlugin,mpQtrPlugin],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:20}},onHover:(e,els,chart)=>{chart.canvas.style.cursor='pointer';},plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},scales:{x:{grid:{display:false},ticks:{color:mutC,font:{family:'DM Sans',size:11}}},y:{ticks:{color:mutC,font:{family:'DM Sans',size:11},callback:v=>cs()+Number(v).toLocaleString('en',{notation:'compact',maximumFractionDigits:1})},grid:{color:'rgba(100,116,139,.1)'}}},onClick:(e)=>{const els=CHARTS.mp.getElementsAtEventForMode(e,'index',{intersect:false},false);if(!els.length)return;const idx=els[0].index,m=moNames[idx];toggleMonthlyPipeDetail(m,moData[m].projects);CHARTS.mp.data.datasets[0].backgroundColor=moNames.map((mo,i)=>barColor(mo,i));CHARTS.mp.update();}}});
+  window._monthlyPipeData=moData;window._monthlyPipePip=pip;document.getElementById('monthlyPipeDetail').innerHTML='';document.getElementById('qtrPipeDetail').innerHTML='';_qtrPipeState.q=null;}
 
 function toggleMonthlyPipeDetail(month,projects){
   const el=document.getElementById('monthlyPipeDetail');
@@ -1293,6 +1433,69 @@ function toggleMonthlyPipeDetail(month,projects){
     h+=`<tr class="anim-fade" style="animation-delay:${(i*0.03).toFixed(2)}s;cursor:pointer" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;});
   h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="5" style="font-weight:700;color:var(--text)">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
   el.innerHTML=h;el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+
+// ═══ QUARTERLY PIPELINE BARS ═══
+let _qtrPipeState={q:null};
+function renderQtrPipeBars(pip){
+  const qMonths=[['Jan','Feb','Mar'],['Apr','May','Jun'],['Jul','Aug','Sep'],['Oct','Nov','Dec']];
+  const moNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const colors=['#3b82f6','#22c55e','#f59e0b','#f1c232'];
+  const curMoIdx=new Date().getMonth();const curQ=Math.floor(curMoIdx/3);
+  const qData=Q_TARGETS_USD.map((qt,qi)=>{
+    const ms=qMonths[qi];
+    const projects=pip.filter(r=>{const ps=r['Project Start']||'';const d=new Date(ps);if(isNaN(d))return false;return ms.includes(moNames[d.getMonth()]);});
+    const amt=projects.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
+    const target=qt.qtrPip*USD_RATE;
+    return{label:qt.label,amt,target,projects,color:colors[qi]};
+  });
+  window._qtrPipeData=qData;
+  const fmtShort=v=>{if(Math.abs(v)>=1e9)return cs()+(v/1e9).toFixed(2)+'B';if(Math.abs(v)>=1e6)return cs()+(v/1e6).toFixed(1)+'M';if(Math.abs(v)>=1e3)return cs()+(v/1e3).toFixed(0)+'K';return cs()+v.toLocaleString('en',{maximumFractionDigits:0});};
+  // Position bars using chart x-scale pixel coordinates
+  const chart=CHARTS.mp;if(!chart)return;
+  const xScale=chart.scales.x;
+  const container=document.getElementById('qtrPipeBars');
+  const canvas=chart.canvas;
+  const containerLeft=canvas.offsetLeft;
+  // Each quarter spans 3 bars: indices [0-2], [3-5], [6-8], [9-11]
+  let h='';
+  qData.forEach((d,i)=>{
+    const startIdx=i*3, endIdx=i*3+2;
+    const x0=xScale.getPixelForValue(startIdx);
+    const x1=xScale.getPixelForValue(endIdx);
+    const halfStep=(xScale.getPixelForValue(1)-xScale.getPixelForValue(0))/2;
+    const left=x0-halfStep;
+    const right=x1+halfStep;
+    const width=right-left;
+    const pctFill=Math.min(d.amt/d.target*100,100);
+    const isPast=i<curQ;const isActive=_qtrPipeState.q===i;
+    const fillColor=isPast&&!isActive?'rgba(100,116,139,.4)':d.color;
+    const hoverBg=isPast&&!isActive?'rgba(100,116,139,.12)':d.color+'15';
+    h+=`<div onclick="toggleQtrPipeDetail(${i})" style="position:absolute;left:${left}px;width:${width}px;top:0;height:22px;cursor:pointer;border-radius:4px;transition:background .15s" onmouseenter="this.style.background='${hoverBg}'" onmouseleave="this.style.background='transparent'">
+      <div style="position:absolute;left:3px;right:3px;top:3px;height:16px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pctFill.toFixed(1)}%;background:${fillColor};border-radius:3px;transition:width .4s"></div>
+      </div>
+      <span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:9px;font-weight:700;color:${pctFill>50?'#000':'var(--text)'};white-space:nowrap;pointer-events:none;z-index:1">${fmtShort(d.amt)}</span>
+    </div>`;
+  });
+  container.innerHTML=h;
+}
+function toggleQtrPipeDetail(qi){
+  const el=document.getElementById('qtrPipeDetail');
+  if(_qtrPipeState.q===qi){el.innerHTML='';_qtrPipeState.q=null;return;}
+  _qtrPipeState.q=qi;
+  const d=window._qtrPipeData[qi];
+  const colors=['#3b82f6','#22c55e','#f59e0b','#f1c232'];
+  const sorted=[...d.projects].sort((a,b)=>{const so={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1,'Talks In Progress':2,'Talent Sourcing':3};return(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']);});
+  const totalAmt=sorted.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalGP=sorted.reduce((s,r)=>s+pn(r['GP']),0);
+  let h=`<div style="padding:8px 0 4px;font-weight:700;font-size:14px;color:${colors[qi]}">${d.label} — Pipeline (${sorted.length})</div>`;
+  h+=`<div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th>AM</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;
+  if(!sorted.length)h+='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">No pipeline projects in this quarter</td></tr>';
+  sorted.forEach((r,i)=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));
+    const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
+    h+=`<tr class="anim-fade" style="animation-delay:${(i*0.03).toFixed(2)}s;cursor:pointer" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;});
+  h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="5" style="font-weight:700;color:var(--text)">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
+  el.innerHTML=h;el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
 
 // ═══ 3. AM (expandable phase detail on click) ═══
 let amDataCache={};
