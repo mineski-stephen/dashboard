@@ -227,6 +227,7 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 #sec-pipeline,#sec-pipeline *{-webkit-user-select:text;user-select:text}
 #pocQtrTotals,#pocQtrTotals *{-webkit-user-select:text;user-select:text;cursor:auto}
 #sec-pipeline .kpi,#sec-pipeline .kpi *{-webkit-user-select:none;user-select:none}
+#qDetailInner,#qDetailInner *{-webkit-user-select:text;user-select:text;cursor:auto}#qDetailInner [onclick]{cursor:pointer}
 /* Project tooltip */
 .proj-tip{position:fixed;z-index:200;max-width:340px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-dim);pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 4px 12px rgba(0,0,0,.3);white-space:pre-wrap;line-height:1.5}
 .proj-tip.show{opacity:1}
@@ -1223,7 +1224,7 @@ function renderPOC(){
   const txtC=getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
   const mutC=getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
   if(CHARTS.poc)CHARTS.poc.destroy();
-  CHARTS.poc=new Chart(document.getElementById('pocChart'),{type:'bar',data:{labels:moNames,datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10}},onHover:(e,els,chart)=>{chart.canvas.style.cursor='pointer';},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{mode:'index',callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:mutC,font:{family:'DM Sans',size:11}}},y:{stacked:true,ticks:{color:mutC,font:{family:'DM Sans',size:11},callback:v=>cs()+Number(v).toLocaleString('en',{notation:'compact',maximumFractionDigits:1})},grid:{color:'rgba(100,116,139,.1)'}}},onClick:(e)=>{const els=CHARTS.poc.getElementsAtEventForMode(e,'index',{intersect:false},false);if(!els.length)return;const idx=els[0].index,m=moNames[idx];togglePocChartDetail(m,pocMoData[m].entries);}}});
+  CHARTS.poc=new Chart(document.getElementById('pocChart'),{type:'bar',data:{labels:moNames,datasets},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10}},animation:false,onHover:(e,els,chart)=>{chart.canvas.style.cursor='pointer';},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{mode:'index',callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:mutC,font:{family:'DM Sans',size:11}}},y:{stacked:true,ticks:{color:mutC,font:{family:'DM Sans',size:11},callback:v=>cs()+Number(v).toLocaleString('en',{notation:'compact',maximumFractionDigits:1})},grid:{color:'rgba(100,116,139,.1)'}}},onClick:(e)=>{const els=CHARTS.poc.getElementsAtEventForMode(e,'index',{intersect:false},false);if(!els.length)return;const idx=els[0].index,m=moNames[idx];togglePocChartDetail(m,pocMoData[m].entries);}}});
   document.getElementById('pocChartDetail').innerHTML='';
 
   // Quarterly POC totals
@@ -1357,7 +1358,7 @@ function renderOverview(cw){
   document.getElementById('tribeAttBars').innerHTML=ah;
   const tpip={};pip.forEach(r=>{const t=r['Tribe']||'?';tpip[t]=(tpip[t]||0)+pn(r['Amount (VAT-Ex.) (PHP)']);});
   const at=Object.keys(TRIBE_TARGETS);if(CHARTS.tc)CHARTS.tc.destroy();
-  CHARTS.tc=new Chart(document.getElementById('tribeChart'),{type:'bar',data:{labels:at.map(t=>t.replace('PDEI - ','')),datasets:[{label:cs()+' Won',data:at.map(t=>cx(tws[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:cs()+' Pipeline',data:at.map(t=>cx(tpip[t]||0)),backgroundColor:'rgba(59,130,246,.3)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{stacked:true,ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
+  CHARTS.tc=new Chart(document.getElementById('tribeChart'),{type:'bar',data:{labels:at.map(t=>t.replace('PDEI - ','')),datasets:[{label:cs()+' Won',data:at.map(t=>cx(tws[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:cs()+' Pipeline',data:at.map(t=>cx(tpip[t]||0)),backgroundColor:'rgba(59,130,246,.3)',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animations:{y:{duration:0},height:{duration:0}},scales:{x:{stacked:true,ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   // Wins table sorted by month with monthly subtotals
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const parseSD=r=>{const s=r['Sign Date']||'';const d=new Date(s);return isNaN(d)?new Date(0):d;};
@@ -1416,8 +1417,8 @@ function renderMonthlyPipe(y){
   const fmtPre=(v)=>{const s=cs();if(Math.abs(v)>=1e9)return s+(v/1e9).toFixed(2)+'B';if(Math.abs(v)>=1e6)return s+(v/1e6).toFixed(2)+'M';if(Math.abs(v)>=1e3)return s+(v/1e3).toFixed(1)+'K';return s+v.toLocaleString('en',{maximumFractionDigits:0});};
   const mpLabelPlugin={id:'mpLabels',afterDatasetsDraw(chart){const ctx=chart.ctx,ds=chart.data.datasets[0],meta=chart.getDatasetMeta(0);meta.data.forEach((bar,i)=>{const v=ds.data[i];if(!v)return;ctx.save();ctx.font='600 10px DM Sans';ctx.fillStyle=txtC;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(fmtPre(v),bar.x,bar.y-4);ctx.restore();});}};
   const mpQtrPlugin={id:'mpQtrSync',afterRender(){if(window._monthlyPipePip)renderQtrPipeBars(window._monthlyPipePip);}};
-  CHARTS.mp=new Chart(document.getElementById('monthlyPipeChart'),{type:'bar',data:{labels:moNames,datasets:[{label:'Pipeline '+cs(),data:amounts,backgroundColor:moNames.map((m,i)=>barColor(m,i)),borderRadius:4}]},plugins:[mpLabelPlugin,mpQtrPlugin],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:20}},onHover:(e,els,chart)=>{chart.canvas.style.cursor='pointer';},plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},scales:{x:{grid:{display:false},ticks:{color:mutC,font:{family:'DM Sans',size:11}}},y:{ticks:{color:mutC,font:{family:'DM Sans',size:11},callback:v=>cs()+Number(v).toLocaleString('en',{notation:'compact',maximumFractionDigits:1})},grid:{color:'rgba(100,116,139,.1)'}}},onClick:(e)=>{const els=CHARTS.mp.getElementsAtEventForMode(e,'index',{intersect:false},false);if(!els.length)return;const idx=els[0].index,m=moNames[idx];toggleMonthlyPipeDetail(m,moData[m].projects);CHARTS.mp.data.datasets[0].backgroundColor=moNames.map((mo,i)=>barColor(mo,i));CHARTS.mp.update();}}});
-  window._monthlyPipeData=moData;window._monthlyPipePip=pip;document.getElementById('monthlyPipeDetail').innerHTML='';document.getElementById('qtrPipeDetail').innerHTML='';_qtrPipeState.q=null;}
+  CHARTS.mp=new Chart(document.getElementById('monthlyPipeChart'),{type:'bar',data:{labels:moNames,datasets:[{label:'Pipeline '+cs(),data:amounts,backgroundColor:moNames.map((m,i)=>barColor(m,i)),borderRadius:4}]},plugins:[mpLabelPlugin,mpQtrPlugin],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:20}},animation:false,onHover:(e,els,chart)=>{chart.canvas.style.cursor='pointer';},plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:ctx=>cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},scales:{x:{grid:{display:false},ticks:{color:mutC,font:{family:'DM Sans',size:11}}},y:{ticks:{color:mutC,font:{family:'DM Sans',size:11},callback:v=>cs()+Number(v).toLocaleString('en',{notation:'compact',maximumFractionDigits:1})},grid:{color:'rgba(100,116,139,.1)'}}},onClick:(e)=>{const els=CHARTS.mp.getElementsAtEventForMode(e,'index',{intersect:false},false);if(!els.length)return;const idx=els[0].index,m=moNames[idx];toggleMonthlyPipeDetail(m,moData[m].projects);CHARTS.mp.data.datasets[0].backgroundColor=moNames.map((mo,i)=>barColor(mo,i));CHARTS.mp.update();}}});
+  window._monthlyPipeData=moData;window._monthlyPipePip=pip;renderQtrPipeBars(pip);document.getElementById('monthlyPipeDetail').innerHTML='';document.getElementById('qtrPipeDetail').innerHTML='';_qtrPipeState.q=null;}
 
 function toggleMonthlyPipeDetail(month,projects){
   const el=document.getElementById('monthlyPipeDetail');
@@ -1445,15 +1446,15 @@ function renderQtrPipeBars(pip){
     const ms=qMonths[qi];
     const projects=pip.filter(r=>{const ps=r['Project Start']||'';const d=new Date(ps);if(isNaN(d))return false;return ms.includes(moNames[d.getMonth()]);});
     const amt=projects.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
-    const target=qt.qtrPip*USD_RATE;
+    const target=qt.qtrPip*USD_RATE/0.3;
     return{label:qt.label,amt,target,projects,color:colors[qi]};
   });
   window._qtrPipeData=qData;
   const fmtShort=v=>{if(Math.abs(v)>=1e9)return cs()+(v/1e9).toFixed(2)+'B';if(Math.abs(v)>=1e6)return cs()+(v/1e6).toFixed(1)+'M';if(Math.abs(v)>=1e3)return cs()+(v/1e3).toFixed(0)+'K';return cs()+v.toLocaleString('en',{maximumFractionDigits:0});};
   // Position bars using chart x-scale pixel coordinates
-  const chart=CHARTS.mp;if(!chart)return;
-  const xScale=chart.scales.x;
-  const container=document.getElementById('qtrPipeBars');
+  const chart=CHARTS.mp;if(!chart||!chart.canvas||!chart.canvas.offsetParent)return;
+  const xScale=chart.scales.x;if(!xScale)return;
+  const container=document.getElementById('qtrPipeBars');if(!container)return;
   const canvas=chart.canvas;
   const containerLeft=canvas.offsetLeft;
   // Each quarter spans 3 bars: indices [0-2], [3-5], [6-8], [9-11]
@@ -1487,7 +1488,57 @@ function toggleQtrPipeDetail(qi){
   const colors=['#3b82f6','#22c55e','#f59e0b','#f1c232'];
   const sorted=[...d.projects].sort((a,b)=>{const so={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1,'Talks In Progress':2,'Talent Sourcing':3};return(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']);});
   const totalAmt=sorted.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalGP=sorted.reduce((s,r)=>s+pn(r['GP']),0);
+  // Target coverage breakdown
+  const qtrTarget=Q_TARGETS_USD[qi].qtrPip*USD_RATE;
+  const curPip=d.amt,projWins=curPip*0.3,gap=Math.max(qtrTarget-projWins,0);
+  const totalPipeReq=qtrTarget/0.3,newPipeNeeded=gap/0.3;
+  const covPct=qtrTarget>0?Math.min(projWins/qtrTarget*100,100):0;
+  const bluePct=qtrTarget>0?Math.min(projWins/qtrTarget*100,100):0;
+  const redPct=qtrTarget>0?Math.min(gap/qtrTarget*100,100):0;
+  const hasGap=gap>0.01;
+  const morePct=curPip>0?(newPipeNeeded/curPip*100):0;
   let h=`<div style="padding:8px 0 4px;font-weight:700;font-size:14px;color:${colors[qi]}">${d.label} — Pipeline (${sorted.length})</div>`;
+  h+=`<div style="margin:8px 0 16px">
+    <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:8px">Target coverage breakdown</div>
+    <div style="position:relative;height:36px;background:var(--border);border-radius:6px;overflow:hidden;display:flex">
+      <div style="width:${bluePct.toFixed(1)}%;height:100%;background:#3b82f6;display:flex;align-items:center;justify-content:center;min-width:${projWins>0?'40px':'0'}">
+        <span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">${fmt(projWins)}</span>
+      </div>${hasGap?`<div style="width:${redPct.toFixed(1)}%;height:100%;background:#8B3A3A;display:flex;align-items:center;justify-content:center;min-width:40px">
+        <span style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap">${fmt(gap)}</span>
+      </div>`:''}
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:4px">
+      <span>${cs()}0</span><span>${fmt(qtrTarget)} target</span>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:6px;font-size:12px;color:var(--text-dim)">
+      <span><span style="color:#3b82f6">■</span> Projected wins — ${fmt(projWins)}</span>
+      ${hasGap?`<span><span style="color:#8B3A3A">■</span> Gap — ${fmt(gap)}</span>`:''}
+    </div>
+  </div>`;
+  if(hasGap){
+    h+=`<div style="margin:0 0 16px">
+      <div style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:8px">What it takes to close the gap</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--surface)">
+          <div style="font-size:12px;color:var(--text-muted)">New pipeline needed</div>
+          <div style="font-size:24px;font-weight:700;color:var(--text);margin:4px 0 2px">${fmt(newPipeNeeded)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">to yield ${fmt(gap)} at 30%</div>
+        </div>
+        <div style="padding:16px;border:1px solid var(--border);border-radius:8px;background:var(--surface)">
+          <div style="font-size:12px;color:var(--text-muted)">Total pipeline required</div>
+          <div style="font-size:24px;font-weight:700;color:var(--text);margin:4px 0 2px">${fmt(totalPipeReq)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">current ${fmt(curPip)} + ${fmt(newPipeNeeded)} new</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:10px 14px;background:rgba(241,194,50,.08);border-left:3px solid #f1c232;border-radius:0 6px 6px 0;font-size:13px;color:var(--text-dim);margin:0 0 14px;line-height:1.5">
+      Current pipeline covers <strong>${covPct.toFixed(0)}%</strong> of target. You need <strong>${morePct.toFixed(0)}%</strong> more pipeline (<strong>${fmt(newPipeNeeded)}</strong>) to fully cover ${d.label}.
+    </div>`;
+  }else{
+    h+=`<div style="padding:10px 14px;background:rgba(16,185,129,.08);border-left:3px solid var(--green);border-radius:0 6px 6px 0;font-size:13px;color:var(--text-dim);margin:0 0 14px;line-height:1.5">
+      Current pipeline covers <strong>${covPct.toFixed(0)}%</strong> of target. Your pipeline can meet the <strong>${d.label}</strong> target at a 30% win rate.
+    </div>`;
+  }
   h+=`<div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th>AM</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;
   if(!sorted.length)h+='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">No pipeline projects in this quarter</td></tr>';
   sorted.forEach((r,i)=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));
@@ -1616,7 +1667,7 @@ function renderBDCharts(){
   if(CHARTS.bdAtt)CHARTS.bdAtt.destroy();
   CHARTS.bdAtt=new Chart(document.getElementById('bdAttainChart'),{type:'bar',
     data:{labels,datasets:[{label:'Qualified',data:qualData,backgroundColor:'#f1c232',borderRadius:{topLeft:6,bottomLeft:6}},{label:'For Qualification',data:fqData,backgroundColor:'#3a74d0',borderRadius:{topRight:6,bottomRight:6}}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{stacked:true,beginAtZero:true,max:Math.max(...goals)+5,ticks:{stepSize:5}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{afterBody:(items)=>{const i=items[0].dataIndex,t=qualData[i]+fqData[i];return `Total: ${t} / ${goals[i]} (${(t/goals[i]*100).toFixed(0)}%)`;}}}}},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animations:{y:{duration:0},height:{duration:0}},scales:{x:{stacked:true,beginAtZero:true,max:Math.max(...goals)+5,ticks:{stepSize:5}},y:{stacked:true,grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{afterBody:(items)=>{const i=items[0].dataIndex,t=qualData[i]+fqData[i];return `Total: ${t} / ${goals[i]} (${(t/goals[i]*100).toFixed(0)}%)`;}}}}},
     plugins:[{id:'goalM',afterDatasetsDraw(chart){const{ctx,scales:{x,y}}=chart;const rc=getComputedStyle(document.documentElement).getPropertyValue('--red').trim()||'#EF4444';
       goals.forEach((g,i)=>{if(g<=0)return;const xP=x.getPixelForValue(g),yC=y.getPixelForValue(i),bH=Math.abs((y.getPixelForValue(0)-y.getPixelForValue(1))||28)*0.45;
         ctx.save();ctx.strokeStyle=rc;ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(xP,yC-bH);ctx.lineTo(xP,yC+bH);ctx.stroke();ctx.setLineDash([]);ctx.restore();});}},
@@ -1663,12 +1714,12 @@ function renderWinRate(){const y=DATA.filter(r=>r['Year']==='2026'),wins=y.filte
   wins.forEach(r=>{const m=dm(r);if(!wm[m])wm[m]={c:0,a:0};wm[m].c++;wm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});losses.forEach(r=>{const m=dm(r);if(!lm[m])lm[m]={c:0,a:0};lm[m].c++;lm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});
   const am=mo.filter(m=>wm[m]||lm[m]),tW=wins.length,tL=losses.length,td=tW+tL,wr=td>0?tW/td*100:0,twv=wins.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),tlv=losses.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),vwr=(twv+tlv)>0?twv/(twv+tlv)*100:0;
   document.getElementById('winrateKpis').innerHTML=`<div ${afc('kpi '+(wr>=60?'green':wr>=40?'amber':'red'),0)} aria-label="Win Rate: ${wr.toFixed(1)}%, ${tW} wins, ${tL} losses"><div class="kpi-label">Win Rate</div><div class="kpi-value">${wr.toFixed(1)}%</div><div class="kpi-sub">${tW}W / ${tL}L</div></div><div ${afc('kpi '+(vwr>=60?'green':vwr>=40?'amber':'red'),1)} aria-label="Value Win Rate: ${vwr.toFixed(1)}%, ${fmt(twv)} of ${fmt(twv+tlv)}"><div class="kpi-label">Value Win Rate</div><div class="kpi-value">${vwr.toFixed(1)}%</div><div class="kpi-sub">${fmt(twv)} of ${fmt(twv+tlv)}</div></div><div ${afc('kpi green',2)} aria-label="Won: ${tW} projects, ${fmt(twv)}"><div class="kpi-label">Won</div><div class="kpi-value">${tW}</div><div class="kpi-sub">${fmt(twv)}</div></div><div ${afc('kpi red clickable',3)} aria-label="Lost: ${tL} projects, ${fmt(tlv)}" onclick="document.getElementById('wrLostCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Lost</div><div class="kpi-value">${tL}</div><div class="kpi-sub">${fmt(tlv)}</div></div>`;
-  if(CHARTS.wlc)CHARTS.wlc.destroy();CHARTS.wlc=new Chart(document.getElementById('winLossCountChart'),{type:'bar',data:{labels:am,datasets:[{label:'Wins',data:am.map(m=>(wm[m]||{}).c||0),backgroundColor:cGreen,borderRadius:6},{label:'Losses',data:am.map(m=>(lm[m]||{}).c||0),backgroundColor:cRed,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cBorder}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}}}}});
-  if(CHARTS.wlv)CHARTS.wlv.destroy();CHARTS.wlv=new Chart(document.getElementById('winLossValueChart'),{type:'bar',data:{labels:am,datasets:[{label:'Won',data:am.map(m=>cx((wm[m]||{}).a||0)),backgroundColor:cGreen,borderRadius:6},{label:'Lost',data:am.map(m=>cx((lm[m]||{}).a||0)),backgroundColor:cRed,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cBorder},ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
+  if(CHARTS.wlc)CHARTS.wlc.destroy();CHARTS.wlc=new Chart(document.getElementById('winLossCountChart'),{type:'bar',data:{labels:am,datasets:[{label:'Wins',data:am.map(m=>(wm[m]||{}).c||0),backgroundColor:cGreen,borderRadius:6},{label:'Losses',data:am.map(m=>(lm[m]||{}).c||0),backgroundColor:cRed,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cBorder}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}}}}});
+  if(CHARTS.wlv)CHARTS.wlv.destroy();CHARTS.wlv=new Chart(document.getElementById('winLossValueChart'),{type:'bar',data:{labels:am,datasets:[{label:'Won',data:am.map(m=>cx((wm[m]||{}).a||0)),backgroundColor:cGreen,borderRadius:6},{label:'Lost',data:am.map(m=>cx((lm[m]||{}).a||0)),backgroundColor:cRed,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cBorder},ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   if(CHARTS.wrt)CHARTS.wrt.destroy();const wrm=am.map(m=>{const w=(wm[m]||{}).c||0,l=(lm[m]||{}).c||0;return(w+l)>0?w/(w+l)*100:null;});CHARTS.wrt=new Chart(document.getElementById('winRateTrendChart'),{type:'line',data:{labels:am,datasets:[{label:'Win Rate %',data:wrm,borderColor:'#f1c232',backgroundColor:'rgba(241,194,50,.1)',borderWidth:3,pointBackgroundColor:'#f1c232',pointRadius:6,fill:true,tension:.3},{label:'50%',data:am.map(()=>50),borderColor:'rgba(100,116,139,.3)',borderDash:[6,4],borderWidth:1,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{min:0,max:100,grid:{color:cBorder},ticks:{callback:v=>v+'%'}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='50%'?'':ctx.raw?.toFixed(1)+'%'}}}}});
   if(CHARTS.wrtb)CHARTS.wrtb.destroy();const tn0=[...new Set([...wins,...losses].map(r=>r['Tribe']).filter(Boolean))].sort(),twc={},tlc={};wins.forEach(r=>{twc[r['Tribe']||'?']=(twc[r['Tribe']||'?']||0)+1;});losses.forEach(r=>{tlc[r['Tribe']||'?']=(tlc[r['Tribe']||'?']||0)+1;});
   const tn=tn0.filter(t=>(twc[t]||0)>0||(tlc[t]||0)>0);const twr=tn.map(t=>{const w=twc[t]||0,l=tlc[t]||0;return(w+l)>0?w/(w+l)*100:0;});
-  CHARTS.wrtb=new Chart(document.getElementById('winRateTribeChart'),{type:'bar',data:{labels:tn.map(t=>t.replace('PDEI - ','')),datasets:[{data:twr,backgroundColor:twr.map(v=>v>=60?cGreen:v>=40?'#f1c232':cRed),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{min:0,max:100,grid:{color:cBorder},ticks:{callback:v=>v+'%'}},y:{grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.toFixed(1)}% — ${twc[tn[ctx.dataIndex]]||0}W / ${tlc[tn[ctx.dataIndex]]||0}L`}}}}});
+  CHARTS.wrtb=new Chart(document.getElementById('winRateTribeChart'),{type:'bar',data:{labels:tn.map(t=>t.replace('PDEI - ','')),datasets:[{data:twr,backgroundColor:twr.map(v=>v>=60?cGreen:v>=40?'#f1c232':cRed),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animations:{y:{duration:0},height:{duration:0}},scales:{x:{min:0,max:100,grid:{color:cBorder},ticks:{callback:v=>v+'%'}},y:{grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw.toFixed(1)}% — ${twc[tn[ctx.dataIndex]]||0}W / ${tlc[tn[ctx.dataIndex]]||0}L`}}}}});
   let fH='<span class="filter-label">Month</span>';fH+=`<button class="filter-btn ${wrState.month==='all'?'active':''}" onclick="setWRM('all')">All</button>`;am.forEach(m=>{fH+=`<button class="filter-btn ${wrState.month===m?'active':''}" onclick="setWRM('${m}')">${m}</button>`;});document.getElementById('winrateMonthFilter').innerHTML=fH;renderLT(losses);
   window._wrData={tW,tL,wr,twv,tlv,vwr,am,wm,lm,wins,losses};}
 function setWRM(m){wrState.month=m;
@@ -1683,12 +1734,12 @@ function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>
 
 // ═══ 6. ATTAINMENT (pipeline bar fix) ═══
 let tribeWinsState={tribe:'all'};
-function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp={};y.forEach(r=>{const t=r['Tribe']||'?',php=pn(r['Amount (VAT-Ex.) (PHP)']);if(WS.includes(r['Status']))tw[t]=(tw[t]||0)+php;if(['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'].includes(r['Status']))tp[t]=(tp[t]||0)+php;});
+function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp={};const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'];y.forEach(r=>{const t=r['Tribe']||'?',php=pn(r['Amount (VAT-Ex.) (PHP)']);if(WS.includes(r['Status']))tw[t]=(tw[t]||0)+php;if(pipStatuses.includes(r['Status']))tp[t]=(tp[t]||0)+php;});
   const totalW=Object.values(tw).reduce((a,b)=>a+b,0),totalT=Object.values(TRIBE_TARGETS).reduce((a,b)=>a+b,0),totalP=Object.values(tp).reduce((a,b)=>a+b,0),pvW=hp()?twp(DATA_PREV):null;
   document.getElementById('attainKpis').innerHTML=`<div ${afc('kpi green clickable',0)} aria-label="Total Won: ${fmt(totalW)}, ${pct(totalW,totalT)}% of target" onclick="document.getElementById('atWonCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Won</div><div class="kpi-value">${fmt(totalW)} ${dv(totalW,pvW)}</div><div class="kpi-sub">${pct(totalW,totalT)}% of target</div></div><div ${afc('kpi blue',1)} aria-label="Target: ${fmt(totalT)}"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(totalT)}</div></div><div ${afc('kpi amber clickable',2)} aria-label="Pipeline: ${fmt(totalP)}" onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(totalP)}</div></div><div ${afc('kpi red',3)} aria-label="Gap to target: ${fmt(totalT-totalW)}"><div class="kpi-label">Gap</div><div class="kpi-value">${fmt(totalT-totalW)}</div></div>`;
   const tribes=Object.keys(TRIBE_TARGETS);
-  if(CHARTS.ac)CHARTS.ac.destroy();CHARTS.ac=new Chart(document.getElementById('attainChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:cs()+' Won',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:cs()+' Target',data:tribes.map(t=>cx(TRIBE_TARGETS[t])),backgroundColor:'rgba(100,116,139,.15)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
-  if(CHARTS.yp)CHARTS.yp.destroy();CHARTS.yp=new Chart(document.getElementById('ytdPipeChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:'YTD Wins',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:'Pipeline',data:tribes.map(t=>cx(tp[t]||0)),backgroundColor:'rgba(100,116,139,.25)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
+  if(CHARTS.ac)CHARTS.ac.destroy();CHARTS.ac=new Chart(document.getElementById('attainChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:cs()+' Won',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:cs()+' Target',data:tribes.map(t=>cx(TRIBE_TARGETS[t])),backgroundColor:'rgba(100,116,139,.15)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animations:{y:{duration:0},height:{duration:0}},scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
+  if(CHARTS.yp)CHARTS.yp.destroy();CHARTS.yp=new Chart(document.getElementById('ytdPipeChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:'YTD Wins',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:'Pipeline',data:tribes.map(t=>cx(tp[t]||0)),backgroundColor:'rgba(100,116,139,.25)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animations:{y:{duration:0},height:{duration:0}},scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   const fmtGap=v=>v<0?'('+fmtF(Math.abs(v))+')':fmtF(v);
   let th=`<table><thead><tr><th>Tribe</th><th class="amt">Target</th><th class="amt">Wins</th><th class="amt">Pipeline</th><th class="amt">Gap</th><th>Att.</th></tr></thead><tbody>`;
   tribes.forEach(t=>{const w=tw[t]||0,p=tp[t]||0,target=TRIBE_TARGETS[t],gap=target-w,att=w/target*100,c=att>=80?'green':att>=40?'amber':'red',pvw=hp()?twpT(DATA_PREV,t):null;const te=encodeURIComponent(t);th+=`<tr><td style="font-weight:600;color:var(--text)">${t.replace('PDEI - ','')}</td><td class="amt">${fmtF(target)}</td><td class="amt" style="color:var(--green);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('wins','${te}')" ${hasChanged(w,pvw)?`onmouseenter="_tip.textContent='was ${fmtF(pvw)}';_tip.classList.add('show');tipMv(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()"`:``}>${fmtF(w)} ${dvRow(w,pvw)}</td><td class="amt" style="color:var(--purple);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('pipeline','${te}')">${fmtF(p)}</td><td class="amt" style="color:${gap<0?'var(--green)':'var(--red)'}">${fmtGap(gap)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:80px"><div class="progress-fill ${c}" style="width:${Math.min(att,100)}%"></div></div><span style="font-size:12px;font-weight:600;color:var(--${c})">${att.toFixed(1)}%</span></div></td></tr>`;});
@@ -1754,9 +1805,9 @@ function toggleOvTribeDetail(type,encodedTribe){
     h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${won.length} win${won.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
     el.innerHTML=h;
   } else {
-    const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation'];
+    const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'];
     const pip=y.filter(r=>pipStatuses.includes(r['Status']));
-    const pipOrd={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1};
+    const pipOrd={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1,'Talks In Progress':2,'Talent Sourcing':3};
     const sorted=[...pip].sort((a,b)=>(pipOrd[a['Status']]??99)-(pipOrd[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
     // Find ghost rows: projects in pipeline last week for this tribe but no longer in pipeline this week
     const ghosts=[];
