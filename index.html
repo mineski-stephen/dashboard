@@ -274,6 +274,118 @@ body.settings-open,body.modal-open{overflow:hidden}
 .poc-phase small{display:block;font-size:10px;font-weight:400;color:var(--text-muted);margin-top:2px}
 .poc-prog{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
 .poc-prog-fill{height:100%;border-radius:4px;transition:width .4s}
+/* ── Target tab ── */
+@keyframes tgPop{0%{opacity:0;transform:translateY(-8px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tgSlide{0%{opacity:0;transform:translateY(-14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes tgPulse{0%{box-shadow:0 0 0 0 rgba(241,194,50,.85)}70%{box-shadow:0 0 0 14px rgba(241,194,50,0)}100%{box-shadow:0 0 0 0 rgba(241,194,50,0)}}
+@keyframes tgFlash{0%{background:var(--accent-glow)}100%{background:transparent}}
+.tg-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;animation:tgSlide .3s ease both}
+.tg-sum-cell{display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--border);padding-right:14px}
+.tg-sum-cell:last-child{border-right:none;padding-right:0}
+.tg-sum-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)}
+.tg-sum-val{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.3px;transition:color .2s}
+.tg-sum-val.gap{color:var(--red)}.tg-sum-val.rfp{color:var(--amber)}.tg-sum-val.won{color:var(--green)}
+.tg-wr-wrap{display:flex;align-items:center;gap:6px}
+.tg-wr-input{width:110px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:24px;font-weight:700;padding:4px 8px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s}
+.tg-wr-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-wr-suffix{font-size:22px;font-weight:700;color:var(--text-dim)}
+.tg-top-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.tg-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tg-btn{padding:10px 18px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:transform .12s,opacity .15s,box-shadow .15s}
+.tg-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.18)}
+.tg-btn:active{transform:translateY(1px);box-shadow:none}
+.tg-btn.ghost{background:var(--surface);color:var(--text-dim);border:1px solid var(--border)}
+.tg-btn.ghost:hover{border-color:var(--accent);color:var(--text)}
+.tg-view-toggle{display:flex;background:var(--surface2);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.tg-view-btn{padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-muted);transition:all .2s;font-family:'DM Sans',sans-serif}
+.tg-view-btn.active{background:var(--accent);color:#fff}
+.tg-groups{display:flex;flex-direction:column;gap:16px}
+.tg-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:background .2s,border-color .2s,transform .15s,box-shadow .2s;animation:tgSlide .35s ease both}
+.tg-group.drag-over{background:var(--accent-glow);border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+.tg-group.dragging{opacity:.4;transform:scale(.98)}
+.tg-group-head{display:flex;align-items:center;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--border);flex-wrap:wrap;cursor:grab;transition:background .15s}
+.tg-group-head:active{cursor:grabbing}
+.tg-group-head:hover .tg-group-grip{background:var(--accent-glow);color:var(--accent)}
+.tg-group-grip{display:inline-flex;align-items:center;justify-content:center;width:28px;height:34px;background:var(--surface3);border-radius:8px;font-size:14px;letter-spacing:1px;color:var(--text-muted);user-select:none;transition:background .15s,color .15s;font-weight:700}
+.tg-group-name{font-size:20px;font-weight:700;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;padding:8px 12px;border-radius:8px;min-width:200px;flex:0 1 auto;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s;cursor:text}
+.tg-group-name:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-group-totals{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap}
+.tg-group-tot{display:flex;flex-direction:column;align-items:flex-end}
+.tg-group-tot .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.tg-group-tot .val{font-size:15px;font-weight:700;color:var(--text)}
+.tg-group-tot.gap .val{color:var(--red)}.tg-group-tot.rfp .val{color:var(--amber)}.tg-group-tot.won .val{color:var(--green)}
+.tg-group-del{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px 10px;border-radius:6px;transition:color .15s,background .15s}
+.tg-group-del:hover{color:var(--red);background:var(--red-dim)}
+.tg-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;min-height:48px;position:relative}
+.tg-empty{grid-column:1/-1;padding:18px;text-align:center;color:var(--text-muted);font-size:13px;border:1px dashed var(--border);border-radius:10px}
+.tg-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;position:relative;transition:transform .15s,box-shadow .2s,background .2s,border-color .2s,opacity .2s;animation:tgPop .3s cubic-bezier(.2,.9,.3,1.2) both}
+.tg-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.tg-card.dragging{opacity:.35;transform:scale(.96)}
+.tg-card.removing{animation:tgPop .2s ease reverse forwards}
+.tg-card.star{background:#f1c232;border-color:#d4a824;color:#111}
+.tg-card.star-pulse{animation:tgPulse .6s ease}
+.tg-card.star .tg-row .v,.tg-card.star .tg-row .k,.tg-card.star input{color:#111}
+.tg-card.star input{background:rgba(255,255,255,.55);border-color:#c99f1e}
+.tg-card-placeholder{border:2px dashed var(--accent);border-radius:12px;background:var(--accent-glow);min-height:160px;animation:tgPop .2s ease both}
+.tg-card-drag{display:flex;align-items:center;gap:8px;margin:-12px -12px 6px;padding:6px 10px 6px 8px;background:var(--surface3);border-radius:12px 12px 0 0;cursor:grab;transition:background .15s}
+.tg-card-drag:hover{background:var(--accent-glow)}
+.tg-card-drag:hover .grip{color:var(--accent)}
+.tg-card-drag:active{cursor:grabbing}
+.tg-card.star .tg-card-drag{background:rgba(0,0,0,.12)}
+.tg-card.star .tg-card-drag:hover{background:rgba(0,0,0,.2)}
+.tg-card-drag .grip{display:inline-flex;align-items:center;justify-content:center;width:20px;font-size:13px;letter-spacing:1px;color:var(--text-muted);font-weight:700;user-select:none;transition:color .15s}
+.tg-card.star .tg-card-drag .grip{color:#333}
+.tg-card input.tg-field-head{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:700;padding:7px 10px;outline:none;font-family:'DM Sans',sans-serif;cursor:text;transition:border-color .15s,box-shadow .15s,background .15s}
+.tg-card input.tg-field-head:hover{border-color:var(--text-muted)}
+.tg-card input.tg-field-head:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-card.star input.tg-field-head{background:rgba(255,255,255,.75);border-color:#c99f1e;color:#111}
+.tg-card.star input.tg-field-head:focus{background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.1)}
+.tg-card-actions{display:flex;gap:6px;align-items:center}
+.tg-star{background:transparent;border:none;font-size:18px;cursor:pointer;padding:2px 6px;color:var(--text-muted);transition:transform .2s,color .15s}
+.tg-star:hover{transform:scale(1.3) rotate(12deg)}
+.tg-star.on{color:#f1c232;filter:drop-shadow(0 0 4px rgba(241,194,50,.5))}
+.tg-card.star .tg-star{color:#111}
+.tg-card-del{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;transition:color .15s,background .15s}
+.tg-card-del:hover{color:var(--red);background:var(--red-dim)}
+.tg-card.star .tg-card-del:hover{color:#a00}
+.tg-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
+.tg-row .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);flex:0 0 64px}
+.tg-row .v{font-weight:700;color:var(--text);text-align:right;font-size:14px;transition:color .2s}
+.tg-row .v.won{color:var(--green)}.tg-row .v.gap{color:var(--red)}.tg-row .v.rfp{color:var(--amber)}
+.tg-card input.tg-field{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-weight:600;padding:6px 10px;text-align:right;outline:none;font-family:'DM Sans',sans-serif;min-width:0;transition:border-color .15s,box-shadow .15s,background .15s}
+.tg-card input.tg-field:hover{border-color:var(--text-muted)}
+.tg-card input.tg-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-card.star input.tg-field{background:rgba(255,255,255,.7);border-color:#c99f1e;color:#111}
+.tg-card.star input.tg-field:focus{background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.08)}
+.tg-wins-list{display:flex;flex-direction:column;gap:4px}
+.tg-win-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:13px;transition:background .2s,border-color .2s,transform .15s;animation:tgSlide .3s ease both}
+.tg-win-row:hover{transform:translateX(4px)}
+.tg-win-row.hi{background:#f1c232;color:#111;border-color:#d4a824;animation:tgFlash .6s ease,tgSlide .3s ease both}
+.tg-win-row.hi .lbl,.tg-win-row.hi .sub{color:#111}
+.tg-win-row .lbl{font-weight:700;color:var(--text);font-size:13px}
+.tg-win-row .sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.tg-win-row .amt{font-weight:700;color:var(--text);text-align:right;white-space:nowrap;font-size:14px}
+.tg-card.star .tg-card-drag .grip{color:#333}
+/* Table view */
+.tg-table-wrap{overflow-x:auto;animation:tgSlide .3s ease both;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px}
+.tg-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tg-table thead th{background:var(--surface2);padding:12px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);border-bottom:1px solid var(--border);text-align:left;position:sticky;top:0;z-index:1}
+.tg-table thead th.amt{text-align:right}
+.tg-table tbody td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tg-table tbody td.amt{text-align:right;font-weight:600;white-space:nowrap}
+.tg-table tbody td.won{color:var(--green);font-weight:700}
+.tg-table tbody td.gap{color:var(--red);font-weight:700}
+.tg-table tbody td.rfp{color:var(--amber);font-weight:700}
+.tg-table tbody tr{animation:tgSlide .25s ease both}
+.tg-table tbody tr.star-row td{background:rgba(241,194,50,.12)}
+.tg-table tbody tr.group-head td{background:var(--surface2);font-weight:700;border-top:2px solid var(--border)}
+.tg-table input.tg-tfield{width:100%;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text);font-size:13px;font-weight:600;padding:4px 6px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .15s,background .15s}
+.tg-table input.tg-tfield:hover{border-color:var(--border);background:var(--surface2)}
+.tg-table input.tg-tfield:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 2px var(--accent-glow)}
+.tg-table input.tg-tfield.amt{text-align:right}
+.tg-table .tg-star{font-size:16px}
+.tg-table tfoot td{padding:12px 10px;background:var(--surface2);border-top:2px solid var(--border);font-weight:700;font-size:14px}
+.tg-table tfoot td.won{color:var(--green)}.tg-table tfoot td.gap{color:var(--red)}.tg-table tfoot td.rfp{color:var(--amber)}
 </style></head><body>
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
@@ -322,7 +434,7 @@ body.settings-open,body.modal-open{overflow:hidden}
   </div>
   <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)toggleSettings()"><div class="settings-panel" id="settingsPanel"></div></div>
   <div class="nav-tabs" id="navTabs">
-    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
+    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="target">Target</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
   </div>
   <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div><div id="ovTribeDetail" style="margin-top:12px"></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
   <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="card" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Monthly Pipeline</div><div style="position:relative"><div style="height:300px"><canvas id="monthlyPipeChart"></canvas></div><div id="qtrPipeBars" style="position:relative;height:24px;margin-top:2px"></div></div><div id="monthlyPipeDetail" style="margin-top:12px"></div><div id="qtrPipeDetail" style="margin-top:12px"></div></div><div class="pipeline-cols" id="pipelineCols"></div></div>
@@ -330,6 +442,33 @@ body.settings-open,body.modal-open{overflow:hidden}
   <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid" id="bdGrid"></div><div class="bd-detail" id="bdDetail"></div><div class="card vis-section" data-vis="bd-doors" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Doors Opened — 2026</div><div class="table-wrap" id="bdDoorsTable"></div></div><div class="card vis-section" data-vis="bd-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>BD Wins — 2026</div><div class="table-wrap" id="bdWinsTable"></div></div></div>
   <div class="section" id="sec-winrate"><div class="kpi-strip vis-section" data-vis="wr-kpis" id="winrateKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="wr-count"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Win vs Loss (Count)</div><div class="chart-container"><canvas id="winLossCountChart"></canvas></div></div><div class="card vis-section" data-vis="wr-value"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Win vs Loss (Value)</div><div class="chart-container"><canvas id="winLossValueChart"></canvas></div></div></div><div class="grid-2"><div class="card vis-section" data-vis="wr-trend"><div class="card-title"><div class="dot" style="background:var(--amber)"></div>Win Rate Trend</div><div class="chart-container short"><canvas id="winRateTrendChart"></canvas></div></div><div class="card vis-section" data-vis="wr-tribe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Win Rate by Tribe</div><div class="chart-container short"><canvas id="winRateTribeChart"></canvas></div></div></div><div class="card vis-section" data-vis="wr-table" id="wrLostCard"><div class="card-title"><div class="dot" style="background:var(--red)"></div>Lost Projects</div><div class="filter-row" id="winrateMonthFilter"></div><div class="table-wrap" id="lossTable"></div></div></div>
   <div class="section" id="sec-attainment"><div class="kpi-strip vis-section" data-vis="at-kpis" id="attainKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="at-attChart"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Attainment by Tribe</div><div class="chart-container"><canvas id="attainChart"></canvas></div></div><div class="card vis-section" data-vis="at-ytdPipe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>YTD vs Pipeline</div><div class="chart-container"><canvas id="ytdPipeChart"></canvas></div></div></div><div class="card vis-section" data-vis="at-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="at-wonTable" id="atWonCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Projects Won</div><div class="filter-row" id="tribeWinsFilter"></div><div class="table-wrap" id="tribeWinsTable"></div></div></div>
+  <!-- TARGET TAB -->
+  <div class="section" id="sec-target">
+    <div class="vis-section" data-vis="tg-summary">
+      <div class="tg-summary">
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Total Sum</span><span class="tg-sum-val" id="tgSumTotal">—</span></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Winrate Estimate</span><div class="tg-wr-wrap"><input type="number" class="tg-wr-input" id="tgWrInput" value="33.33" step="0.01" min="0.01"><span class="tg-wr-suffix">%</span></div></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Total Won</span><span class="tg-sum-val won" id="tgSumWon">—</span></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Gap</span><span class="tg-sum-val gap" id="tgSumGap">—</span></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">RFP</span><span class="tg-sum-val rfp" id="tgSumRfp">—</span></div>
+      </div>
+      <div class="tg-top-bar">
+        <div class="tg-actions">
+          <button class="tg-btn" onclick="tgAddGroup()">+ New Group</button>
+          <button class="tg-btn ghost" onclick="tgAddCard()">+ New Card</button>
+        </div>
+        <div class="tg-view-toggle">
+          <button class="tg-view-btn active" id="tgViewCards" onclick="tgSetView('cards')">Cards</button>
+          <button class="tg-view-btn" id="tgViewTable" onclick="tgSetView('table')">Table</button>
+        </div>
+      </div>
+    </div>
+    <div class="vis-section" data-vis="tg-groups">
+      <div class="tg-groups" id="tgGroups"></div>
+      <div class="tg-table-wrap" id="tgTableWrap" style="display:none"></div>
+    </div>
+    <div class="card vis-section" data-vis="tg-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="tg-wins-list" id="tgWinsList"></div></div>
+  </div>
   <!-- POC TAB -->
   <div class="section" id="sec-poc">
     <div class="card vis-section" data-vis="poc-info"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Phase Reference</div><div id="pocRefBody"></div></div>
@@ -448,15 +587,16 @@ async function doEncAction(){
   }}
 
 // ═══ SETTINGS CONFIG ═══
-const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table'};
-const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins','bd-doors'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],poc:['poc-info','poc-chart','poc-table']};
-const TAB_NAMES={overview:'Overview',pipeline:'Sales',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',poc:'POC',encrypt:'Encrypt/Decrypt'};
+const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','bd-wins':'BD Wins Table','bd-doors':'Doors Opened','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','tg-summary':'Summary Bar','tg-groups':'Groups & Cards','tg-wins':'Wins List','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table'};
+const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins','bd-doors'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],target:['tg-summary','tg-groups','tg-wins'],poc:['poc-info','poc-chart','poc-table']};
+const TAB_NAMES={overview:'Overview',pipeline:'Sales',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',target:'Target',poc:'POC',encrypt:'Encrypt/Decrypt'};
 const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',currency:'PHP',usdRate:57,
   overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-table':true,'ov-winsTable':true},
   pipeline:{visible:true,'pl-kpis':true},am:{visible:true,'am-chart':true,'am-detail':true},
   bd:{visible:true,'bd-charts':true,'bd-filter':true},
   winrate:{visible:false,'wr-kpis':true,'wr-count':true,'wr-value':true,'wr-trend':true,'wr-tribe':true,'wr-table':true},
   attainment:{visible:true,'at-kpis':true,'at-attChart':true,'at-ytdPipe':true,'at-ytdPipeline':true,'at-wonTable':true},
+  target:{visible:true,'tg-summary':true,'tg-groups':true,'tg-wins':true},
   poc:{visible:true,'poc-info':true,'poc-chart':true,'poc-table':true},
   encrypt:{visible:false}};
 let CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
@@ -1094,11 +1234,11 @@ async function downloadPDF(){
   finally{ov.remove();}
 }
 
-function setCurrency(c){CURRENCY=c;CFG.currency=c;document.getElementById('btnPHP').classList.toggle('active',c==='PHP');document.getElementById('btnUSD').classList.toggle('active',c==='USD');if(DATA.length)renderAll();}
-document.getElementById('usdRateInput').addEventListener('change',function(){const v=parseFloat(this.value);if(v>0){USD_RATE=v;CFG.usdRate=v;rebuildTargets();if(DATA.length)renderAll();}});
+function setCurrency(c){CURRENCY=c;CFG.currency=c;document.getElementById('btnPHP').classList.toggle('active',c==='PHP');document.getElementById('btnUSD').classList.toggle('active',c==='USD');if(DATA.length)renderAll();else if(typeof renderTarget==='function')renderTarget();}
+document.getElementById('usdRateInput').addEventListener('change',function(){const v=parseFloat(this.value);if(v>0){USD_RATE=v;CFG.usdRate=v;rebuildTargets();if(DATA.length)renderAll();else if(typeof renderTarget==='function')renderTarget();}});
 document.getElementById('usdRateInput').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
 function switchTab(name){const tab=document.querySelector(`.nav-tab[data-tab="${name}"]`);if(tab)tab.click();}
-document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');});});
+document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');if(tab.dataset.tab==='target'&&typeof renderTarget==='function')renderTarget();});});
 // ═══ VERBAL CAPTION SYSTEM ═══
 function toggleCaption(visKey){const card=document.querySelector(`[data-vis="${visKey}"]`);if(!card)return;const t=card.querySelector('.caption-toggle'),c=card.querySelector('.card-caption');if(!t||!c)return;const o=c.classList.toggle('open');t.classList.toggle('open',o);}
 function injectCaptions(){for(const[k,fn]of Object.entries(CAPTIONS)){const card=document.querySelector(`[data-vis="${k}"].card`);if(!card)continue;let cap=card.querySelector('.card-caption');const wasOpen=cap?.classList.contains('open');if(cap)cap.remove();const oldT=card.querySelector('.caption-toggle');if(oldT)oldT.remove();const html=fn();if(!html)continue;const tri=document.createElement('div');tri.className='caption-toggle'+(wasOpen?' open':'');tri.setAttribute('aria-label','Toggle verbal report');tri.innerHTML='&#9660;';tri.onclick=function(e){e.stopPropagation();toggleCaption(k);};card.appendChild(tri);const ce=document.createElement('div');ce.className='card-caption'+(wasOpen?' open':'');ce.setAttribute('role','region');ce.setAttribute('aria-label','Verbal report for this chart');ce.innerHTML=`<div class="card-caption-inner">${html}</div>`;card.appendChild(ce);}}
@@ -1295,7 +1435,7 @@ function togglePocChartDetail(month,entries){
   el.innerHTML=h;el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();injectCaptions();}
+function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();injectCaptions();}
 
 // ═══ 1. OVERVIEW ═══
 let _activeQ=-1;
@@ -1844,4 +1984,184 @@ function toggleOvTribeDetail(type,encodedTribe){
   }
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
+
+// ═══ TARGET TAB ═══
+// State — all monetary values stored in PHP internally. Display converts via cx().
+let TG_STATE={
+  winrateEst:33.33,
+  view:'cards',
+  groups:[
+    {id:'g1',name:'Moonton',cards:[
+      {id:'c1',account:'MPL',bd:'Kewen',am:'Marcus',targetPHP:1100000*57,star:true}
+    ]},
+    {id:'g2',name:'Tencent',cards:[
+      {id:'c2',account:'PKL',bd:'Ella',am:'Carla',targetPHP:350000*57,star:false},
+      {id:'c3',account:'PUBGM',bd:'Vince',am:'',targetPHP:200000*57,star:false}
+    ]},
+    {id:'g3',name:'Level Infinite',cards:[
+      {id:'c4',account:'CFL',bd:'',am:'',targetPHP:40000*57,star:false},
+      {id:'c5',account:'Nikke',bd:'',am:'',targetPHP:40000*57,star:false}
+    ]},
+    {id:'g4',name:'Solaire',cards:[
+      {id:'c6',account:'Solaire Resort',bd:'Ella',am:'Cathy',targetPHP:100000*57,star:false},
+      {id:'c7',account:'MEGAFUNALO',bd:'Ella',am:'Cathy',targetPHP:800000*57,star:false},
+      {id:'c8',account:'Solaire Online',bd:'Vince',am:'Cathy',targetPHP:100000*57,star:false}
+    ]},
+    {id:'g5',name:'Sportsplus',cards:[
+      {id:'c9',account:'SportsPlus',bd:'Vince',am:'Iggy',targetPHP:500000*57,star:false}
+    ]},
+    {id:'g6',name:'SM',cards:[
+      {id:'c10',account:'SM Cyberzone',bd:'Vince',am:'Shanna',targetPHP:225000*57,star:false},
+      {id:'c11',account:'SMDC',bd:'Vince',am:'Shanna',targetPHP:25000*57,star:false}
+    ]},
+    {id:'g7',name:'Minotaur',cards:[
+      {id:'c12',account:'Minotaur',bd:'Vince',am:'Iggy',targetPHP:1000000*57,star:false}
+    ]},
+    {id:'g8',name:'Digiplus Group',cards:[
+      {id:'c13',account:'GameZone',bd:'Kewen',am:'Sr. Account Manager',targetPHP:250000*57,star:false},
+      {id:'c14',account:'ArenaPlus',bd:'Ella',am:'',targetPHP:250000*57,star:false},
+      {id:'c15',account:'BingoPlus',bd:'Ella & Kewen',am:'Shanna',targetPHP:250000*57,star:false},
+      {id:'c16',account:'Color Games',bd:'Kewen',am:'Shanna',targetPHP:250000*57,star:false}
+    ]}
+  ]
+};
+let _tgDragCardId=null,_tgDragGroupId=null,_tgFocus=null;
+const _tgEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+function _tgNewId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function _tgFindCard(id){for(const g of TG_STATE.groups){const c=g.cards.find(x=>x.id===id);if(c)return{card:c,group:g};}return null;}
+function _tgNorm(s){return String(s||'').trim().toLowerCase();}
+// Calculate Won for a card: sum Amount (VAT-Ex.) (PHP) of 2026 WS-status rows where any Tags entry contains the Account (case-insensitive substring).
+function tgCalcWon(card){
+  if(!DATA||!DATA.length)return 0;
+  const acct=_tgNorm(card.account);
+  if(!acct)return 0;
+  let s=0;
+  for(const r of DATA){
+    if(r['Year']!=='2026')continue;
+    if(!WS.includes(r['Status']))continue;
+    const tags=String(r['Tags']||'').split(',').map(t=>_tgNorm(t)).filter(Boolean);
+    if(tags.some(tag=>tag.includes(acct)))s+=pn(r['Amount (VAT-Ex.) (PHP)']);
+  }
+  return s;
+}
+function _tgParseAmt(raw){const v=pn(raw);return CURRENCY==='USD'?v*USD_RATE:v;}
+function _tgFmtEdit(php){const v=cx(php);return v?v.toLocaleString('en',{maximumFractionDigits:2}):'0';}
+function tgSetView(v){TG_STATE.view=v;document.getElementById('tgViewCards').classList.toggle('active',v==='cards');document.getElementById('tgViewTable').classList.toggle('active',v==='table');document.getElementById('tgGroups').style.display=v==='cards'?'':'none';document.getElementById('tgTableWrap').style.display=v==='table'?'':'none';renderTarget();}
+function _tgRfp(gap,wr){return gap<0?0:gap/wr;}
+function _tgCaptureFocus(){const ae=document.activeElement;if(!ae||ae.tagName!=='INPUT')return;const cid=ae.getAttribute('data-card-id'),gid=ae.getAttribute('data-group-id'),fld=ae.getAttribute('data-field');if(!fld)return;_tgFocus={cardId:cid,groupId:gid,field:fld,caret:ae.selectionStart,len:ae.value.length};}
+function _tgRestoreFocus(){if(!_tgFocus)return;const f=_tgFocus;_tgFocus=null;let sel='';if(f.cardId)sel=`input[data-card-id="${f.cardId}"][data-field="${f.field}"]`;else if(f.groupId)sel=`input[data-group-id="${f.groupId}"][data-field="${f.field}"]`;if(!sel)return;const root=TG_STATE.view==='table'?document.getElementById('tgTableWrap'):document.getElementById('tgGroups');const el=(root||document).querySelector(sel);if(!el)return;el.focus();if(el.setSelectionRange){try{const p=Math.min(f.caret==null?el.value.length:f.caret,el.value.length);el.setSelectionRange(p,p);}catch(_){}}}
+function renderTarget(){
+  const wr=Math.max(0.01,parseFloat(TG_STATE.winrateEst)||0.01)/100;
+  let grandTarget=0,grandWon=0;
+  TG_STATE.groups.forEach(g=>{g.cards.forEach(c=>{grandTarget+=c.targetPHP;grandWon+=tgCalcWon(c,g);});});
+  const grandGap=grandTarget-grandWon,grandRfp=_tgRfp(grandGap,wr);
+  const sumT=document.getElementById('tgSumTotal');if(sumT){sumT.textContent=fmtF(grandTarget);}
+  document.getElementById('tgSumWon').textContent=fmtF(grandWon);
+  document.getElementById('tgSumGap').textContent=fmtF(grandGap);
+  document.getElementById('tgSumRfp').textContent=fmtF(grandRfp);
+  const wrIn=document.getElementById('tgWrInput');if(wrIn&&document.activeElement!==wrIn)wrIn.value=TG_STATE.winrateEst;
+  if(TG_STATE.view==='cards')_tgRenderCards(wr);else _tgRenderTable(wr);
+  renderTargetWins();
+  _tgRestoreFocus();
+}
+function _tgRenderCards(wr){
+  const groupsEl=document.getElementById('tgGroups');if(!groupsEl)return;
+  let gh='';
+  TG_STATE.groups.forEach(g=>{
+    let gT=0,gW=0;
+    const cardsH=g.cards.map(c=>{
+      const won=tgCalcWon(c,g);const gap=c.targetPHP-won;const rfp=_tgRfp(gap,wr);gT+=c.targetPHP;gW+=won;
+      return `<div class="tg-card${c.star?' star':''}" data-card-id="${c.id}">
+        <div class="tg-card-drag" draggable="true" ondragstart="tgDragStart(event,'${c.id}')" ondragend="tgDragEnd(event)"><span class="grip" title="Drag to move">⋮⋮</span><input class="tg-field-head" data-card-id="${c.id}" data-field="account" value="${_tgEsc(c.account)}" placeholder="Account" oninput="tgAccountInput('${c.id}',this.value)" ondragstart="event.stopPropagation();event.preventDefault();"><div class="tg-card-actions"><button class="tg-star${c.star?' on':''}" onclick="tgToggleStar('${c.id}')" title="Toggle star">★</button><button class="tg-card-del" onclick="tgDelCard('${c.id}')" title="Delete card">✕</button></div></div>
+        <div class="tg-row"><span class="k">BD</span><input class="tg-field" data-card-id="${c.id}" data-field="bd" value="${_tgEsc(c.bd)}" onchange="tgEditCard('${c.id}','bd',this.value)"></div>
+        <div class="tg-row"><span class="k">AM</span><input class="tg-field" data-card-id="${c.id}" data-field="am" value="${_tgEsc(c.am)}" onchange="tgEditCard('${c.id}','am',this.value)"></div>
+        <div class="tg-row"><span class="k">Target</span><input class="tg-field" data-card-id="${c.id}" data-field="target" value="${_tgFmtEdit(c.targetPHP)}" onchange="tgEditAmt('${c.id}',this.value)"></div>
+        <div class="tg-row"><span class="k">Won</span><span class="v won">${fmtF(won)}</span></div>
+        <div class="tg-row"><span class="k">Gap</span><span class="v gap">${fmtF(gap)}</span></div>
+        <div class="tg-row"><span class="k">RFP</span><span class="v rfp">${fmtF(rfp)}</span></div>
+      </div>`;
+    }).join('');
+    const gGap=gT-gW,gRfp=_tgRfp(gGap,wr);
+    gh+=`<div class="tg-group" data-group-id="${g.id}" ondragover="tgGroupDragOver(event,'${g.id}')" ondragleave="tgGroupDragLeave(event,'${g.id}')" ondrop="tgGroupDrop(event,'${g.id}')">
+      <div class="tg-group-head" draggable="true" ondragstart="tgGroupDragStart(event,'${g.id}')" ondragend="tgGroupDragEnd(event)" title="Drag to reorder group">
+        <span class="tg-group-grip" aria-hidden="true">⋮⋮</span>
+        <input class="tg-group-name" data-group-id="${g.id}" data-field="name" value="${_tgEsc(g.name)}" onchange="tgEditGroupName('${g.id}',this.value)" ondragstart="event.stopPropagation();event.preventDefault();">
+        <div class="tg-group-totals">
+          <div class="tg-group-tot"><span class="lbl">Target</span><span class="val">${fmtF(gT)}</span></div>
+          <div class="tg-group-tot won"><span class="lbl">Won</span><span class="val">${fmtF(gW)}</span></div>
+          <div class="tg-group-tot gap"><span class="lbl">Gap</span><span class="val">${fmtF(gGap)}</span></div>
+          <div class="tg-group-tot rfp"><span class="lbl">RFP</span><span class="val">${fmtF(gRfp)}</span></div>
+        </div>
+        <button class="tg-group-del" onclick="tgDelGroup('${g.id}')" title="Delete group">✕</button>
+      </div>
+      <div class="tg-cards">${cardsH||'<div class="tg-empty">Empty — drop cards here or click + New Card</div>'}</div>
+    </div>`;
+  });
+  groupsEl.innerHTML=gh;
+}
+function _tgRenderTable(wr){
+  const el=document.getElementById('tgTableWrap');if(!el)return;
+  let grandT=0,grandW=0;
+  let body='';
+  TG_STATE.groups.forEach(g=>{
+    let gT=0,gW=0;
+    const rows=g.cards.map(c=>{
+      const won=tgCalcWon(c,g);const gap=c.targetPHP-won;const rfp=_tgRfp(gap,wr);gT+=c.targetPHP;gW+=won;
+      return `<tr class="${c.star?'star-row':''}" data-card-id="${c.id}">
+        <td><button class="tg-star${c.star?' on':''}" onclick="tgToggleStar('${c.id}')" title="Toggle star">★</button></td>
+        <td><input class="tg-tfield" data-group-id="${g.id}" data-field="name" value="${_tgEsc(g.name)}" onchange="tgEditGroupName('${g.id}',this.value)"></td>
+        <td><input class="tg-tfield" data-card-id="${c.id}" data-field="account" value="${_tgEsc(c.account)}" oninput="tgAccountInput('${c.id}',this.value)"></td>
+        <td><input class="tg-tfield" data-card-id="${c.id}" data-field="bd" value="${_tgEsc(c.bd)}" onchange="tgEditCard('${c.id}','bd',this.value)"></td>
+        <td><input class="tg-tfield" data-card-id="${c.id}" data-field="am" value="${_tgEsc(c.am)}" onchange="tgEditCard('${c.id}','am',this.value)"></td>
+        <td class="amt"><input class="tg-tfield amt" data-card-id="${c.id}" data-field="target" value="${_tgFmtEdit(c.targetPHP)}" onchange="tgEditAmt('${c.id}',this.value)"></td>
+        <td class="amt won">${fmtF(won)}</td>
+        <td class="amt gap">${fmtF(gap)}</td>
+        <td class="amt rfp">${fmtF(rfp)}</td>
+        <td><button class="tg-card-del" onclick="tgDelCard('${c.id}')" title="Delete card">✕</button></td>
+      </tr>`;
+    }).join('');
+    grandT+=gT;grandW+=gW;
+    body+=rows||`<tr class="group-head"><td colspan="10" style="color:var(--text-muted);font-style:italic">${_tgEsc(g.name)} — empty (add a card)</td></tr>`;
+  });
+  const grandGap=grandT-grandW,grandRfp=_tgRfp(grandGap,wr);
+  el.innerHTML=`<table class="tg-table"><thead><tr><th></th><th>Group</th><th>Account</th><th>BD</th><th>AM</th><th class="amt">Target</th><th class="amt">Won</th><th class="amt">Gap</th><th class="amt">RFP</th><th></th></tr></thead><tbody>${body||'<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-muted)">No groups or cards yet</td></tr>'}</tbody><tfoot><tr><td colspan="5" style="text-align:right">TOTAL</td><td class="amt">${fmtF(grandT)}</td><td class="amt won">${fmtF(grandW)}</td><td class="amt gap">${fmtF(grandGap)}</td><td class="amt rfp">${fmtF(grandRfp)}</td><td></td></tr></tfoot></table>`;
+}
+function renderTargetWins(){
+  const el=document.getElementById('tgWinsList');if(!el)return;
+  if(!DATA||!DATA.length){el.innerHTML='<div class="tg-empty" style="grid-column:unset">No data loaded</div>';return;}
+  const accountKeys=[];
+  TG_STATE.groups.forEach(g=>g.cards.forEach(c=>{const a=_tgNorm(c.account);if(a)accountKeys.push(a);}));
+  const matchesTag=(rawTags)=>{if(!accountKeys.length)return false;const tags=String(rawTags||'').split(',').map(t=>_tgNorm(t)).filter(Boolean);return tags.some(tag=>accountKeys.some(k=>tag.includes(k)));};
+  const wins=DATA.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])).map(r=>({client:r['Client']||'—',project:r['Project']||'—',tribe:r['Tribe']||'',tags:r['Tags']||'',amt:pn(r['Amount (VAT-Ex.) (PHP)'])})).sort((a,b)=>b.amt-a.amt);
+  if(!wins.length){el.innerHTML='<div class="tg-empty" style="grid-column:unset">No 2026 wins in dataset</div>';return;}
+  el.innerHTML=wins.map(w=>{
+    const hi=matchesTag(w.tags);
+    return `<div class="tg-win-row${hi?' hi':''}"><div><div class="lbl">${_tgEsc(w.project)}</div><div class="sub">${_tgEsc(w.client)}${w.tribe?' · '+_tgEsc(w.tribe.replace('PDEI - ','')):''}</div></div><div class="amt">${fmtF(w.amt)}</div></div>`;
+  }).join('');
+}
+// Mutations
+function tgAddGroup(){const id=_tgNewId('g');TG_STATE.groups.unshift({id,name:'New Group',cards:[]});renderTarget();}
+function tgDelGroup(id){const i=TG_STATE.groups.findIndex(g=>g.id===id);if(i<0)return;TG_STATE.groups.splice(i,1);renderTarget();}
+function tgEditGroupName(id,v){const g=TG_STATE.groups.find(x=>x.id===id);if(!g)return;g.name=v;renderTarget();}
+function tgAddCard(){let g=TG_STATE.groups[0];if(!g){g={id:_tgNewId('g'),name:'New Group',cards:[]};TG_STATE.groups.unshift(g);}g.cards.unshift({id:_tgNewId('c'),account:'New Account',bd:'',am:'',targetPHP:0,star:false});renderTarget();}
+function tgDelCard(id){for(const g of TG_STATE.groups){const i=g.cards.findIndex(c=>c.id===id);if(i>=0){const el=document.querySelector('[data-card-id="'+id+'"]');if(el&&TG_STATE.view==='cards'){el.classList.add('removing');setTimeout(()=>{g.cards.splice(i,1);renderTarget();},180);}else{g.cards.splice(i,1);renderTarget();}return;}}}
+function tgEditCard(id,field,v){const r=_tgFindCard(id);if(!r)return;r.card[field]=v;renderTarget();}
+function tgAccountInput(id,v){const r=_tgFindCard(id);if(!r)return;r.card.account=v;_tgCaptureFocus();renderTarget();}
+function tgEditAmt(id,v){const r=_tgFindCard(id);if(!r)return;r.card.targetPHP=_tgParseAmt(v);renderTarget();}
+function tgToggleStar(id){const r=_tgFindCard(id);if(!r)return;r.card.star=!r.card.star;renderTarget();requestAnimationFrame(()=>{const el=document.querySelector('[data-card-id="'+id+'"]');if(el&&r.card.star){el.classList.add('star-pulse');setTimeout(()=>el.classList.remove('star-pulse'),650);}});}
+// Card drag
+function tgDragStart(e,id){_tgDragCardId=id;_tgDragGroupId=null;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','card:'+id);}catch(_){}const card=e.target.closest('.tg-card');if(card){card.classList.add('dragging');try{e.dataTransfer.setDragImage(card,card.offsetWidth/2,20);}catch(_){}}}
+function tgDragEnd(){_tgDragCardId=null;document.querySelectorAll('.tg-card.dragging').forEach(el=>el.classList.remove('dragging'));document.querySelectorAll('.tg-group.drag-over').forEach(el=>el.classList.remove('drag-over'));document.querySelectorAll('.tg-card-placeholder').forEach(el=>el.remove());}
+function tgGroupDragOver(e,gid){if(!_tgDragCardId&&!_tgDragGroupId)return;e.preventDefault();e.dataTransfer.dropEffect='move';const g=e.currentTarget;g.classList.add('drag-over');if(_tgDragCardId){const cards=g.querySelector('.tg-cards');if(cards&&!cards.querySelector('.tg-card-placeholder')){cards.querySelectorAll('.tg-card-placeholder').forEach(el=>el.remove());const ph=document.createElement('div');ph.className='tg-card-placeholder';cards.appendChild(ph);const em=cards.querySelector('.tg-empty');if(em)em.style.display='none';}}}
+function tgGroupDragLeave(e,gid){const g=e.currentTarget;if(e.relatedTarget&&g.contains(e.relatedTarget))return;g.classList.remove('drag-over');g.querySelectorAll('.tg-card-placeholder').forEach(el=>el.remove());const em=g.querySelector('.tg-empty');if(em)em.style.display='';}
+function tgGroupDrop(e,gid){e.preventDefault();if(_tgDragCardId){const id=_tgDragCardId;const src=_tgFindCard(id);const dst=TG_STATE.groups.find(g=>g.id===gid);tgDragEnd();if(!src||!dst)return;if(src.group.id===gid)return;const i=src.group.cards.findIndex(c=>c.id===id);if(i>=0)src.group.cards.splice(i,1);dst.cards.push(src.card);renderTarget();return;}
+  if(_tgDragGroupId&&_tgDragGroupId!==gid){const si=TG_STATE.groups.findIndex(g=>g.id===_tgDragGroupId);const di=TG_STATE.groups.findIndex(g=>g.id===gid);if(si<0||di<0){tgGroupDragEnd();return;}const[moved]=TG_STATE.groups.splice(si,1);TG_STATE.groups.splice(di,0,moved);tgGroupDragEnd();renderTarget();}else{tgGroupDragEnd();}}
+// Group drag
+function tgGroupDragStart(e,gid){_tgDragGroupId=gid;_tgDragCardId=null;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','group:'+gid);}catch(_){}const group=e.target.closest('.tg-group');if(group){group.classList.add('dragging');try{e.dataTransfer.setDragImage(group,40,20);}catch(_){}e.stopPropagation();}}
+function tgGroupDragEnd(){_tgDragGroupId=null;document.querySelectorAll('.tg-group.dragging').forEach(el=>el.classList.remove('dragging'));document.querySelectorAll('.tg-group.drag-over').forEach(el=>el.classList.remove('drag-over'));}
+// Winrate input wire
+document.addEventListener('DOMContentLoaded',()=>{
+  const wr=document.getElementById('tgWrInput');
+  if(wr){wr.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(!isNaN(v)&&v>0){TG_STATE.winrateEst=v;renderTarget();}});}
+});
 </script></body></html>
