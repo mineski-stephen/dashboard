@@ -1,7 +1,8 @@
 {
   "theme": "system",
-  "defaultCSV": "20260415_AMBD_Universe_Raw.enc",
-  "lastWeekCSV": "20260410_AMBD_Universe_Raw.enc",
+  "defaultCSV": "20260423_AMBD_Universe_Raw.enc",
+  "lastWeekCSV": "20260420_AMBD_Universe_Raw.enc",
+  "targetCSV": "targets.enc",
   "currency": "PHP",
   "usdRate": 57,
   "overview": {
@@ -22,8 +23,11 @@
   },
   "bd": {
     "visible": true,
-    "bd-charts": true,
-    "bd-filter": true
+    "bd-charts": false,
+    "bd-doors-chart": true,
+    "bd-filter": false,
+    "bd-wins": true,
+    "bd-doors": true
   },
   "winrate": {
     "visible": false,
@@ -36,7 +40,7 @@
   },
   "attainment": {
     "visible": false,
-    "at-kpis": true,
+    "at-kpis": false,
     "at-attChart": true,
     "at-ytdPipe": true,
     "at-ytdPipeline": true,

@@ -93,7 +93,7 @@ body.settings-open,body.modal-open{overflow:hidden}
 .kpi .kpi-value{font-size:26px;font-weight:700;letter-spacing:-.5px}.kpi .kpi-sub{font-size:13px;color:var(--text-dim);margin-top:4px}
 .delta{font-weight:700;font-size:13px;margin-left:6px}.delta.up{color:var(--green)}.delta.down{color:var(--red)}.delta.flat{color:var(--text-muted)}
 .delta-sm{font-weight:600;font-size:11px;margin-left:4px}.delta-sm.up{color:var(--green)}.delta-sm.down{color:var(--red)}.delta-sm.flat{color:var(--text-muted)}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;position:relative}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;position:relative;min-width:0}
 .caption-toggle{position:absolute;top:14px;right:14px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;transition:background .15s,transform .25s;color:var(--text-muted);font-size:10px;z-index:1;border:none;background:none;padding:0}
 .caption-toggle:hover{background:var(--surface2);color:var(--text-dim)}
 .caption-toggle.open{transform:rotate(180deg)}
@@ -150,7 +150,7 @@ body.settings-open,body.modal-open{overflow:hidden}
 .kpi.clickable.anim-fade{animation:fadeUpKpi .5s ease-out both}
 @keyframes fadeUpKpi{from{opacity:0;margin-top:12px}to{opacity:1;margin-top:0}}
 .tribe-att-target-line{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--text-dim)}
-.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}
+.table-wrap{overflow-x:auto;max-width:100%}table{width:100%;border-collapse:collapse;font-size:14px}
 thead th{text-align:left;padding:10px 14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);border-bottom:1px solid var(--border);white-space:nowrap}
 tbody td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-dim);white-space:nowrap}
 tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-child td{border-bottom:none}
@@ -211,6 +211,7 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .bd-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:20px;display:none}
 .bd-detail.visible{display:block;animation:slideDown .3s ease}
 .bd-charts-row{display:grid;grid-template-columns:1fr 200px;gap:20px;align-items:center}@media(max-width:800px){.bd-charts-row{grid-template-columns:1fr}}
+.bd-doors-filter{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 .filter-row{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
 .filter-label{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-right:8px}
@@ -243,6 +244,7 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .proj-modal-field .fld-value a{color:var(--accent);text-decoration:none}
 .proj-modal-field .fld-value a:hover{text-decoration:underline}
 .link-token{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--accent-glow);color:var(--accent);text-decoration:none;margin:2px 4px 2px 0;transition:background .15s}
+.proj-tag-pill{display:inline-block;padding:3px 10px;border-radius:14px;font-size:11px;font-weight:600;background:var(--surface3);color:var(--text-dim);border:1px solid var(--border)}
 .link-token:hover{background:rgba(59,130,246,.2);color:var(--accent);text-decoration:none}
 .proj-modal-remarks{margin-top:4px;padding:12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
 .proj-modal-remarks .fld-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:6px}
@@ -274,6 +276,180 @@ body.settings-open,body.modal-open{overflow:hidden}
 .poc-phase small{display:block;font-size:10px;font-weight:400;color:var(--text-muted);margin-top:2px}
 .poc-prog{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
 .poc-prog-fill{height:100%;border-radius:4px;transition:width .4s}
+/* ── Target tab ── */
+@keyframes tgPop{0%{opacity:0;transform:translateY(-8px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tgSlide{0%{opacity:0;transform:translateY(-14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes tgPulse{0%{box-shadow:0 0 0 0 rgba(241,194,50,.85)}70%{box-shadow:0 0 0 14px rgba(241,194,50,0)}100%{box-shadow:0 0 0 0 rgba(241,194,50,0)}}
+@keyframes tgFlash{0%{background:var(--accent-glow)}100%{background:transparent}}
+@keyframes tgBarGrow{0%{width:0}}
+/* One-shot entrance animations — applied only when section has .tg-animate-once (removed after tab switch completes) */
+.tg-animate-once .tg-summary{animation:tgSlide .3s ease both}
+.tg-animate-once .tg-group{animation:tgSlide .35s ease both}
+.tg-animate-once .tg-card{animation:tgPop .3s cubic-bezier(.2,.9,.3,1.2) both}
+.tg-animate-once .tg-win-row{animation:tgSlide .3s ease both}
+.tg-animate-once .tg-table-wrap{animation:tgSlide .3s ease both}
+.tg-animate-once .tg-table tbody tr{animation:tgSlide .25s ease both}
+.tg-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px}
+.tg-sum-cell{display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--border);padding-right:14px}
+.tg-sum-cell:last-child{border-right:none;padding-right:0}
+.tg-sum-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted)}
+.tg-sum-val{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.3px;transition:color .2s}
+.tg-sum-val.gap{color:var(--red)}.tg-sum-val.rfp{color:var(--amber)}.tg-sum-val.won{color:var(--green)}
+.tg-wr-wrap{display:flex;align-items:center;gap:6px}
+.tg-wr-input{width:110px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:24px;font-weight:700;padding:4px 8px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s}
+.tg-wr-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-wr-suffix{font-size:22px;font-weight:700;color:var(--text-dim)}
+.tg-top-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.tg-actions{display:flex;gap:8px;flex-wrap:wrap}
+.tg-btn{padding:10px 18px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:transform .12s,opacity .15s,box-shadow .15s}
+.tg-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.18)}
+.tg-btn:active{transform:translateY(1px);box-shadow:none}
+.tg-btn.ghost{background:var(--surface);color:var(--text-dim);border:1px solid var(--border)}
+.tg-btn.ghost:hover{border-color:var(--accent);color:var(--text)}
+.tg-view-toggle{display:flex;background:var(--surface2);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.tg-view-btn{padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-muted);transition:all .2s;font-family:'DM Sans',sans-serif}
+.tg-view-btn.active{background:var(--accent);color:#fff}
+.tg-groups{display:flex;flex-direction:column;gap:16px}
+.tg-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:background .2s,border-color .2s,transform .15s,box-shadow .2s}
+.tg-group.drag-over{background:var(--accent-glow);border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+.tg-group.dragging{opacity:.4;transform:scale(.98)}
+.tg-group-head{display:flex;align-items:center;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--border);flex-wrap:wrap;cursor:grab;transition:background .15s}
+.tg-group-head:active{cursor:grabbing}
+.tg-group-head:hover .tg-group-grip{background:var(--accent-glow);color:var(--accent)}
+.tg-group-grip{display:inline-flex;align-items:center;justify-content:center;width:28px;height:34px;background:var(--surface3);border-radius:8px;font-size:14px;letter-spacing:1px;color:var(--text-muted);user-select:none;transition:background .15s,color .15s;font-weight:700}
+.tg-group-name{font-size:20px;font-weight:700;background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;padding:8px 12px;border-radius:8px;min-width:200px;flex:0 1 auto;font-family:'DM Sans',sans-serif;transition:border-color .15s,box-shadow .15s;cursor:text}
+.tg-group-name:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-group-totals{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap}
+.tg-group-tot{display:flex;flex-direction:column;align-items:flex-end}
+.tg-group-tot .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.tg-group-tot .val{font-size:15px;font-weight:700;color:var(--text)}
+.tg-group-tot.gap .val{color:var(--red)}.tg-group-tot.rfp .val{color:var(--amber)}.tg-group-tot.won .val{color:var(--green)}
+.tg-group-del{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:4px 10px;border-radius:6px;transition:color .15s,background .15s}
+.tg-group-del:hover{color:var(--red);background:var(--red-dim)}
+.tg-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;min-height:48px;position:relative}
+.tg-empty{grid-column:1/-1;padding:18px;text-align:center;color:var(--text-muted);font-size:13px;border:1px dashed var(--border);border-radius:10px}
+.tg-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;position:relative;transition:transform .15s,box-shadow .2s,background .2s,border-color .2s,opacity .2s}
+.tg-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.tg-card.dragging{opacity:.35;transform:scale(.96)}
+.tg-card.removing{animation:tgPop .2s ease reverse forwards}
+.tg-card.star{background:#f1c232;border-color:#d4a824;color:#111}
+.tg-card.star-pulse{animation:tgPulse .6s ease}
+.tg-card.star .tg-row .v,.tg-card.star .tg-row .k,.tg-card.star input{color:#111}
+.tg-card.star input{background:rgba(255,255,255,.55);border-color:#c99f1e}
+.tg-card-placeholder{border:2px dashed var(--accent);border-radius:12px;background:var(--accent-glow);min-height:160px;animation:tgPop .2s ease both}
+.tg-card-drag{display:flex;align-items:center;gap:8px;margin:-12px -12px 6px;padding:6px 10px 6px 8px;background:var(--surface3);border-radius:12px 12px 0 0;cursor:grab;transition:background .15s}
+.tg-card-drag:hover{background:var(--accent-glow)}
+.tg-card-drag:hover .grip{color:var(--accent)}
+.tg-card-drag:active{cursor:grabbing}
+.tg-card.star .tg-card-drag{background:rgba(0,0,0,.12)}
+.tg-card.star .tg-card-drag:hover{background:rgba(0,0,0,.2)}
+.tg-card-drag .grip{display:inline-flex;align-items:center;justify-content:center;width:20px;font-size:13px;letter-spacing:1px;color:var(--text-muted);font-weight:700;user-select:none;transition:color .15s}
+.tg-card.star .tg-card-drag .grip{color:#333}
+.tg-card input.tg-field-head{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:15px;font-weight:700;padding:7px 10px;outline:none;font-family:'DM Sans',sans-serif;cursor:text;transition:border-color .15s,box-shadow .15s,background .15s}
+.tg-card input.tg-field-head:hover{border-color:var(--text-muted)}
+.tg-card input.tg-field-head:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-card.star input.tg-field-head{background:rgba(255,255,255,.75);border-color:#c99f1e;color:#111}
+.tg-card.star input.tg-field-head:focus{background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.1)}
+/* Hide Account textbox chrome when not being edited — only reveal on hover/focus */
+.tg-card input.tg-field-head{background:transparent;border-color:transparent}
+.tg-card input.tg-field-head:hover{background:var(--surface);border-color:var(--text-muted)}
+.tg-card input.tg-field-head:focus{background:var(--surface);border-color:var(--accent)}
+.tg-card.star input.tg-field-head{background:transparent;border-color:transparent;color:#111}
+.tg-card.star input.tg-field-head:hover{background:rgba(255,255,255,.55);border-color:#c99f1e}
+.tg-card.star input.tg-field-head:focus{background:#fff;border-color:#8a5a00}
+.tg-card-actions{display:flex;gap:6px;align-items:center}
+.tg-star{background:transparent;border:none;font-size:18px;cursor:pointer;padding:2px 6px;color:var(--text-muted);transition:transform .2s,color .15s}
+.tg-star:hover{transform:scale(1.3) rotate(12deg)}
+.tg-star.on{color:#f1c232;filter:drop-shadow(0 0 4px rgba(241,194,50,.5))}
+.tg-card.star .tg-star{color:#fff8dc;filter:drop-shadow(0 0 4px rgba(255,255,255,.6))}
+.tg-card-del{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;transition:color .15s,background .15s}
+.tg-card-del:hover{color:var(--red);background:var(--red-dim)}
+.tg-card.star .tg-card-del:hover{color:#a00}
+.tg-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
+.tg-row .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);flex:0 0 64px}
+.tg-row .v{font-weight:700;color:var(--text);text-align:right;font-size:14px;transition:color .2s}
+.tg-row .v.won{color:var(--green)}.tg-row .v.gap{color:var(--red)}.tg-row .v.rfp{color:var(--amber)}
+.tg-row .v.clickable{cursor:pointer;text-decoration:underline dotted var(--text-muted);text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+.tg-row .v.clickable:hover{text-decoration-color:var(--accent);color:var(--accent)}
+.tg-row.rfp-row{align-items:stretch;flex-direction:column;gap:4px;background:var(--surface);padding:8px 10px;border-radius:8px;border:1px solid var(--border);transition:border-color .15s,box-shadow .15s}
+.tg-row.rfp-row.clickable{cursor:pointer}
+.tg-row.rfp-row.clickable:hover{border-color:var(--amber);box-shadow:0 0 0 2px rgba(245,158,11,.2)}
+.tg-card.star .tg-row.rfp-row{background:rgba(255,255,255,.35);border-color:#c99f1e}
+.tg-rfp-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tg-rfp-top .k{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
+.tg-rfp-top .v{font-size:12px;font-weight:700;color:var(--amber)}
+.tg-card.star .tg-rfp-top .k{color:#444}
+.tg-card.star .tg-rfp-top .v{color:#8a5a00}
+.tg-rfp-bar{position:relative;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;border:1px solid var(--border)}
+.tg-card.star .tg-rfp-bar{background:rgba(0,0,0,.1);border-color:#b8871a}
+.tg-rfp-fill{position:absolute;top:0;left:0;bottom:0;background:linear-gradient(90deg,var(--amber),#f1c232);border-radius:5px;transition:width .4s cubic-bezier(.16,1,.3,1)}
+.tg-rfp-fill.over{background:linear-gradient(90deg,var(--green),#22c55e)}
+.tg-rfp-sub{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);padding:0 2px}
+.tg-card.star .tg-rfp-sub{color:#444}
+.tg-row.remark-row{flex-direction:column;align-items:flex-start;gap:2px;background:var(--surface);padding:6px 10px;border-radius:6px;border:1px solid var(--border)}
+.tg-card.star .tg-row.remark-row{background:rgba(255,255,255,.3);border-color:#c99f1e}
+.tg-row.remark-row .k{font-size:10px;flex:none}
+.tg-row.remark-row .txt{font-size:12px;font-weight:500;color:var(--text-dim);line-height:1.35;white-space:pre-wrap;word-break:break-word}
+.tg-row.remark-row .txt.empty{color:var(--text-muted);font-style:italic}
+.tg-card.star .tg-row.remark-row .txt{color:#222}
+.tg-card.star .tg-row.remark-row .txt.empty{color:#666}
+.tg-sum-val.clickable{cursor:pointer;transition:color .15s}
+.tg-sum-val.clickable:hover{color:var(--accent)}
+/* Won modal */
+.tg-won-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center}
+.tg-won-modal.open{display:flex}
+.tg-won-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;min-width:520px;max-width:90vw;max-height:85vh;overflow-y:auto;-webkit-user-select:text;user-select:text;animation:tgPop .2s ease both}
+.tg-won-box *{-webkit-user-select:text;user-select:text}
+.tg-won-box h3{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);text-align:center;margin-bottom:4px}
+.tg-won-box .big{text-align:center;font-size:32px;font-weight:700;color:var(--green);margin-bottom:6px}
+.tg-won-box .big.amber{color:var(--amber)}
+.tg-won-box tbody tr[onclick]{cursor:pointer}
+.tg-won-box .sub{text-align:center;font-size:12px;color:var(--text-dim);margin-bottom:16px}
+.tg-won-box table{width:100%;border-collapse:collapse;font-size:13px}
+.tg-won-box thead th{text-align:left;padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);border-bottom:1px solid var(--border);font-weight:700}
+.tg-won-box thead th.amt{text-align:right}
+.tg-won-box tbody td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim)}
+.tg-won-box tbody td.amt{text-align:right;font-weight:700;color:var(--text);white-space:nowrap}
+.tg-won-box tbody tr:hover td{background:var(--surface2);color:var(--text)}
+.tg-won-box tfoot td{padding:10px;background:var(--surface2);border-top:2px solid var(--border);font-weight:700}
+.tg-won-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer}
+.tg-won-close:hover{color:var(--text)}
+.tg-card input.tg-field{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-weight:600;padding:6px 10px;text-align:right;outline:none;font-family:'DM Sans',sans-serif;min-width:0;transition:border-color .15s,box-shadow .15s,background .15s}
+.tg-card input.tg-field:hover{border-color:var(--text-muted)}
+.tg-card input.tg-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.tg-card.star input.tg-field{background:rgba(255,255,255,.7);border-color:#c99f1e;color:#111}
+.tg-card.star input.tg-field:focus{background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.08)}
+.tg-wins-list{display:flex;flex-direction:column;gap:4px}
+.tg-win-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:13px;transition:background .2s,border-color .2s,transform .15s}
+.tg-win-row.clickable{cursor:pointer}
+.tg-win-row:hover{transform:translateX(4px);border-color:var(--accent)}
+.tg-win-row.hi{background:#f1c232;color:#111;border-color:#d4a824}
+.tg-win-row.hi:hover{border-color:#8a5a00}
+.tg-win-row.hi .lbl,.tg-win-row.hi .sub{color:#111}
+.tg-win-row .lbl{font-weight:700;color:var(--text);font-size:13px}
+.tg-win-row .sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.tg-win-row .amt{font-weight:700;color:var(--text);text-align:right;white-space:nowrap;font-size:14px}
+.tg-card.star .tg-card-drag .grip{color:#333}
+/* Table view */
+.tg-table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px}
+.tg-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tg-table thead th{background:var(--surface2);padding:12px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);border-bottom:1px solid var(--border);text-align:left;position:sticky;top:0;z-index:1}
+.tg-table thead th.amt{text-align:right}
+.tg-table tbody td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+.tg-table tbody td.amt{text-align:right;font-weight:600;white-space:nowrap}
+.tg-table tbody td.won{color:var(--green);font-weight:700}
+.tg-table tbody td.gap{color:var(--red);font-weight:700}
+.tg-table tbody td.rfp{color:var(--amber);font-weight:700}
+.tg-table tbody tr{transition:background .15s}
+.tg-table tbody tr.star-row td{background:rgba(241,194,50,.12)}
+.tg-table tbody tr.group-head td{background:var(--surface2);font-weight:700;border-top:2px solid var(--border)}
+.tg-table input.tg-tfield{width:100%;background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text);font-size:13px;font-weight:600;padding:4px 6px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .15s,background .15s}
+.tg-table input.tg-tfield:hover{border-color:var(--border);background:var(--surface2)}
+.tg-table input.tg-tfield:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 2px var(--accent-glow)}
+.tg-table input.tg-tfield.amt{text-align:right}
+.tg-table .tg-star{font-size:16px}
+.tg-table tfoot td{padding:12px 10px;background:var(--surface2);border-top:2px solid var(--border);font-weight:700;font-size:14px}
+.tg-table tfoot td.won{color:var(--green)}.tg-table tfoot td.gap{color:var(--red)}.tg-table tfoot td.rfp{color:var(--amber)}
 </style></head><body>
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
@@ -282,6 +458,10 @@ body.settings-open,body.modal-open{overflow:hidden}
 <!-- Pipeline KPI Modal -->
 <div class="pipe-kpi-modal" id="pipeKpiModal" onclick="if(event.target===this)closePipeKpiModal()">
   <div class="pipe-kpi-modal-box" id="pipeKpiModalContent"></div>
+</div>
+<!-- Target Won Projects Modal -->
+<div class="tg-won-modal" id="tgWonModal" onclick="if(event.target===this)tgCloseWonModal()">
+  <div class="tg-won-box" id="tgWonBox" style="position:relative"></div>
 </div>
 <div class="proj-tip" id="projTip"></div>
 <div class="am-seg-tip" id="amSegTip"></div>
@@ -322,14 +502,42 @@ body.settings-open,body.modal-open{overflow:hidden}
   </div>
   <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)toggleSettings()"><div class="settings-panel" id="settingsPanel"></div></div>
   <div class="nav-tabs" id="navTabs">
-    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales Pipeline</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
+    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="target">Targets</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
   </div>
   <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div><div id="ovTribeDetail" style="margin-top:12px"></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
   <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="card" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Monthly Pipeline</div><div style="position:relative"><div style="height:300px"><canvas id="monthlyPipeChart"></canvas></div><div id="qtrPipeBars" style="position:relative;height:24px;margin-top:2px"></div></div><div id="monthlyPipeDetail" style="margin-top:12px"></div><div id="qtrPipeDetail" style="margin-top:12px"></div></div><div class="pipeline-cols" id="pipelineCols"></div></div>
   <div class="section" id="sec-am"><div class="card vis-section" data-vis="am-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Account Manager Weighted Performance</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#cc0000"></div>Actual Collection</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#ffd966;border:1px solid #ccc"></div>Collection Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f0c132"></div>Awarded Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3c78d8"></div>Pitch Phase</div><div class="am-legend-item"><div style="width:10px;height:2px;background:var(--red)"></div>Target</div></div><div id="amBars"></div></div><div id="amDetailContainer" class="vis-section" data-vis="am-detail"></div></div>
-  <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid" id="bdGrid"></div><div class="bd-detail" id="bdDetail"></div><div class="card vis-section" data-vis="bd-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>BD Wins — 2026</div><div class="table-wrap" id="bdWinsTable"></div></div><div class="card vis-section" data-vis="bd-doors" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Doors Opened — 2026</div><div class="table-wrap" id="bdDoorsTable"></div></div></div>
+  <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="card vis-section" data-vis="bd-doors-chart" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Doors Opened by BD</div><div class="bd-doors-filter" id="bdDoorsChartFilter"></div><div style="height:320px;position:relative"><canvas id="bdDoorsChart"></canvas></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid vis-section" data-vis="bd-filter" id="bdGrid"></div><div class="bd-detail vis-section" data-vis="bd-filter" id="bdDetail"></div><div class="card vis-section" data-vis="bd-doors" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Doors Opened — 2026</div><div class="table-wrap" id="bdDoorsTable"></div></div><div class="card vis-section" data-vis="bd-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>BD Wins — 2026</div><div class="table-wrap" id="bdWinsTable"></div></div></div>
   <div class="section" id="sec-winrate"><div class="kpi-strip vis-section" data-vis="wr-kpis" id="winrateKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="wr-count"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Win vs Loss (Count)</div><div class="chart-container"><canvas id="winLossCountChart"></canvas></div></div><div class="card vis-section" data-vis="wr-value"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Win vs Loss (Value)</div><div class="chart-container"><canvas id="winLossValueChart"></canvas></div></div></div><div class="grid-2"><div class="card vis-section" data-vis="wr-trend"><div class="card-title"><div class="dot" style="background:var(--amber)"></div>Win Rate Trend</div><div class="chart-container short"><canvas id="winRateTrendChart"></canvas></div></div><div class="card vis-section" data-vis="wr-tribe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Win Rate by Tribe</div><div class="chart-container short"><canvas id="winRateTribeChart"></canvas></div></div></div><div class="card vis-section" data-vis="wr-table" id="wrLostCard"><div class="card-title"><div class="dot" style="background:var(--red)"></div>Lost Projects</div><div class="filter-row" id="winrateMonthFilter"></div><div class="table-wrap" id="lossTable"></div></div></div>
   <div class="section" id="sec-attainment"><div class="kpi-strip vis-section" data-vis="at-kpis" id="attainKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="at-attChart"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Attainment by Tribe</div><div class="chart-container"><canvas id="attainChart"></canvas></div></div><div class="card vis-section" data-vis="at-ytdPipe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>YTD vs Pipeline</div><div class="chart-container"><canvas id="ytdPipeChart"></canvas></div></div></div><div class="card vis-section" data-vis="at-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="at-wonTable" id="atWonCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Projects Won</div><div class="filter-row" id="tribeWinsFilter"></div><div class="table-wrap" id="tribeWinsTable"></div></div></div>
+  <!-- TARGET TAB -->
+  <div class="section" id="sec-target">
+    <div class="vis-section" data-vis="tg-summary">
+      <div class="tg-summary">
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Total Sum</span><span class="tg-sum-val" id="tgSumTotal">—</span></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Winrate Estimate</span><div class="tg-wr-wrap"><input type="number" class="tg-wr-input" id="tgWrInput" value="33.33" step="0.01" min="0.01"><span class="tg-wr-suffix">%</span></div></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Total Won</span><span class="tg-sum-val won clickable" id="tgSumWon" onclick="tgShowWonModal()" title="Click to view all contributing projects">—</span></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">Gap</span><span class="tg-sum-val gap" id="tgSumGap">—</span></div>
+        <div class="tg-sum-cell"><span class="tg-sum-lbl">RFP</span><span class="tg-sum-val rfp" id="tgSumRfp">—</span></div>
+      </div>
+      <div class="tg-top-bar">
+        <div class="tg-actions">
+          <button class="tg-btn" onclick="tgAddGroup()">+ New Group</button>
+          <button class="tg-btn ghost" onclick="tgAddCard()">+ New Card</button>
+          <button class="tg-btn ghost" onclick="tgDownloadCSV()">⬇ Download targets.csv</button>
+        </div>
+        <div class="tg-view-toggle">
+          <button class="tg-view-btn active" id="tgViewCards" onclick="tgSetView('cards')">Cards</button>
+          <button class="tg-view-btn" id="tgViewTable" onclick="tgSetView('table')">Table</button>
+        </div>
+      </div>
+    </div>
+    <div class="vis-section" data-vis="tg-groups">
+      <div class="tg-groups" id="tgGroups"></div>
+      <div class="tg-table-wrap" id="tgTableWrap" style="display:none"></div>
+    </div>
+    <div class="card vis-section" data-vis="tg-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="tg-wins-list" id="tgWinsList"></div></div>
+  </div>
   <!-- POC TAB -->
   <div class="section" id="sec-poc">
     <div class="card vis-section" data-vis="poc-info"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Phase Reference</div><div id="pocRefBody"></div></div>
@@ -448,15 +656,16 @@ async function doEncAction(){
   }}
 
 // ═══ SETTINGS CONFIG ═══
-const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-filter':'Month Filter','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table'};
-const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-filter','bd-wins','bd-doors'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],poc:['poc-info','poc-chart','poc-table']};
-const TAB_NAMES={overview:'Overview',pipeline:'Sales Pipeline',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',poc:'POC',encrypt:'Encrypt/Decrypt'};
-const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',currency:'PHP',usdRate:57,
+const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-doors-chart':'Doors Opened Bar Chart','bd-filter':'Month Filter + BD Grid','bd-wins':'BD Wins Table','bd-doors':'Doors Opened Table','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','tg-summary':'Summary Bar','tg-groups':'Groups & Cards','tg-wins':'Wins List','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table'};
+const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-detail'],bd:['bd-charts','bd-doors-chart','bd-filter','bd-wins','bd-doors'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],target:['tg-summary','tg-groups','tg-wins'],poc:['poc-info','poc-chart','poc-table']};
+const TAB_NAMES={overview:'Overview',pipeline:'Sales',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',target:'Targets',poc:'POC',encrypt:'Encrypt/Decrypt'};
+const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',targetCSV:'targets.csv',currency:'PHP',usdRate:57,
   overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-table':true,'ov-winsTable':true},
   pipeline:{visible:true,'pl-kpis':true},am:{visible:true,'am-chart':true,'am-detail':true},
-  bd:{visible:true,'bd-charts':true,'bd-filter':true},
+  bd:{visible:true,'bd-charts':true,'bd-doors-chart':true,'bd-filter':true,'bd-wins':true,'bd-doors':true},
   winrate:{visible:false,'wr-kpis':true,'wr-count':true,'wr-value':true,'wr-trend':true,'wr-tribe':true,'wr-table':true},
   attainment:{visible:true,'at-kpis':true,'at-attChart':true,'at-ytdPipe':true,'at-ytdPipeline':true,'at-wonTable':true},
+  target:{visible:true,'tg-summary':true,'tg-groups':true,'tg-wins':true},
   poc:{visible:true,'poc-info':true,'poc-chart':true,'poc-table':true},
   encrypt:{visible:false}};
 let CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
@@ -531,8 +740,10 @@ function curLeadMonth(){const m=new Date().getMonth(),n=['Jan','Feb','Mar','Apr'
 function extractDate(n){const m=(n||'').match(/(\d{4})(\d{2})(\d{2})/);return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
 // Lookup previous-week row by Project+Client key
 let _prevMap=null;
-function prevMap(){if(_prevMap)return _prevMap;_prevMap={};DATA_PREV.forEach(r=>{const k=(r['Project']||'')+'|||'+(r['Client']||'');_prevMap[k]=r;});return _prevMap;}
-function getPrev(r){if(!hp())return null;return prevMap()[(r['Project']||'')+'|||'+(r['Client']||'')]||null;}
+// Prev-week lookup keyed by UID (unique identifier). Falls back to Project|||Client for rows missing UID (legacy).
+function _pmKey(r){const u=(r['UID']||'').toString().trim();return u?'u::'+u:'pc::'+(r['Project']||'')+'|||'+(r['Client']||'');}
+function prevMap(){if(_prevMap)return _prevMap;_prevMap={};DATA_PREV.forEach(r=>{_prevMap[_pmKey(r)]=r;});return _prevMap;}
+function getPrev(r){if(!hp())return null;return prevMap()[_pmKey(r)]||null;}
 function dvRow(cur,prev){if(prev===null||Math.abs(cur-prev)<0.01)return '';return dv(cur,prev,true);}
 function hasChanged(cur,prev){return prev!==null&&Math.abs(cur-prev)>=0.01;}
 function invalidatePrevMap(){_prevMap=null;}
@@ -590,7 +801,7 @@ function showProjModal(r,fromPipeKpi){
   h+=`<div class="proj-modal-field"><span class="fld-label">PM</span><span class="fld-value">${escHtml(r['PM']||'—')}${wasTag(r['PM']||'',pPM,false)}</span></div>`;
   h+=`</div><hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
   // Dates block
-  const projStart=r['Project Start']||'',projEnd=r['Project End']||'';
+  const prepDate=r['Preparation Date']||'',execDate=r['Execution Date']||'',closureDate=r['Closure Date']||'',completionDate=r['Completion Date']||'';
   h+=`<div class="proj-modal-grid" style="margin-bottom:0">`;
   h+=`<div class="proj-modal-field"><span class="fld-label">RFP Received Date</span><span class="fld-value">${escHtml(rfpDate||'—')}${wasTag(rfpDate,pRfp,false)}</span></div>`;
   const moNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -598,8 +809,13 @@ function showProjModal(r,fromPipeKpi){
   const signMismatch=signDate&&sdMonth&&declMonth&&sdMonth!==declMonth&&WS.includes(r['Status']);
   const mismatchTip=signMismatch?`Signed in ${sdMonth} but declared as a win in ${declMonth}`:'';
   h+=`<div class="proj-modal-field"><span class="fld-label">Sign Date${signMismatch?` <span style="display:inline-block;padding:0 5px;border-radius:8px;font-size:9px;font-weight:700;background:#f1c232;color:#000;cursor:help;vertical-align:middle;margin-left:4px" onmouseenter="(function(e){_tip.textContent='${mismatchTip}';_tip.classList.add('show');tipMv(e);})(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()">⚠</span>`:''}</span><span class="fld-value">${escHtml(signDate||'—')}${wasTag(signDate,pSign,false)}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">Project Start</span><span class="fld-value">${escHtml(projStart||'—')}</span></div>`;
-  h+=`<div class="proj-modal-field"><span class="fld-label">Project End</span><span class="fld-value">${escHtml(projEnd||'—')}</span></div>`;
+  h+=`</div>`;
+  // Phase dates block
+  h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0"><div class="proj-modal-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:0">`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">Preparation</span><span class="fld-value">${escHtml(prepDate||'—')}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">Execution</span><span class="fld-value">${escHtml(execDate||'—')}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">Closure</span><span class="fld-value">${escHtml(closureDate||'—')}</span></div>`;
+  h+=`<div class="proj-modal-field"><span class="fld-label">Completion</span><span class="fld-value">${escHtml(completionDate||'—')}</span></div>`;
   h+=`</div>`;
   // Links block
   const hasLinks=ceLink||intCE||otherLinks;
@@ -609,6 +825,9 @@ function showProjModal(r,fromPipeKpi){
   h+=`</div>`;}
   // Quick Remarks
   if(remarks)h+=`<div class="proj-modal-remarks"><div class="fld-label">Quick Remarks</div><div class="fld-value">${escHtml(remarks)}</div></div>`;
+  // Tags pill list
+  const tagsRaw=(r['Tags']||'').toString();const tagsList=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
+  if(tagsList.length){h+=`<div class="proj-modal-remarks"><div class="fld-label">Tags</div><div class="fld-value" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${tagsList.map(t=>`<span class="proj-tag-pill">${escHtml(t)}</span>`).join('')}</div></div>`;}
   box.innerHTML=h;document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');}
 function closeProjModal(){
   document.getElementById('projModal').classList.remove('open');document.body.classList.remove('modal-open');
@@ -651,6 +870,8 @@ async function initLoad(){
   applyCfg();
   const hasEnc=(CFG.defaultCSV||'').endsWith('.enc')||(CFG.lastWeekCSV||'').endsWith('.enc');
   await reloadFromConfig();
+  // Load Target tab seed data from CSV (independent of encrypted pipeline data)
+  try{if(typeof loadTargetsCSV==='function')await loadTargetsCSV();}catch(_){}
   // If enc files configured but no data loaded, password was wrong — retry
   if(hasEnc && !Object.keys(csvSlots).length && ENC_PW){
     showPWModal('Decryption Failed — please try again.');
@@ -1094,11 +1315,11 @@ async function downloadPDF(){
   finally{ov.remove();}
 }
 
-function setCurrency(c){CURRENCY=c;CFG.currency=c;document.getElementById('btnPHP').classList.toggle('active',c==='PHP');document.getElementById('btnUSD').classList.toggle('active',c==='USD');if(DATA.length)renderAll();}
-document.getElementById('usdRateInput').addEventListener('change',function(){const v=parseFloat(this.value);if(v>0){USD_RATE=v;CFG.usdRate=v;rebuildTargets();if(DATA.length)renderAll();}});
+function setCurrency(c){CURRENCY=c;CFG.currency=c;document.getElementById('btnPHP').classList.toggle('active',c==='PHP');document.getElementById('btnUSD').classList.toggle('active',c==='USD');if(DATA.length)renderAll();else if(typeof renderTarget==='function')renderTarget();}
+document.getElementById('usdRateInput').addEventListener('change',function(){const v=parseFloat(this.value);if(v>0){USD_RATE=v;CFG.usdRate=v;rebuildTargets();if(DATA.length)renderAll();else if(typeof renderTarget==='function')renderTarget();}});
 document.getElementById('usdRateInput').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
 function switchTab(name){const tab=document.querySelector(`.nav-tab[data-tab="${name}"]`);if(tab)tab.click();}
-document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');});});
+document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');if(tab.dataset.tab==='target'){if(typeof renderTarget==='function')renderTarget();if(typeof tgPlayEntrance==='function')tgPlayEntrance();}});});
 // ═══ VERBAL CAPTION SYSTEM ═══
 function toggleCaption(visKey){const card=document.querySelector(`[data-vis="${visKey}"]`);if(!card)return;const t=card.querySelector('.caption-toggle'),c=card.querySelector('.card-caption');if(!t||!c)return;const o=c.classList.toggle('open');t.classList.toggle('open',o);}
 function injectCaptions(){for(const[k,fn]of Object.entries(CAPTIONS)){const card=document.querySelector(`[data-vis="${k}"].card`);if(!card)continue;let cap=card.querySelector('.card-caption');const wasOpen=cap?.classList.contains('open');if(cap)cap.remove();const oldT=card.querySelector('.caption-toggle');if(oldT)oldT.remove();const html=fn();if(!html)continue;const tri=document.createElement('div');tri.className='caption-toggle'+(wasOpen?' open':'');tri.setAttribute('aria-label','Toggle verbal report');tri.innerHTML='&#9660;';tri.onclick=function(e){e.stopPropagation();toggleCaption(k);};card.appendChild(tri);const ce=document.createElement('div');ce.className='card-caption'+(wasOpen?' open':'');ce.setAttribute('role','region');ce.setAttribute('aria-label','Verbal report for this chart');ce.innerHTML=`<div class="card-caption-inner">${html}</div>`;card.appendChild(ce);}}
@@ -1295,7 +1516,7 @@ function togglePocChartDetail(month,entries){
   el.innerHTML=h;el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();injectCaptions();}
+function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();injectCaptions();}
 
 // ═══ 1. OVERVIEW ═══
 let _activeQ=-1;
@@ -1339,7 +1560,7 @@ function renderOverview(cw){
   const pw=hp()?twp(DATA_PREV):null,pce=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&r['Status']==='CE/Pitch Submitted').reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
   const pfs=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&r['Status']==='For CE/Pitch Creation').reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
   const pp=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&ps.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
-  document.getElementById('kpiStrip').innerHTML=`<div class="kpi green clickable anim-fade" style="animation-delay:0s" aria-label="Total Wins 2026: ${fmt(tw)}, ${won.length} projects, ${pct(tw,tt)}% attainment" onclick="document.getElementById('ovWinsCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Wins 2026</div><div class="kpi-value">${fmt(tw)} ${dv(tw,pw)}</div><div class="kpi-sub">${won.length} projects · ${pct(tw,tt)}% att.</div></div><div class="kpi blue clickable anim-fade" style="animation-delay:.05s" aria-label="Target: ${fmt(tt)}" onclick="switchTab('attainment')"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(tt)}</div></div><div class="kpi amber clickable anim-fade" style="animation-delay:.1s" aria-label="CEs Submitted: ${fmt(ceT)}, ${ce.length} projects" onclick="switchTab('pipeline')"><div class="kpi-label">CEs Submitted</div><div class="kpi-value">${fmt(ceT)} ${dv(ceT,pce)}</div><div class="kpi-sub">${ce.length} projects</div></div><div class="kpi purple clickable anim-fade" style="animation-delay:.15s" aria-label="Pipeline: ${fmt(pipT)}, ${pip.length} active" onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(pipT)} ${dv(pipT,pp)}</div><div class="kpi-sub">${pip.length} active</div></div><div class="kpi cyan clickable anim-fade" style="animation-delay:.2s" aria-label="For Submission: ${fmt(fsT)}, ${fs.length} in prep" onclick="switchTab('pipeline')"><div class="kpi-label">For Submission</div><div class="kpi-value">${fmt(fsT)} ${dv(fsT,pfs)}</div><div class="kpi-sub">${fs.length} in prep</div></div>`;
+  document.getElementById('kpiStrip').innerHTML=`<div class="kpi green clickable anim-fade" style="animation-delay:0s" aria-label="Total Wins 2026: ${fmt(tw)}, ${won.length} projects, ${pct(tw,tt)}% attainment" onclick="document.getElementById('ovWinsCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Wins 2026</div><div class="kpi-value">${fmt(tw)} ${dv(tw,pw)}</div><div class="kpi-sub">${won.length} projects · ${pct(tw,tt)}% att.</div></div><div class="kpi blue clickable anim-fade" style="animation-delay:.05s" aria-label="Target: ${fmt(tt)}" onclick="switchTab('attainment')"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(tt)}</div></div><div class="kpi amber clickable anim-fade" style="animation-delay:.1s" aria-label="CEs Submitted: ${fmt(ceT)}, ${ce.length} projects" onclick="switchTab('pipeline')"><div class="kpi-label">CEs Submitted</div><div class="kpi-value">${fmt(ceT)} ${dv(ceT,pce)}</div><div class="kpi-sub">${ce.length} projects</div></div><div class="kpi purple clickable anim-fade" style="animation-delay:.15s" aria-label="RFP/RFQ: ${fmt(pipT)}, ${pip.length} active" onclick="switchTab('pipeline')"><div class="kpi-label">RFP/RFQ</div><div class="kpi-value">${fmt(pipT)} ${dv(pipT,pp)}</div><div class="kpi-sub">${pip.length} active</div></div><div class="kpi cyan clickable anim-fade" style="animation-delay:.2s" aria-label="For Submission: ${fmt(fsT)}, ${fs.length} in prep" onclick="switchTab('pipeline')"><div class="kpi-label">For Submission</div><div class="kpi-value">${fmt(fsT)} ${dv(fsT,pfs)}</div><div class="kpi-sub">${fs.length} in prep</div></div>`;
   const ap=tw/tt*100,ppct=pw!==null?(pw/tt*100):null;
   const barPctVal=Math.min(ap,100);const valFitsInBar=barPctVal>18;
   document.getElementById('totalSalesBar').innerHTML=`${hp()?`<p style="font-size:11px;font-style:italic;color:var(--text-muted);margin:0 0 10px">Previous week: ${fmtF(pw)}</p>`:''}<div class="sales-bar-wrap"><div style="display:flex;justify-content:flex-end;align-items:baseline;gap:10px;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:var(--text-muted)">(${fmtF(tt-tw)} to go)</span><div class="sales-bar-target">${fmt(tt)}</div></div><div class="sales-bar-track"><div class="sales-bar-fill" style="width:${barPctVal}%"></div><div class="sales-bar-slider ${valFitsInBar?'val-inside':''}" style="width:${barPctVal}%"><span class="sales-val-in">${fmtF(tw)}</span><div class="sales-bar-edge"><span class="sales-val-out">${fmtF(tw)}</span><span style="font-size:14px;font-weight:300;color:var(--text)">${ap.toFixed(2)}% ${hp()?dv(tw,pw):''}</span></div></div><div id="qOverlay" class="q-overlay"></div>${hp()?`<div class="sales-bar-lw-marker" style="left:${Math.min(ppct,100)}%" data-label="Last Week"></div>`:''}</div><div class="sales-bar-axis"><span>${cs()}0</span><span>${fmt(tt*.25)}</span><span>${fmt(tt*.5)}</span><span>${fmt(tt*.75)}</span><span>${fmt(tt)}</span></div></div><div style="font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">Quarterly Targets Skew</div><div class="q-quarters">${(()=>{const colors=['#3b82f6','#22c55e','#f59e0b','#f1c232'];let prev=0;return Q_TARGETS_USD.map((q,i)=>{const w=q.pct-prev;prev=q.pct;return`<div class="q-item" style="width:${w}%" onclick="toggleQDetail(${i})"><div class="q-split"><div class="q-seg" style="width:100%;background:${colors[i]}" data-qi="${i}"></div></div><div class="q-lbl">${q.label}<br>${q.pct}%</div></div>`;}).join('');})()}</div><div id="qDetail" class="q-detail"><div class="q-detail-inner" id="qDetailInner"></div></div>`;
@@ -1550,8 +1771,8 @@ function toggleQtrPipeDetail(qi){
 
 // ═══ 3. AM (expandable phase detail on click) ═══
 let amDataCache={};
-function renderAM(){const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost'),ad={},ao=Object.keys(AM_NICKS);ao.forEach(a=>{ad[a]={p:0,a:0,c:0,d:0};});y.forEach(r=>{const a=r['AM'];if(!ad[a])return;ad[a].p+=pn(r['Weighted Pitch Phase (PHP)']);ad[a].a+=pn(r['Weighted Awarded Phase (PHP)']);ad[a].c+=pn(r['Weighted Collection Phase (PHP)']);ad[a].d+=pn(r['Weighted Completed Cycle (PHP)']);});amDataCache=ad;
-  let apd=null;if(hp()){apd={};ao.forEach(a=>{apd[a]=0;});DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost').forEach(r=>{const a=r['AM'];if(apd[a]===undefined)return;apd[a]+=pn(r['Weighted Pitch Phase (PHP)'])+pn(r['Weighted Awarded Phase (PHP)'])+pn(r['Weighted Collection Phase (PHP)'])+pn(r['Weighted Completed Cycle (PHP)']);});}
+function renderAM(){const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost'),ad={},ao=Object.keys(AM_NICKS);ao.forEach(a=>{ad[a]={p:0,a:0,c:0,d:0};});y.forEach(r=>{const a=r['AM'];if(!ad[a])return;ad[a].p+=pn(r['Weighted Pitch Phase (PHP)']);ad[a].a+=pn(r['Weighted Awarded Phase (PHP)']);ad[a].c+=pn(r['Weighted Collection Phase (PHP)']);ad[a].d+=pn(r['Amount Collected (PHP)']);});amDataCache=ad;
+  let apd=null;if(hp()){apd={};ao.forEach(a=>{apd[a]=0;});DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost').forEach(r=>{const a=r['AM'];if(apd[a]===undefined)return;apd[a]+=pn(r['Weighted Pitch Phase (PHP)'])+pn(r['Weighted Awarded Phase (PHP)'])+pn(r['Weighted Collection Phase (PHP)'])+pn(r['Amount Collected (PHP)']);});}
   const mx=Math.max(...ao.map(a=>{const d=ad[a];return Math.max(d.p+d.a+d.c+d.d,AM_TARGETS[a]||0);}),1);let h='';let amIdx=0;
   ao.forEach(a=>{const d=ad[a],t=d.p+d.a+d.c+d.d,tg=AM_TARGETS[a],nk=AM_NICKS[a],sc=mx*1.1,pt=apd?apd[a]:null;
     const cW=(d.d/sc*100).toFixed(2),clW=(d.c/sc*100).toFixed(2),aW=(d.a/sc*100).toFixed(2),pW=(d.p/sc*100).toFixed(2),tp=tg>0?(tg/sc*100).toFixed(2):-1;
@@ -1569,7 +1790,7 @@ function expandAM(am){const nk=AM_NICKS[am],el=document.getElementById('amExpand
   if(amExpandedName){const prev=AM_NICKS[amExpandedName];const pe=document.getElementById('amExpand_'+prev);if(pe)pe.style.display='none';document.getElementById('amDrawer').classList.remove('visible');}
   amExpandedName=am;const d=amDataCache[am];
   let pd={p:null,a:null,c:null,d:null};
-  if(hp()){const py=DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost');pd={p:py.reduce((s,r)=>s+pn(r['Weighted Pitch Phase (PHP)']),0),a:py.reduce((s,r)=>s+pn(r['Weighted Awarded Phase (PHP)']),0),c:py.reduce((s,r)=>s+pn(r['Weighted Collection Phase (PHP)']),0),d:py.reduce((s,r)=>s+pn(r['Weighted Completed Cycle (PHP)']),0)};}
+  if(hp()){const py=DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost');pd={p:py.reduce((s,r)=>s+pn(r['Weighted Pitch Phase (PHP)']),0),a:py.reduce((s,r)=>s+pn(r['Weighted Awarded Phase (PHP)']),0),c:py.reduce((s,r)=>s+pn(r['Weighted Collection Phase (PHP)']),0),d:py.reduce((s,r)=>s+pn(r['Amount Collected (PHP)']),0)};}
   el.innerHTML=`<div class="am-expand"><div class="am-expand-grid">
     <div class="am-expand-item"><div class="phase-color" style="background:#3c78d8"></div><span class="phase-name">Pitch Phase</span><span class="phase-val" style="color:#3c78d8">${fmtF(d.p)} ${hp()?dv(d.p,pd.p,true):''}</span></div>
     <div class="am-expand-item"><div class="phase-color" style="background:#f0c132"></div><span class="phase-name">Awarded Phase</span><span class="phase-val" style="color:#f0c132">${fmtF(d.a)} ${hp()?dv(d.a,pd.a,true):''}</span></div>
@@ -1579,12 +1800,12 @@ function expandAM(am){const nk=AM_NICKS[am],el=document.getElementById('amExpand
   el.style.display='block';
   // Also show accounts table
   showAMAccounts(am);}
-function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection - Invoice Sent':2,'For Collection - For Invoicing':3,'Collected - For Closing':4,'Fully Closed':5,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span><button class="am-close-btn" onclick="expandAM('${am.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Weighted Completed Cycle (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Weighted Completed Cycle (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
+function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection - Invoice Sent':2,'For Collection - For Invoicing':3,'Collected - For Closing':4,'Fully Closed':5,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span><button class="am-close-btn" onclick="expandAM('${am.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Amount Collected (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Amount Collected (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
 
 // ═══ 4. BD LEADS (donut with theme-aware text) ═══
 let bdState={month:null,activeBD:null};
 function renderBD(){const months=[...new Set(DATA.filter(r=>r['Lead Month']).map(r=>r['Lead Month']))].sort();if(bdState.month===null){const cm=curLeadMonth();bdState.month=months.includes(cm)?cm:(months.length?months[months.length-1]:'all');}
-  let f='<span class="filter-label">Lead Month</span>';f+=`<button class="filter-btn ${bdState.month==='all'?'active':''}" onclick="setBDMonth('all')">All</button>`;months.forEach(m=>{f+=`<button class="filter-btn ${bdState.month===m?'active':''}" onclick="setBDMonth('${m}')">${m.split(' - ')[1]||m}</button>`;});document.getElementById('bdMonthFilter').innerHTML=f;renderBDCharts();renderBDCards();renderBDWins();renderBDDoors();}
+  let f='<span class="filter-label">Lead Month</span>';f+=`<button class="filter-btn ${bdState.month==='all'?'active':''}" onclick="setBDMonth('all')">All</button>`;months.forEach(m=>{f+=`<button class="filter-btn ${bdState.month===m?'active':''}" onclick="setBDMonth('${m}')">${m.split(' - ')[1]||m}</button>`;});document.getElementById('bdMonthFilter').innerHTML=f;renderBDCharts();renderBDDoorsChart();renderBDCards();renderBDWins();renderBDDoors();}
 let _bdWinsFilter=null;
 function toggleBDWinsFilter(bd){_bdWinsFilter=_bdWinsFilter===bd?null:bd;renderBDWins();}
 function renderBDWins(){
@@ -1613,6 +1834,36 @@ function renderBDWins(){
 }
 let _bdDoorsFilter=null;
 function toggleBDDoorsFilter(bd){_bdDoorsFilter=_bdDoorsFilter===bd?null:bd;renderBDDoors();}
+// BD Doors bar chart — checkbox filter state (Set of BD full names). Defaults to Ella/Kewen/H on first render.
+let _bdDoorsChartSel=null;
+function toggleBDDoorsChart(bd){if(!_bdDoorsChartSel)_bdDoorsChartSel=new Set();if(_bdDoorsChartSel.has(bd))_bdDoorsChartSel.delete(bd);else _bdDoorsChartSel.add(bd);renderBDDoorsChart();}
+function renderBDDoorsChart(){
+  if(!DATA.length)return;
+  const canvas=document.getElementById('bdDoorsChart');if(!canvas)return;
+  const y=DATA.filter(r=>r['Year']==='2026'&&(r['BD']||'').trim()&&r['Status']!=='Talks In Progress'&&r['Status']!=='Talent Sourcing');
+  const totals={};y.forEach(r=>{const bds=(r['BD']||'').split(/[,;]/).map(s=>s.trim()).filter(Boolean);bds.forEach(bd=>{if(!totals[bd])totals[bd]={count:0,amt:0};totals[bd].count++;totals[bd].amt+=pn(r['Amount (VAT-Ex.) (PHP)']);});});
+  const allBDs=Object.keys(totals).sort((a,b)=>totals[b].amt-totals[a].amt);
+  if(_bdDoorsChartSel===null){
+    // Default: Ella, Kewen, H (by BD_NICKS value or full name)
+    _bdDoorsChartSel=new Set();allBDs.forEach(bd=>{const nick=BD_NICKS[bd]||'';if(['Ella','Kewen','H'].includes(nick)||['Ella','Kewen','H'].includes(bd))_bdDoorsChartSel.add(bd);});
+  }
+  // Render filter chips
+  const filterEl=document.getElementById('bdDoorsChartFilter');
+  if(filterEl){let fh='<span class="filter-label">BDs</span>';allBDs.forEach(bd=>{const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');const on=_bdDoorsChartSel.has(bd);fh+=`<button class="filter-btn ${on?'active':''}" onclick="toggleBDDoorsChart('${bd.replace(/'/g,"\\'")}')">${nick}</button>`;});filterEl.innerHTML=fh;}
+  // Build chart data from selected BDs
+  const sel=allBDs.filter(bd=>_bdDoorsChartSel.has(bd));
+  const labels=sel.map(bd=>BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' '));
+  const amts=sel.map(bd=>cx(totals[bd].amt));
+  const counts=sel.map(bd=>totals[bd].count);
+  if(CHARTS.bdDoors){CHARTS.bdDoors.destroy();delete CHARTS.bdDoors;}
+  const cs2=getComputedStyle(document.documentElement);
+  const textColor=cs2.getPropertyValue('--text').trim()||'#111';
+  const gridColor=cs2.getPropertyValue('--border').trim()||'#ccc';
+  const axFmt=(v)=>{const s=cs();const a=Math.abs(v);if(a>=1e9)return s+(v/1e9).toFixed(1)+'B';if(a>=1e6)return s+(v/1e6).toFixed(1)+'M';if(a>=1e3)return s+(v/1e3).toFixed(0)+'K';return s+Math.round(v).toLocaleString('en');};
+  // Custom plugin to draw shortened value labels at the end of each horizontal bar
+  const valueLabelPlugin={id:'bdDoorsValueLabel',afterDatasetsDraw(chart){const{ctx}=chart;const meta=chart.getDatasetMeta(0);if(!meta||!meta.data)return;ctx.save();ctx.fillStyle=textColor;ctx.font='600 12px DM Sans,sans-serif';ctx.textBaseline='middle';meta.data.forEach((bar,i)=>{const v=amts[i];if(v==null)return;const label=axFmt(v);const x=bar.x+8;const y=bar.y;ctx.textAlign='left';ctx.fillText(label,x,y);});ctx.restore();}};
+  CHARTS.bdDoors=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Doors Opened Amount',data:amts,backgroundColor:'#f1c232',borderRadius:6,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:60}},plugins:{legend:{display:false},tooltip:{callbacks:{label:(ctx)=>{const i=ctx.dataIndex;return`${counts[i]} door${counts[i]!==1?'s':''} · ${fmtF(totals[sel[i]].amt)}`;}}}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor,callback:axFmt}},y:{grid:{color:gridColor,display:false},ticks:{color:textColor,font:{weight:'600'}}}}},plugins:[valueLabelPlugin]});
+}
 function renderBDDoors(){
   const y=DATA.filter(r=>r['Year']==='2026'),all=y.filter(r=>(r['BD']||'').trim()&&r['Status']!=='Talks In Progress'&&r['Status']!=='Talent Sourcing');
   // Group by BD — count doors opened
@@ -1627,11 +1878,11 @@ function renderBDDoors(){
   // Sort by month then status priority then amount
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const sorted=[...filtered].sort((a,b)=>{const ia=mo.indexOf(dm(a)),ib=mo.indexOf(dm(b));if(ia!==ib)return ia-ib;const da=a['Sign Date']||'',db=b['Sign Date']||'';if(da&&db)return da.localeCompare(db);if(da)return 1;if(db)return -1;return pn(a['Amount (VAT-Ex.) (PHP)'])-pn(b['Amount (VAT-Ex.) (PHP)']);});
-  h+=`<table><thead><tr><th>Month</th><th>BD</th><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th class="amt">Amount</th></tr></thead><tbody>`;
+  h+=`<table style="table-layout:fixed;width:100%"><colgroup><col style="width:44px"><col style="width:60px"><col><col><col style="width:72px"><col style="width:120px"><col style="width:130px"></colgroup><thead><tr><th>Month</th><th>BD</th><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th class="amt">Amount</th></tr></thead><tbody>`;
   let lastM='';
   sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),bds=(r['BD']||'').split(/[,;]/).map(s=>s.trim()).filter(Boolean),bdNicks=bds.map(b=>BD_NICKS[b]||b.split(' ').slice(0,2).join(' ')).join(', ');
     const m=dm(r),showM=m!==lastM;lastM=m;
-    h+=`<tr style="cursor:pointer" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${m}</td><td style="font-weight:600">${bdNicks}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)}</td></tr>`;});
+    h+=`<tr style="cursor:pointer" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${m}</td><td style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${bdNicks}</td><td style="font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r['Project']||'—'}</td><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)}</td></tr>`;});
   const totalAmt=filtered.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="6" style="font-weight:700;color:var(--text)">Total — ${filtered.length} project${filtered.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--text)">${fmtF(totalAmt)}</td></tr></tfoot></table>`;
   document.getElementById('bdDoorsTable').innerHTML=h;
@@ -1741,7 +1992,7 @@ function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp=
   if(CHARTS.ac)CHARTS.ac.destroy();CHARTS.ac=new Chart(document.getElementById('attainChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:cs()+' Won',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:cs()+' Target',data:tribes.map(t=>cx(TRIBE_TARGETS[t])),backgroundColor:'rgba(100,116,139,.15)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animations:{y:{duration:0},height:{duration:0}},scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   if(CHARTS.yp)CHARTS.yp.destroy();CHARTS.yp=new Chart(document.getElementById('ytdPipeChart'),{type:'bar',data:{labels:tribes.map(t=>t.replace('PDEI - ','')),datasets:[{label:'YTD Wins',data:tribes.map(t=>cx(tw[t]||0)),backgroundColor:'#f1c232',borderRadius:4},{label:'Pipeline',data:tribes.map(t=>cx(tp[t]||0)),backgroundColor:'rgba(100,116,139,.25)',borderColor:'rgba(100,116,139,.5)',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',animations:{y:{duration:0},height:{duration:0}},scales:{x:{ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}},y:{grid:{display:false}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}}}});
   const fmtGap=v=>v<0?'('+fmtF(Math.abs(v))+')':fmtF(v);
-  let th=`<table><thead><tr><th>Tribe</th><th class="amt">Target</th><th class="amt">Wins</th><th class="amt">Pipeline</th><th class="amt">Gap</th><th>Att.</th></tr></thead><tbody>`;
+  let th=`<table><thead><tr><th>Tribe</th><th class="amt">Target</th><th class="amt">Wins</th><th class="amt">RFP/RFQ</th><th class="amt">Gap</th><th>Att.</th></tr></thead><tbody>`;
   tribes.forEach(t=>{const w=tw[t]||0,p=tp[t]||0,target=TRIBE_TARGETS[t],gap=target-w,att=w/target*100,c=att>=80?'green':att>=40?'amber':'red',pvw=hp()?twpT(DATA_PREV,t):null;const te=encodeURIComponent(t);th+=`<tr><td style="font-weight:600;color:var(--text)">${t.replace('PDEI - ','')}</td><td class="amt">${fmtF(target)}</td><td class="amt" style="color:var(--green);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('wins','${te}')" ${hasChanged(w,pvw)?`onmouseenter="_tip.textContent='was ${fmtF(pvw)}';_tip.classList.add('show');tipMv(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()"`:``}>${fmtF(w)} ${dvRow(w,pvw)}</td><td class="amt" style="color:var(--purple);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('pipeline','${te}')">${fmtF(p)}</td><td class="amt" style="color:${gap<0?'var(--green)':'var(--red)'}">${fmtGap(gap)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar" style="width:80px"><div class="progress-fill ${c}" style="width:${Math.min(att,100)}%"></div></div><span style="font-size:12px;font-weight:600;color:var(--${c})">${att.toFixed(1)}%</span></div></td></tr>`;});
   const totalGap=totalT-totalW;
   th+=`<tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)">TOTAL</td><td class="amt" style="font-weight:700">${fmtF(totalT)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalW)}</td><td class="amt" style="font-weight:700;color:var(--purple)">${fmtF(totalP)}</td><td class="amt" style="font-weight:700;color:${totalGap<0?'var(--green)':'var(--red)'}">${fmtGap(totalGap)}</td><td style="font-weight:700;color:var(--amber)">${(totalW/totalT*100).toFixed(1)}%</td></tr></tbody></table>`;document.getElementById('tribeTable').innerHTML=th;document.getElementById('ovTribeDetail').innerHTML='';
@@ -1844,4 +2095,246 @@ function toggleOvTribeDetail(type,encodedTribe){
   }
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
+
+// ═══ TARGET TAB ═══
+// State — all monetary values stored in PHP internally. Display converts via cx().
+// Groups/cards seed is loaded from data/targets.csv at boot (see loadTargetsCSV).
+let TG_STATE={winrateEst:33.33,view:'cards',groups:[]};
+async function loadTargetsCSV(){
+  const name=CFG.targetCSV||'targets.csv';
+  try{
+    const r=await fetch('data/'+encodeURIComponent(name)+'?_='+Date.now());
+    if(!r.ok){console.warn('targets CSV fetch failed:',r.status);return;}
+    let text;
+    if(/\.enc$/i.test(name)){
+      if(!ENC_PW){console.warn('targets CSV is encrypted but no password is available');return;}
+      const buf=new Uint8Array(await r.arrayBuffer());
+      text=await decryptBuf(buf,ENC_PW);
+      if(!text){console.warn('targets CSV decryption failed');return;}
+    }else{
+      text=await r.text();
+    }
+    const parsed=Papa.parse(text,{header:true,skipEmptyLines:true});
+    if(!parsed.data||!parsed.data.length)return;
+    const gMap={};const order=[];
+    parsed.data.forEach((row,i)=>{
+      const grp=String(row['Group']||'').trim();if(!grp)return;
+      if(!gMap[grp]){gMap[grp]={id:'g'+i+'_'+Math.random().toString(36).slice(2,6),name:grp,cards:[]};order.push(grp);}
+      const tgtUSD=parseFloat(String(row['Target (USD)']||'0').replace(/[,\s]/g,''))||0;
+      gMap[grp].cards.push({
+        id:'c'+i+'_'+Math.random().toString(36).slice(2,6),
+        account:String(row['Account']||'').trim(),
+        bd:String(row['BD']||'').trim(),
+        am:String(row['AM']||'').trim(),
+        remarksBD:String(row['Remarks (BD)']||'').trim(),
+        remarksAM:String(row['Remarks (AM)']||'').trim(),
+        type:String(row['Type']||'').trim(),
+        targetPHP:tgtUSD*(USD_RATE||57),
+        star:/key account/i.test(String(row['Type']||''))
+      });
+    });
+    TG_STATE.groups=order.map(k=>gMap[k]);
+    if(typeof renderTarget==='function')renderTarget();
+  }catch(e){console.warn('loadTargetsCSV error:',e);}
+}
+let _tgDragCardId=null,_tgDragGroupId=null,_tgFocus=null;
+const _tgEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+function _tgNewId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function _tgFindCard(id){for(const g of TG_STATE.groups){const c=g.cards.find(x=>x.id===id);if(c)return{card:c,group:g};}return null;}
+function _tgNorm(s){return String(s||'').trim().toLowerCase();}
+// Account matches a row when any of its Tags (comma-separated) contains the account (case-insensitive substring).
+function _tgRowMatches(r,acct){if(!acct)return false;const tags=String(r['Tags']||'').split(',').map(t=>_tgNorm(t)).filter(Boolean);return tags.some(tag=>tag.includes(acct));}
+// Sum of 2026 WS-status Amounts where any Tag contains Account.
+function tgCalcWon(card){
+  if(!DATA||!DATA.length)return 0;const acct=_tgNorm(card.account);if(!acct)return 0;
+  let s=0;for(const r of DATA){if(r['Year']!=='2026')continue;if(!WS.includes(r['Status']))continue;if(_tgRowMatches(r,acct))s+=pn(r['Amount (VAT-Ex.) (PHP)']);}
+  return s;
+}
+// List of rows contributing to a card's Won (for modal drill-down).
+function tgCalcWonList(acct){
+  const out=[];if(!DATA||!DATA.length||!acct)return out;
+  for(const r of DATA){if(r['Year']!=='2026')continue;if(!WS.includes(r['Status']))continue;if(_tgRowMatches(r,acct))out.push(r);}
+  return out.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
+}
+// Sum of 2026 pipeline rows (non-Lost, non-Won) tagged with Account — current raised RFP.
+function tgCalcRFP(card){
+  if(!DATA||!DATA.length)return 0;const acct=_tgNorm(card.account);if(!acct)return 0;
+  let s=0;for(const r of DATA){if(r['Year']!=='2026')continue;const st=r['Status'];if(st==='Lost'||WS.includes(st))continue;if(_tgRowMatches(r,acct))s+=pn(r['Amount (VAT-Ex.) (PHP)']);}
+  return s;
+}
+// Tooltip for table rows: show stacked BD + AM remarks (last line of each).
+function tgRowTipIn(e,cardId){const r=_tgFindCard(cardId);if(!r)return;const bd=_tgLastLine(r.card.remarksBD),am=_tgLastLine(r.card.remarksAM);const lines=[];if(bd)lines.push('BD: '+bd);if(am)lines.push('AM: '+am);if(!lines.length)return;_tip.textContent=lines.join('\n');_tip.classList.add('show');tipMv(e);}
+// List of pipeline rows contributing to a card's RFP (for modal drill-down).
+function tgCalcRFPList(acct){
+  const out=[];if(!DATA||!DATA.length||!acct)return out;
+  for(const r of DATA){if(r['Year']!=='2026')continue;const st=r['Status'];if(st==='Lost'||WS.includes(st))continue;if(_tgRowMatches(r,acct))out.push(r);}
+  return out.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
+}
+function _tgLastLine(s){if(!s)return '';const parts=String(s).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);return parts.length?parts[parts.length-1]:'';}
+function _tgParseAmt(raw){const v=pn(raw);return CURRENCY==='USD'?v*USD_RATE:v;}
+function _tgFmtEdit(php){const v=cx(php);return v?v.toLocaleString('en',{maximumFractionDigits:2}):'0';}
+function tgSetView(v){TG_STATE.view=v;document.getElementById('tgViewCards').classList.toggle('active',v==='cards');document.getElementById('tgViewTable').classList.toggle('active',v==='table');document.getElementById('tgGroups').style.display=v==='cards'?'':'none';document.getElementById('tgTableWrap').style.display=v==='table'?'':'none';renderTarget();}
+function _tgRfp(gap,wr){return gap<0?0:gap/wr;}
+function _tgCaptureFocus(){const ae=document.activeElement;if(!ae||ae.tagName!=='INPUT')return;const cid=ae.getAttribute('data-card-id'),gid=ae.getAttribute('data-group-id'),fld=ae.getAttribute('data-field');if(!fld)return;_tgFocus={cardId:cid,groupId:gid,field:fld,caret:ae.selectionStart,len:ae.value.length};}
+function _tgRestoreFocus(){if(!_tgFocus)return;const f=_tgFocus;_tgFocus=null;let sel='';if(f.cardId)sel=`input[data-card-id="${f.cardId}"][data-field="${f.field}"]`;else if(f.groupId)sel=`input[data-group-id="${f.groupId}"][data-field="${f.field}"]`;if(!sel)return;const root=TG_STATE.view==='table'?document.getElementById('tgTableWrap'):document.getElementById('tgGroups');const el=(root||document).querySelector(sel);if(!el)return;el.focus();if(el.setSelectionRange){try{const p=Math.min(f.caret==null?el.value.length:f.caret,el.value.length);el.setSelectionRange(p,p);}catch(_){}}}
+function renderTarget(){
+  const wr=Math.max(0.01,parseFloat(TG_STATE.winrateEst)||0.01)/100;
+  let grandTarget=0,grandWon=0;
+  TG_STATE.groups.forEach(g=>{g.cards.forEach(c=>{grandTarget+=c.targetPHP;grandWon+=tgCalcWon(c);});});
+  const grandGap=grandTarget-grandWon,grandRfp=_tgRfp(grandGap,wr);
+  const sumT=document.getElementById('tgSumTotal');if(sumT){sumT.textContent=fmtF(grandTarget);}
+  document.getElementById('tgSumWon').textContent=fmtF(grandWon);
+  document.getElementById('tgSumGap').textContent=fmtF(grandGap);
+  document.getElementById('tgSumRfp').textContent=fmtF(grandRfp);
+  const wrIn=document.getElementById('tgWrInput');if(wrIn&&document.activeElement!==wrIn)wrIn.value=TG_STATE.winrateEst;
+  if(TG_STATE.view==='cards')_tgRenderCards(wr);else _tgRenderTable(wr);
+  renderTargetWins();
+  _tgRestoreFocus();
+}
+function _tgRenderCards(wr){
+  const groupsEl=document.getElementById('tgGroups');if(!groupsEl)return;
+  let gh='';
+  TG_STATE.groups.forEach(g=>{
+    let gT=0,gW=0;
+    const cardsH=g.cards.map(c=>{
+      const won=tgCalcWon(c);const gap=c.targetPHP-won;const rfpRequired=_tgRfp(gap,wr);
+      const rfpHave=tgCalcRFP(c);
+      const pct=rfpRequired>0?Math.min(100,(rfpHave/rfpRequired)*100):(rfpHave>0?100:0);
+      const over=rfpRequired>0&&rfpHave>=rfpRequired;
+      gT+=c.targetPHP;gW+=won;
+      const bdR=_tgLastLine(c.remarksBD),amR=_tgLastLine(c.remarksAM);
+      return `<div class="tg-card${c.star?' star':''}" data-card-id="${c.id}">
+        <div class="tg-card-drag" draggable="true" ondragstart="tgDragStart(event,'${c.id}')" ondragend="tgDragEnd(event)"><span class="grip" title="Drag to move">⋮⋮</span><input class="tg-field-head" data-card-id="${c.id}" data-field="account" value="${_tgEsc(c.account)}" placeholder="Account" oninput="tgAccountInput('${c.id}',this.value)" ondragstart="event.stopPropagation();event.preventDefault();"><div class="tg-card-actions"><button class="tg-star${c.star?' on':''}" onclick="tgToggleStar('${c.id}')" title="Toggle star">★</button><button class="tg-card-del" onclick="tgDelCard('${c.id}')" title="Delete card">✕</button></div></div>
+        <div class="tg-row"><span class="k">BD</span><input class="tg-field" data-card-id="${c.id}" data-field="bd" value="${_tgEsc(c.bd)}" onchange="tgEditCard('${c.id}','bd',this.value)"></div>
+        <div class="tg-row"><span class="k">AM</span><input class="tg-field" data-card-id="${c.id}" data-field="am" value="${_tgEsc(c.am)}" onchange="tgEditCard('${c.id}','am',this.value)"></div>
+        <div class="tg-row"><span class="k">Target</span><input class="tg-field" data-card-id="${c.id}" data-field="target" value="${_tgFmtEdit(c.targetPHP)}" onchange="tgEditAmt('${c.id}',this.value)"></div>
+        <div class="tg-row"><span class="k">Won</span><span class="v won clickable" onclick="tgShowWonModal('${c.id}')" title="Click to see contributing projects">${fmtF(won)}</span></div>
+        <div class="tg-row"><span class="k">Gap</span><span class="v gap">${fmtF(gap)}</span></div>
+        <div class="tg-row rfp-row clickable" onclick="tgShowRFPModal('${c.id}')" title="Click to see contributing RFP projects"><div class="tg-rfp-top"><span class="k">RFP</span><span class="v">${fmtF(rfpHave)} / ${fmtF(rfpRequired)}</span></div><div class="tg-rfp-bar"><div class="tg-rfp-fill${over?' over':''}" style="width:${pct.toFixed(1)}%"></div></div><div class="tg-rfp-sub"><span>${pct.toFixed(1)}%</span><span>${over?'target met':'to target'}</span></div></div>
+        <div class="tg-row remark-row"><span class="k">BD Remark</span><span class="txt${bdR?'':' empty'}">${bdR?_tgEsc(bdR):'No remark'}</span></div>
+        <div class="tg-row remark-row"><span class="k">AM Remark</span><span class="txt${amR?'':' empty'}">${amR?_tgEsc(amR):'No remark'}</span></div>
+      </div>`;
+    }).join('');
+    const gGap=gT-gW,gRfp=_tgRfp(gGap,wr);
+    gh+=`<div class="tg-group" data-group-id="${g.id}" ondragover="tgGroupDragOver(event,'${g.id}')" ondragleave="tgGroupDragLeave(event,'${g.id}')" ondrop="tgGroupDrop(event,'${g.id}')">
+      <div class="tg-group-head" draggable="true" ondragstart="tgGroupDragStart(event,'${g.id}')" ondragend="tgGroupDragEnd(event)" title="Drag to reorder group">
+        <span class="tg-group-grip" aria-hidden="true">⋮⋮</span>
+        <input class="tg-group-name" data-group-id="${g.id}" data-field="name" value="${_tgEsc(g.name)}" onchange="tgEditGroupName('${g.id}',this.value)" ondragstart="event.stopPropagation();event.preventDefault();">
+        <div class="tg-group-totals">
+          <div class="tg-group-tot"><span class="lbl">Target</span><span class="val">${fmtF(gT)}</span></div>
+          <div class="tg-group-tot won"><span class="lbl">Won</span><span class="val">${fmtF(gW)}</span></div>
+          <div class="tg-group-tot gap"><span class="lbl">Gap</span><span class="val">${fmtF(gGap)}</span></div>
+          <div class="tg-group-tot rfp"><span class="lbl">RFP</span><span class="val">${fmtF(gRfp)}</span></div>
+        </div>
+        <button class="tg-group-del" onclick="tgDelGroup('${g.id}')" title="Delete group">✕</button>
+      </div>
+      <div class="tg-cards">${cardsH||'<div class="tg-empty">Empty — drop cards here or click + New Card</div>'}</div>
+    </div>`;
+  });
+  groupsEl.innerHTML=gh;
+}
+function _tgRenderTable(wr){
+  const el=document.getElementById('tgTableWrap');if(!el)return;
+  let grandT=0,grandW=0;
+  let body='';
+  TG_STATE.groups.forEach(g=>{
+    let gT=0,gW=0;
+    const rows=g.cards.map(c=>{
+      const won=tgCalcWon(c);const gap=c.targetPHP-won;const rfp=_tgRfp(gap,wr);gT+=c.targetPHP;gW+=won;
+      return `<tr class="${c.star?'star-row':''}" data-card-id="${c.id}" onmouseenter="tgRowTipIn(event,'${c.id}')" onmousemove="tipMv(event)" onmouseleave="tipOut()">
+        <td><button class="tg-star${c.star?' on':''}" onclick="tgToggleStar('${c.id}')" title="Toggle star">★</button></td>
+        <td><input class="tg-tfield" data-group-id="${g.id}" data-field="name" value="${_tgEsc(g.name)}" onchange="tgEditGroupName('${g.id}',this.value)"></td>
+        <td><input class="tg-tfield" data-card-id="${c.id}" data-field="account" value="${_tgEsc(c.account)}" oninput="tgAccountInput('${c.id}',this.value)"></td>
+        <td><input class="tg-tfield" data-card-id="${c.id}" data-field="bd" value="${_tgEsc(c.bd)}" onchange="tgEditCard('${c.id}','bd',this.value)"></td>
+        <td><input class="tg-tfield" data-card-id="${c.id}" data-field="am" value="${_tgEsc(c.am)}" onchange="tgEditCard('${c.id}','am',this.value)"></td>
+        <td class="amt"><input class="tg-tfield amt" data-card-id="${c.id}" data-field="target" value="${_tgFmtEdit(c.targetPHP)}" onchange="tgEditAmt('${c.id}',this.value)"></td>
+        <td class="amt won" style="cursor:pointer;text-decoration:underline dotted var(--text-muted);text-underline-offset:3px" onclick="tgShowWonModal('${c.id}')" title="Click to see contributing projects">${fmtF(won)}</td>
+        <td class="amt gap">${fmtF(gap)}</td>
+        <td class="amt rfp">${fmtF(rfp)}</td>
+        <td><button class="tg-card-del" onclick="tgDelCard('${c.id}')" title="Delete card">✕</button></td>
+      </tr>`;
+    }).join('');
+    grandT+=gT;grandW+=gW;
+    body+=rows||`<tr class="group-head"><td colspan="10" style="color:var(--text-muted);font-style:italic">${_tgEsc(g.name)} — empty (add a card)</td></tr>`;
+  });
+  const grandGap=grandT-grandW,grandRfp=_tgRfp(grandGap,wr);
+  el.innerHTML=`<table class="tg-table"><thead><tr><th></th><th>Group</th><th>Account</th><th>BD</th><th>AM</th><th class="amt">Target</th><th class="amt">Won</th><th class="amt">Gap</th><th class="amt">RFP</th><th></th></tr></thead><tbody>${body||'<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-muted)">No groups or cards yet</td></tr>'}</tbody><tfoot><tr><td colspan="5" style="text-align:right">TOTAL</td><td class="amt">${fmtF(grandT)}</td><td class="amt won">${fmtF(grandW)}</td><td class="amt gap">${fmtF(grandGap)}</td><td class="amt rfp">${fmtF(grandRfp)}</td><td></td></tr></tfoot></table>`;
+}
+function renderTargetWins(){
+  const el=document.getElementById('tgWinsList');if(!el)return;
+  if(!DATA||!DATA.length){el.innerHTML='<div class="tg-empty" style="grid-column:unset">No data loaded</div>';return;}
+  const accountKeys=[];
+  TG_STATE.groups.forEach(g=>g.cards.forEach(c=>{const a=_tgNorm(c.account);if(a)accountKeys.push(a);}));
+  const matchesTag=(rawTags)=>{if(!accountKeys.length)return false;const tags=String(rawTags||'').split(',').map(t=>_tgNorm(t)).filter(Boolean);return tags.some(tag=>accountKeys.some(k=>tag.includes(k)));};
+  const wins=DATA.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])).map(r=>({idx:r._i!=null?r._i:-1,client:r['Client']||'—',project:r['Project']||'—',tribe:r['Tribe']||'',tags:r['Tags']||'',amt:pn(r['Amount (VAT-Ex.) (PHP)'])})).sort((a,b)=>b.amt-a.amt);
+  if(!wins.length){el.innerHTML='<div class="tg-empty" style="grid-column:unset">No 2026 wins in dataset</div>';return;}
+  el.innerHTML=wins.map(w=>{
+    const hi=matchesTag(w.tags);
+    const click=w.idx>=0?` onclick="showProjModal(DATA[${w.idx}])"`:'';
+    return `<div class="tg-win-row clickable${hi?' hi':''}"${click}><div><div class="lbl">${_tgEsc(w.project)}</div><div class="sub">${_tgEsc(w.client)}${w.tribe?' · '+_tgEsc(w.tribe.replace('PDEI - ','')):''}</div></div><div class="amt">${fmtF(w.amt)}</div></div>`;
+  }).join('');
+}
+// Mutations
+function tgAddGroup(){const id=_tgNewId('g');TG_STATE.groups.unshift({id,name:'New Group',cards:[]});renderTarget();}
+function tgDelGroup(id){const i=TG_STATE.groups.findIndex(g=>g.id===id);if(i<0)return;TG_STATE.groups.splice(i,1);renderTarget();}
+function tgEditGroupName(id,v){const g=TG_STATE.groups.find(x=>x.id===id);if(!g)return;g.name=v;renderTarget();}
+function tgAddCard(){let g=TG_STATE.groups[0];if(!g){g={id:_tgNewId('g'),name:'New Group',cards:[]};TG_STATE.groups.unshift(g);}g.cards.unshift({id:_tgNewId('c'),account:'New Account',bd:'',am:'',remarksBD:'',remarksAM:'',type:'',targetPHP:0,star:false});renderTarget();}
+function tgDelCard(id){for(const g of TG_STATE.groups){const i=g.cards.findIndex(c=>c.id===id);if(i>=0){const el=document.querySelector('[data-card-id="'+id+'"]');if(el&&TG_STATE.view==='cards'){el.classList.add('removing');setTimeout(()=>{g.cards.splice(i,1);renderTarget();},180);}else{g.cards.splice(i,1);renderTarget();}return;}}}
+function tgEditCard(id,field,v){const r=_tgFindCard(id);if(!r)return;r.card[field]=v;renderTarget();}
+function tgAccountInput(id,v){const r=_tgFindCard(id);if(!r)return;r.card.account=v;_tgCaptureFocus();renderTarget();}
+function tgEditAmt(id,v){const r=_tgFindCard(id);if(!r)return;r.card.targetPHP=_tgParseAmt(v);renderTarget();}
+function tgToggleStar(id){const r=_tgFindCard(id);if(!r)return;r.card.star=!r.card.star;renderTarget();requestAnimationFrame(()=>{const el=document.querySelector('[data-card-id="'+id+'"]');if(el&&r.card.star){el.classList.add('star-pulse');setTimeout(()=>el.classList.remove('star-pulse'),650);}});}
+// Card drag
+function tgDragStart(e,id){_tgDragCardId=id;_tgDragGroupId=null;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','card:'+id);}catch(_){}const card=e.target.closest('.tg-card');if(card){card.classList.add('dragging');try{e.dataTransfer.setDragImage(card,card.offsetWidth/2,20);}catch(_){}}}
+function tgDragEnd(){_tgDragCardId=null;document.querySelectorAll('.tg-card.dragging').forEach(el=>el.classList.remove('dragging'));document.querySelectorAll('.tg-group.drag-over').forEach(el=>el.classList.remove('drag-over'));document.querySelectorAll('.tg-card-placeholder').forEach(el=>el.remove());}
+function tgGroupDragOver(e,gid){if(!_tgDragCardId&&!_tgDragGroupId)return;e.preventDefault();e.dataTransfer.dropEffect='move';const g=e.currentTarget;g.classList.add('drag-over');if(_tgDragCardId){const cards=g.querySelector('.tg-cards');if(cards&&!cards.querySelector('.tg-card-placeholder')){cards.querySelectorAll('.tg-card-placeholder').forEach(el=>el.remove());const ph=document.createElement('div');ph.className='tg-card-placeholder';cards.appendChild(ph);const em=cards.querySelector('.tg-empty');if(em)em.style.display='none';}}}
+function tgGroupDragLeave(e,gid){const g=e.currentTarget;if(e.relatedTarget&&g.contains(e.relatedTarget))return;g.classList.remove('drag-over');g.querySelectorAll('.tg-card-placeholder').forEach(el=>el.remove());const em=g.querySelector('.tg-empty');if(em)em.style.display='';}
+function tgGroupDrop(e,gid){e.preventDefault();if(_tgDragCardId){const id=_tgDragCardId;const src=_tgFindCard(id);const dst=TG_STATE.groups.find(g=>g.id===gid);tgDragEnd();if(!src||!dst)return;if(src.group.id===gid)return;const i=src.group.cards.findIndex(c=>c.id===id);if(i>=0)src.group.cards.splice(i,1);dst.cards.push(src.card);renderTarget();return;}
+  if(_tgDragGroupId&&_tgDragGroupId!==gid){const si=TG_STATE.groups.findIndex(g=>g.id===_tgDragGroupId);const di=TG_STATE.groups.findIndex(g=>g.id===gid);if(si<0||di<0){tgGroupDragEnd();return;}const[moved]=TG_STATE.groups.splice(si,1);TG_STATE.groups.splice(di,0,moved);tgGroupDragEnd();renderTarget();}else{tgGroupDragEnd();}}
+// Group drag
+function tgGroupDragStart(e,gid){_tgDragGroupId=gid;_tgDragCardId=null;e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain','group:'+gid);}catch(_){}const group=e.target.closest('.tg-group');if(group){group.classList.add('dragging');try{e.dataTransfer.setDragImage(group,40,20);}catch(_){}e.stopPropagation();}}
+function tgGroupDragEnd(){_tgDragGroupId=null;document.querySelectorAll('.tg-group.dragging').forEach(el=>el.classList.remove('dragging'));document.querySelectorAll('.tg-group.drag-over').forEach(el=>el.classList.remove('drag-over'));}
+// Won / RFP modal — lists projects contributing to a card's Won total, or pipeline RFPs.
+function tgShowWonModal(cardId){_tgShowProjectsModal('won',cardId);}
+function tgShowRFPModal(cardId){_tgShowProjectsModal('rfp',cardId);}
+function _tgShowProjectsModal(mode,cardId){
+  const modal=document.getElementById('tgWonModal'),box=document.getElementById('tgWonBox');if(!modal||!box)return;
+  const isRFP=mode==='rfp';
+  const listFn=isRFP?tgCalcRFPList:tgCalcWonList;
+  let title=isRFP?'RFP — All Cards':'Total Won — All Cards',rows=[],subtext='',total=0,bigClass=isRFP?'amber':'green';
+  if(cardId){
+    const r=_tgFindCard(cardId);if(!r)return;
+    title=`${isRFP?'RFP':'Won'} — ${r.card.account||'(no account)'}`;subtext=`Group: ${r.group.name}`;rows=listFn(_tgNorm(r.card.account));
+  }else{
+    const seen=new Set();TG_STATE.groups.forEach(g=>g.cards.forEach(c=>{const a=_tgNorm(c.account);if(!a)return;listFn(a).forEach(row=>{const k=(row['UID']||'')+'|'+(row['Project']||'')+'|'+(row['Client']||'');if(seen.has(k))return;seen.add(k);rows.push(row);});}));
+    rows.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
+    const cardCount=TG_STATE.groups.reduce((s,g)=>s+g.cards.length,0);
+    subtext=`Across ${cardCount} card${cardCount!==1?'s':''}`;
+  }
+  rows.forEach(r=>total+=pn(r['Amount (VAT-Ex.) (PHP)']));
+  let body='';
+  if(!rows.length)body=`<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No contributing 2026 ${isRFP?'pipeline items':'wins'} found</td></tr>`;
+  else rows.forEach(r=>{const idx=r._i!=null?r._i:-1;const click=idx>=0?` style="cursor:pointer" onclick="tgCloseWonModal();showProjModal(DATA[${idx}])"`:'';body+=`<tr${click}><td>${_tgEsc(r['Project']||'—')}</td><td>${_tgEsc(r['Client']||'—')}</td><td>${_tgEsc((r['Tribe']||'').replace('PDEI - ',''))}</td><td>${_tgEsc(r['Status']||'—')}</td><td class="amt">${fmtF(pn(r['Amount (VAT-Ex.) (PHP)']))}</td></tr>`;});
+  box.innerHTML=`<button class="tg-won-close" onclick="tgCloseWonModal()" title="Close">✕</button><h3>${_tgEsc(title)}</h3><div class="big ${bigClass}">${fmtF(total)}</div><div class="sub">${_tgEsc(subtext)} · ${rows.length} project${rows.length!==1?'s':''}</div><table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th class="amt">Amount</th></tr></thead><tbody>${body}</tbody></table>`;
+  modal.classList.add('open');document.body.classList.add('modal-open');
+}
+function tgCloseWonModal(){const m=document.getElementById('tgWonModal');if(!m)return;m.classList.remove('open');document.body.classList.remove('modal-open');}
+// CSV download — mirrors data/targets.csv schema
+function _tgCsvCell(v){const s=String(v==null?'':v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function tgDownloadCSV(){
+  const rows=[['Account','Group','BD','AM','Target (USD)','Remarks (BD)','Remarks (AM)','Type']];
+  TG_STATE.groups.forEach(g=>g.cards.forEach(c=>{
+    const usd=(USD_RATE?c.targetPHP/USD_RATE:0);
+    rows.push([c.account,g.name,c.bd,c.am,usd?usd.toFixed(2):'',c.remarksBD||'',c.remarksAM||'',c.type||(c.star?'Key Account':'')]);
+  }));
+  const csv=rows.map(r=>r.map(_tgCsvCell).join(',')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='targets.csv';a.click();
+}
+// One-shot entrance animation trigger (applied when the Target tab is opened).
+function tgPlayEntrance(){const sec=document.getElementById('sec-target');if(!sec)return;sec.classList.remove('tg-animate-once');void sec.offsetWidth;sec.classList.add('tg-animate-once');clearTimeout(tgPlayEntrance._t);tgPlayEntrance._t=setTimeout(()=>sec.classList.remove('tg-animate-once'),900);}
+// Winrate input wire
+document.addEventListener('DOMContentLoaded',()=>{
+  const wr=document.getElementById('tgWrInput');
+  if(wr){wr.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(!isNaN(v)&&v>0){TG_STATE.winrateEst=v;renderTarget();}});}
+});
 </script></body></html>
