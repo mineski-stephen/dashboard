@@ -1,15 +1,16 @@
 {
   "theme": "system",
-  "defaultCSV": "20260429_AMBD_Universe_Raw.enc",
-  "lastWeekCSV": "20260423_AMBD_Universe_Raw.enc",
+  "defaultCSV": "20260506_AMBD_Universe_Raw.enc",
+  "lastWeekCSV": "20260429_AMBD_Universe_Raw.enc",
   "targetCSV": "targets.enc",
   "currency": "PHP",
   "usdRate": 57,
+  "showPDFBtn": false,
   "overview": {
     "visible": true,
     "ov-kpis": true,
     "ov-totalSales": true,
-    "ov-tribeAtt": true,
+    "ov-tribeAtt": false,
     "ov-table": true
   },
   "pipeline": {
