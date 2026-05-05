@@ -9,7 +9,7 @@
     "visible": true,
     "ov-kpis": true,
     "ov-totalSales": true,
-    "ov-tribeAtt": true,
+    "ov-tribeAtt": false,
     "ov-table": true
   },
   "pipeline": {

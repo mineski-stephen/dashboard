@@ -1985,7 +1985,7 @@ function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>
 
 // ═══ 6. ATTAINMENT (pipeline bar fix) ═══
 let tribeWinsState={tribe:'all'};
-function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp={};const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'];y.forEach(r=>{const t=r['Tribe']||'?',php=pn(r['Amount (VAT-Ex.) (PHP)']);if(WS.includes(r['Status']))tw[t]=(tw[t]||0)+php;if(pipStatuses.includes(r['Status']))tp[t]=(tp[t]||0)+php;});
+function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp={};const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talent Sourcing'];y.forEach(r=>{const t=r['Tribe']||'?',php=pn(r['Amount (VAT-Ex.) (PHP)']);if(WS.includes(r['Status']))tw[t]=(tw[t]||0)+php;if(pipStatuses.includes(r['Status']))tp[t]=(tp[t]||0)+php;});
   const totalW=Object.values(tw).reduce((a,b)=>a+b,0),totalT=Object.values(TRIBE_TARGETS).reduce((a,b)=>a+b,0),totalP=Object.values(tp).reduce((a,b)=>a+b,0),pvW=hp()?twp(DATA_PREV):null;
   document.getElementById('attainKpis').innerHTML=`<div ${afc('kpi green clickable',0)} aria-label="Total Won: ${fmt(totalW)}, ${pct(totalW,totalT)}% of target" onclick="document.getElementById('atWonCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Won</div><div class="kpi-value">${fmt(totalW)} ${dv(totalW,pvW)}</div><div class="kpi-sub">${pct(totalW,totalT)}% of target</div></div><div ${afc('kpi blue',1)} aria-label="Target: ${fmt(totalT)}"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(totalT)}</div></div><div ${afc('kpi amber clickable',2)} aria-label="Pipeline: ${fmt(totalP)}" onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(totalP)}</div></div><div ${afc('kpi red',3)} aria-label="Gap to target: ${fmt(totalT-totalW)}"><div class="kpi-label">Gap</div><div class="kpi-value">${fmt(totalT-totalW)}</div></div>`;
   const tribes=Object.keys(TRIBE_TARGETS);
@@ -2056,9 +2056,9 @@ function toggleOvTribeDetail(type,encodedTribe){
     h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${won.length} win${won.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
     el.innerHTML=h;
   } else {
-    const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'];
+    const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talent Sourcing'];
     const pip=y.filter(r=>pipStatuses.includes(r['Status']));
-    const pipOrd={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1,'Talks In Progress':2,'Talent Sourcing':3};
+    const pipOrd={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1,'Talent Sourcing':2};
     const sorted=[...pip].sort((a,b)=>(pipOrd[a['Status']]??99)-(pipOrd[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
     // Find ghost rows: projects in pipeline last week for this tribe but no longer in pipeline this week
     const ghosts=[];
