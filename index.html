@@ -566,7 +566,7 @@ function rebuildTargets(){TRIBE_TARGETS={};for(const[k,v]of Object.entries(TRIBE
 rebuildTargets();
 const AM_TARGETS={'Alvaro Miguel Dela Vega Santos':0,'Carla Andrea Calma Crespo':25650000,'Carlos Roberto Francisco, David, IV Coscolluela':25650000,'Catherine Bautista Pumarega':0,'Marcus Joaquin Viray Gonzales':57000000,'Shanna Mae Alindada Sacsi':25650000};
 const AM_NICKS={'Alvaro Miguel Dela Vega Santos':'Iggy','Carla Andrea Calma Crespo':'Carla','Carlos Roberto Francisco, David, IV Coscolluela':'CC','Catherine Bautista Pumarega':'Cathy','Marcus Joaquin Viray Gonzales':'Marcus','Shanna Mae Alindada Sacsi':'Shanna'};
-const BD_NICKS={'Diana Lou Perocho Gosamo':'Diana','Marinella M. Casabuena':'Ella','Kewen Ysan Tolentino Sy':'Kewen','Jorge Luis Tesoro':'H','Vince':'Vince'};
+const BD_NICKS={'Diana Lou Perocho Gosamo':'Diana','Marinella M. Casabuena':'Ella','Kewen Ysan Tolentino Sy':'Kewen','Jorge Luis Tesoro':'H','Vince':'Vince', 'Pepito Laureola Garcia Jr.':'Moki','Christine Joyce Jimenez Cahigas':'Ceij','Kirk Terrence Agcaoili':'Kirk','Jared Jose Santos Matias':'Jared'};
 const BD_SPECIAL_GOALS={'Jorge Luis Tesoro':10,'Vince':0}; // H has special goal of 10, Vince has no goal
 const BD_DEFAULT_GOAL=15; // All other BDs get 15
 function getBDGoal(bdKey){return bdKey in BD_SPECIAL_GOALS?BD_SPECIAL_GOALS[bdKey]:BD_DEFAULT_GOAL;}
@@ -1857,7 +1857,7 @@ function renderBDDoorsChart(){
   const allBDs=Object.keys(totals).sort((a,b)=>totals[b].amt-totals[a].amt);
   if(_bdDoorsChartSel===null){
     // Default: Ella, Kewen, H (by BD_NICKS value or full name)
-    _bdDoorsChartSel=new Set();allBDs.forEach(bd=>{const nick=BD_NICKS[bd]||'';if(['Ella','Kewen','H'].includes(nick)||['Ella','Kewen','H'].includes(bd))_bdDoorsChartSel.add(bd);});
+    _bdDoorsChartSel=new Set();allBDs.forEach(bd=>{const nick=BD_NICKS[bd]||'';if(['Ella','Kewen','H','Moki'].includes(nick)||['Ella','Kewen','H','Moki'].includes(bd))_bdDoorsChartSel.add(bd);});
   }
   // Render filter chips
   const filterEl=document.getElementById('bdDoorsChartFilter');
