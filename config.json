@@ -27,7 +27,7 @@
     "bd-charts": false,
     "bd-doors-chart": true,
     "bd-filter": false,
-    "bd-wins": true,
+    "bd-wins": false,
     "bd-doors": true
   },
   "winrate": {
