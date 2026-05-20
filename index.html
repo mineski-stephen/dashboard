@@ -94,14 +94,8 @@ body.settings-open,body.modal-open{overflow:hidden}
 .delta{font-weight:700;font-size:13px;margin-left:6px}.delta.up{color:var(--green)}.delta.down{color:var(--red)}.delta.flat{color:var(--text-muted)}
 .delta-sm{font-weight:600;font-size:11px;margin-left:4px}.delta-sm.up{color:var(--green)}.delta-sm.down{color:var(--red)}.delta-sm.flat{color:var(--text-muted)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;position:relative;min-width:0}
-.caption-toggle{position:absolute;top:14px;right:14px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;transition:background .15s,transform .25s;color:var(--text-muted);font-size:10px;z-index:1;border:none;background:none;padding:0}
-.caption-toggle:hover{background:var(--surface2);color:var(--text-dim)}
-.caption-toggle.open{transform:rotate(180deg)}
-.card-caption{max-height:0;overflow:hidden;transition:max-height .4s ease,opacity .4s ease,margin .3s ease;opacity:0;margin-top:0}
-.card-caption.open{max-height:500px;opacity:1;margin-top:16px}
-.card-caption-inner{padding:14px 18px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border);font-size:13px;line-height:1.7;color:var(--text-dim);-webkit-user-select:text;user-select:text}
-.card-caption-inner strong{color:var(--text);font-weight:600}
-.card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.tbl-copy-btn{position:absolute;top:13px;right:16px;padding:3px 10px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;transition:all .15s;white-space:nowrap;z-index:2;line-height:1.6}
+.tbl-copy-btn:hover{background:var(--accent);color:#fff}.card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .card-title .dot{width:8px;height:8px;border-radius:50%}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:1100px){.grid-2{grid-template-columns:1fr}}
 .chart-container{position:relative;height:300px}.chart-container.short{height:220px}.chart-container.tall{height:340px}
@@ -459,6 +453,25 @@ body.settings-open,body.modal-open{overflow:hidden}
 .tg-table .tg-star{font-size:16px}
 .tg-table tfoot td{padding:12px 10px;background:var(--surface2);border-top:2px solid var(--border);font-weight:700;font-size:14px}
 .tg-table tfoot td.won{color:var(--green)}.tg-table tfoot td.gap{color:var(--red)}.tg-table tfoot td.rfp{color:var(--amber)}
+/* ═══ AR TAB ═══ */
+.ar-chart-wrap{position:relative;overflow:hidden;height:400px;background:var(--surface2);border-radius:var(--radius);cursor:grab;user-select:none;margin-bottom:20px}
+.ar-chart-wrap:active{cursor:grabbing}
+.ar-chart-inner{display:flex;align-items:flex-end;height:100%;padding:36px 0 36px;position:absolute;top:0;left:0;will-change:transform}
+.ar-week-col{display:flex;flex-direction:column;align-items:center;width:80px;flex-shrink:0;position:relative;cursor:pointer;transition:background .12s}
+.ar-week-col:hover{background:var(--surface3);border-radius:8px}
+.ar-week-col.active{background:var(--accent-glow);border-radius:8px}
+.ar-week-bar{width:48px;border-radius:6px 6px 0 0;background:var(--accent);transition:height .3s ease,opacity .3s;min-height:3px;opacity:.7}
+.ar-week-col:hover .ar-week-bar,.ar-week-col.active .ar-week-bar{opacity:1}
+.ar-week-col.past .ar-week-bar{background:var(--green)}
+.ar-week-col.future .ar-week-bar{background:var(--accent);opacity:.5}
+.ar-week-col.future:hover .ar-week-bar{opacity:.8}
+.ar-week-lbl{font-size:13px;color:var(--text-muted);margin-top:6px;font-weight:700}
+.ar-now-line{position:absolute;top:0;bottom:0;width:2px;background:var(--red);z-index:3;pointer-events:none}
+.ar-now-label{position:absolute;top:4px;left:6px;font-size:9px;font-weight:700;color:var(--red);white-space:nowrap}
+.ar-recenter{position:absolute;top:8px;right:8px;z-index:4;padding:4px 12px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer;transition:all .15s}
+.ar-recenter:hover{background:var(--accent);color:#fff}
+.ar-all-btn{padding:4px 14px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;transition:all .15s;margin-left:auto}
+.ar-all-btn:hover,.ar-all-btn.active{background:var(--accent);color:#fff}
 </style></head><body>
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
@@ -511,7 +524,7 @@ body.settings-open,body.modal-open{overflow:hidden}
   </div>
   <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)toggleSettings()"><div class="settings-panel" id="settingsPanel"></div></div>
   <div class="nav-tabs" id="navTabs">
-    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="target">Targets</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
+    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="target">Targets</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="ar">Collections</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
   </div>
   <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div><div id="ovTribeDetail" style="margin-top:12px"></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
   <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="card" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Monthly Pipeline</div><div style="position:relative"><div style="height:300px"><canvas id="monthlyPipeChart"></canvas></div><div id="qtrPipeBars" style="position:relative;height:24px;margin-top:2px"></div></div><div id="monthlyPipeDetail" style="margin-top:12px"></div><div id="qtrPipeDetail" style="margin-top:12px"></div></div><div class="pipeline-cols" id="pipelineCols"></div></div>
@@ -553,6 +566,12 @@ body.settings-open,body.modal-open{overflow:hidden}
     <div class="card vis-section" data-vis="poc-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>POC Amounts by Month</div><div style="height:340px"><canvas id="pocChart"></canvas></div><div id="pocQtrTotals" style="margin-top:8px"></div><div id="pocChartDetail" style="margin-top:12px"></div></div>
     <div class="card vis-section" data-vis="poc-table"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Completion Status</div><div class="table-wrap" id="pocTable"></div></div>
   </div>
+  <!-- AR TAB -->
+  <div class="section" id="sec-ar">
+    <div class="kpi-strip vis-section" data-vis="ar-kpis" id="arKpis"></div>
+    <div class="card vis-section" data-vis="ar-chart"><div class="card-title" style="display:flex;align-items:center"><div class="dot" style="background:var(--accent)"></div>Collections by Week<button class="ar-all-btn" id="arAllBtn" onclick="arToggleAll()">All</button></div><div class="ar-chart-wrap" id="arChartWrap"><button class="ar-recenter" onclick="arRecenter()">Re-center</button><div class="ar-chart-inner" id="arChartInner"></div></div></div>
+    <div class="card vis-section" data-vis="ar-table" id="arDetailCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div><span id="arDetailTitle">AR Details</span></div><div class="table-wrap" id="arDetailTable"></div></div>
+  </div>
   <!-- ENCRYPT TAB -->
   <div class="section" id="sec-encrypt"><div class="card"><div class="card-title"><div class="dot" style="background:var(--red)"></div>File Encryption / Decryption</div>
     <div class="enc-box">
@@ -574,7 +593,7 @@ let TRIBE_TARGETS={};
 function rebuildTargets(){TRIBE_TARGETS={};for(const[k,v]of Object.entries(TRIBE_TARGETS_USD))TRIBE_TARGETS[k]=v*USD_RATE;}
 rebuildTargets();
 const AM_TARGETS={'Alvaro Miguel Dela Vega Santos':0,'Carla Andrea Calma Crespo':25650000,'Carlos Roberto Francisco, David, IV Coscolluela':25650000,'Catherine Bautista Pumarega':0,'Marcus Joaquin Viray Gonzales':57000000,'Shanna Mae Alindada Sacsi':25650000};
-const AM_NICKS={'Alvaro Miguel Dela Vega Santos':'Iggy','Carla Andrea Calma Crespo':'Carla','Carlos Roberto Francisco, David, IV Coscolluela':'CC','Catherine Bautista Pumarega':'Cathy','Marcus Joaquin Viray Gonzales':'Marcus','Shanna Mae Alindada Sacsi':'Shanna'};
+const AM_NICKS={'Alvaro Miguel Dela Vega Santos':'Iggy','Catherine Bautista Pumarega':'Cathy','Carla Andrea Calma Crespo':'Carla','Carlos Roberto Francisco, David, IV Coscolluela':'CC','Marcus Joaquin Viray Gonzales':'Marcus','Shanna Mae Alindada Sacsi':'Shanna'};
 const BD_NICKS={'Diana Lou Perocho Gosamo':'Diana','Marinella M. Casabuena':'Ella','Kewen Ysan Tolentino Sy':'Kewen','Jorge Luis Tesoro':'H','Vince':'Vince', 'Pepito Laureola Garcia Jr.':'Moki','Christine Joyce Jimenez Cahigas':'Ceij','Kirk Terrence Agcaoili':'Kirk','Jared Jose Santos Matias':'Jared'};
 const BD_SPECIAL_GOALS={'Jorge Luis Tesoro':10,'Vince':0}; // H has special goal of 10, Vince has no goal
 const BD_DEFAULT_GOAL=15; // All other BDs get 15
@@ -665,10 +684,10 @@ async function doEncAction(){
   }}
 
 // ═══ SETTINGS CONFIG ═══
-const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-actual':'Actual Collection Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-doors-chart':'Doors Opened Bar Chart','bd-filter':'Month Filter + BD Grid','bd-wins':'BD Wins Table','bd-doors':'Doors Opened Table','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','tg-summary':'Summary Bar','tg-groups':'Groups & Cards','tg-wins':'Wins List','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table'};
-const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-actual','am-detail'],bd:['bd-charts','bd-doors-chart','bd-filter','bd-wins'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],target:['tg-summary','tg-groups','tg-wins'],poc:['poc-info','poc-chart','poc-table']};
-const TAB_NAMES={overview:'Overview',pipeline:'Sales',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',target:'Targets',poc:'POC',encrypt:'Encrypt/Decrypt'};
-const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',targetCSV:'targets.csv',currency:'PHP',usdRate:57,showPDFBtn:false,
+const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-actual':'Actual Collection Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-doors-chart':'Doors Opened Bar Chart','bd-filter':'Month Filter + BD Grid','bd-wins':'BD Wins Table','bd-doors':'Doors Opened Table','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','tg-summary':'Summary Bar','tg-groups':'Groups & Cards','tg-wins':'Wins List','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table','ar-kpis':'AR KPI Cards','ar-chart':'Collections Chart','ar-table':'AR Detail Table'};
+const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-actual','am-detail'],bd:['bd-charts','bd-doors-chart','bd-filter','bd-wins'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],target:['tg-summary','tg-groups','tg-wins'],poc:['poc-info','poc-chart','poc-table'],ar:['ar-kpis','ar-chart','ar-table']};
+const TAB_NAMES={overview:'Overview',pipeline:'Sales',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',target:'Targets',poc:'POC',ar:'Collections',encrypt:'Encrypt/Decrypt'};
+const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',targetCSV:'targets.csv',arCSV:'ar.csv',currency:'PHP',usdRate:57,showPDFBtn:false,
   overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-table':true,'ov-winsTable':true},
   pipeline:{visible:true,'pl-kpis':true},am:{visible:true,'am-chart':true,'am-actual':true,'am-detail':true},
   bd:{visible:true,'bd-charts':true,'bd-doors-chart':true,'bd-filter':true,'bd-wins':true,'bd-doors':true},
@@ -676,6 +695,7 @@ const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',targetCSV:'target
   attainment:{visible:true,'at-kpis':true,'at-attChart':true,'at-ytdPipe':true,'at-ytdPipeline':true,'at-wonTable':true},
   target:{visible:true,'tg-summary':true,'tg-groups':true,'tg-wins':true},
   poc:{visible:true,'poc-info':true,'poc-chart':true,'poc-table':true},
+  ar:{visible:true,'ar-kpis':true,'ar-chart':true,'ar-table':true},
   encrypt:{visible:false}};
 let CFG=JSON.parse(JSON.stringify(DEFAULT_CFG));
 function isTabVis(t){return CFG[t]?.visible!==false;}
@@ -693,11 +713,13 @@ function renderSettings(){
   h+=`<div class="settings-section"><div class="settings-section-header">Data Sources</div>`;
   h+=`<div class="setting-row" style="flex-direction:column;align-items:stretch;gap:6px"><span class="setting-label">Upload files directly</span>`;
   h+=`<label class="s-file-label"><input type="file" accept=".csv,.enc" onchange="handleSettingsUpload(this,1)">📂 Upload Current Week <span class="loaded" id="sUpload1"></span></label>`;
-  h+=`<label class="s-file-label"><input type="file" accept=".csv,.enc" onchange="handleSettingsUpload(this,2)">📁 Upload Last Week <span class="loaded" id="sUpload2"></span></label></div>`;
+  h+=`<label class="s-file-label"><input type="file" accept=".csv,.enc" onchange="handleSettingsUpload(this,2)">📁 Upload Last Week <span class="loaded" id="sUpload2"></span></label>`;
+  h+=`<label class="s-file-label"><input type="file" accept=".csv" onchange="handleARUpload(this)">📊 Upload AR CSV <span class="loaded" id="sUploadAR"></span></label></div>`;
   h+=`<button class="config-btn" style="margin-top:6px;font-size:11px" onclick="showCSVFields=!showCSVFields;renderSettings()">⚙ ${showCSVFields?'Hide':'Show'} config filenames</button>`;
   if(showCSVFields){
     h+=`<div class="setting-row" style="flex-direction:column;align-items:stretch;gap:4px;margin-top:8px"><span class="setting-label">Current Week CSV (from data/)</span><input class="s-input" type="text" value="${CFG.defaultCSV||''}" onchange="CFG.defaultCSV=this.value" placeholder="20260318_AMBD_Universe_Raw.csv"></div>`;
     h+=`<div class="setting-row" style="flex-direction:column;align-items:stretch;gap:4px"><span class="setting-label">Last Week CSV (from data/)</span><input class="s-input" type="text" value="${CFG.lastWeekCSV||''}" onchange="CFG.lastWeekCSV=this.value" placeholder="20260311_AMBD_Universe_Raw.csv"></div>`;
+    h+=`<div class="setting-row" style="flex-direction:column;align-items:stretch;gap:4px"><span class="setting-label">AR CSV (from data/)</span><input class="s-input" type="text" value="${CFG.arCSV||''}" onchange="CFG.arCSV=this.value" placeholder="ar.csv"></div>`;
     h+=`<button class="config-btn" style="margin-top:6px" onclick="reloadFromConfig()">↻ Reload from data/ directory</button>`;
   }
   h+=`</div>`;
@@ -744,7 +766,7 @@ function fmt(n){const v=cx(n),s=cs();if(Math.abs(v)>=1e9)return s+(v/1e9).toFixe
 function fmtF(n){return cs()+cx(n).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function pct(v,t){return t>0?((v/t)*100).toFixed(1):'0.0';}
 function dv(c,p,sm){const k=sm?'delta-sm':'delta';if(p===null||p===undefined)return '';if(Math.abs(c-p)<0.01)return `<span class="${k} flat">—</span>`;if(c>p)return `<span class="${k} up">▲</span>`;return `<span class="${k} down">▼</span>`;}
-function sp(st){const m={'Signed CE':['Won','status-won'],'Won - Awaiting CE Signature':['Won (Pending CE)','status-won'],'For Closing':['For Closing','status-collection'],'Fully Closed':['Closed','status-collection'],'For Collection':['For Collection','status-collection'],'CE/Pitch Submitted':['CE Submitted','status-submitted'],'For CE/Pitch Creation':['For Submission','status-pitch'],'Talks In Progress':['In Progress','status-rfp'],'Talent Sourcing':['Talent Sourcing','status-rfp'],'Stalled':['Stalled','status-lost'],'Lost':['Lost','status-lost'],'Archived':['Archived','status-lost']};const[l,c]=m[st]||[st,''];return `<span class="status-pill ${c}">${l}</span>`;}
+function sp(st){const m={'Signed CE':['Won','status-won'],'Won - Awaiting CE Signature':['Won (Pending CE)','status-won'],'For Closing':['For Closing','status-collection'],'Fully Closed':['Closed','status-collection'],'For Collection':['For Collection','status-collection'],'CE/Pitch Submitted':['CE Submitted','status-submitted'],'For CE/Pitch Creation':['For Submission','status-pitch'],'Talks In Progress':['In Progress','status-rfp'],'Talent Sourcing':['Talent Sourcing','status-rfp'],'Stalled':['Stalled','status-lost'],'Lost':['Lost','status-lost'],'Archived':['Archived','status-lost'],'Collected':['Collected','status-won'],'For Invoicing':['For Invoicing','status-submitted'],'For Approval':['For Approval','status-rfp']};const[l,c]=m[st]||[st,''];return `<span class="status-pill ${c}">${l}</span>`;}
 function gw(){const d=new Date(),o=new Date(d.getFullYear(),0,1);return Math.ceil(((d-o)/864e5+o.getDay()+1)/7);}
 function twp(d){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
 function twpT(d,t){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])&&r['Tribe']===t).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
@@ -775,6 +797,8 @@ function reconcile(){
   else if(csvSlots[1]){DATA=csvSlots[1].data;DATA_PREV=[];}
   else if(csvSlots[2]){DATA=csvSlots[2].data;DATA_PREV=[];}
   else{DATA=[];DATA_PREV=[];}
+  // Normalize legacy statuses → "For Collection"
+  [DATA,DATA_PREV].forEach(d=>d.forEach(r=>{const s=r['Status'];if(s==='For Collection - Invoice Sent'||s==='For Collection - For Invoicing')r['Status']='For Collection';}));
   DATA.forEach((r,i)=>r._i=i);
   invalidatePrevMap();
   renderAll();}
@@ -794,7 +818,7 @@ function _buildProjHtml(r,closeAction){
   const pBD=pr?(pr['BD']||''):null,pAM=pr?(pr['AM']||''):null,pPM=pr?(pr['PM']||''):null;
   const pStatus=pr?(pr['Status']||''):null,pTribe=pr?(pr['Tribe']||''):null;
   const pRfp=pr?(pr['RFP Received Date']||''):null,pSign=pr?(pr['Sign Date']||''):null;
-  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div>${wasTag((r['Tribe']||''),(pTribe),false)}<div>${sp(r['Status'])}</div></div>${closeAction?`<button class="am-close-btn" onclick="${closeAction}">✕</button>`:''}</div>`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div>${wasTag((r['Tribe']||''),(pTribe),false)}<div>${sp(r['Status'])}${r['Status']==='Lost'&&r['Reason for Loss']?` <span class="status-pill status-lost" style="font-size:10px">${escHtml(r['Reason for Loss'])}</span>`:''}</div></div>${closeAction?`<button class="am-close-btn" onclick="${closeAction}">✕</button>`:''}</div>`;
   // Project Code + PAR
   const par=r['PAR']||'';
   h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Code: <span style="color:var(--text);font-weight:600">${escHtml(r['Project Code']||'—')}</span>${par?` · PAR: <span style="color:var(--text);font-weight:600">${escHtml(par)}</span>`:''}</div>`;
@@ -889,6 +913,7 @@ async function initLoad(){
   await reloadFromConfig();
   // Load Target tab seed data from CSV (independent of encrypted pipeline data)
   try{if(typeof loadTargetsCSV==='function')await loadTargetsCSV();}catch(_){}
+  try{await loadARCSV();}catch(_){}
   // If enc files configured but no data loaded, password was wrong — retry
   if(hasEnc && !Object.keys(csvSlots).length && ENC_PW){
     showPWModal('Decryption Failed — please try again.');
@@ -1336,10 +1361,8 @@ function setCurrency(c){CURRENCY=c;CFG.currency=c;document.getElementById('btnPH
 document.getElementById('usdRateInput').addEventListener('change',function(){const v=parseFloat(this.value);if(v>0){USD_RATE=v;CFG.usdRate=v;rebuildTargets();if(DATA.length)renderAll();else if(typeof renderTarget==='function')renderTarget();}});
 document.getElementById('usdRateInput').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
 function switchTab(name){const tab=document.querySelector(`.nav-tab[data-tab="${name}"]`);if(tab)tab.click();}
-document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');if(tab.dataset.tab==='target'){if(typeof renderTarget==='function')renderTarget();if(typeof tgPlayEntrance==='function')tgPlayEntrance();}});});
-// ═══ VERBAL CAPTION SYSTEM ═══
-function toggleCaption(visKey){const card=document.querySelector(`[data-vis="${visKey}"]`);if(!card)return;const t=card.querySelector('.caption-toggle'),c=card.querySelector('.card-caption');if(!t||!c)return;const o=c.classList.toggle('open');t.classList.toggle('open',o);}
-function injectCaptions(){for(const[k,fn]of Object.entries(CAPTIONS)){const card=document.querySelector(`[data-vis="${k}"].card`);if(!card)continue;let cap=card.querySelector('.card-caption');const wasOpen=cap?.classList.contains('open');if(cap)cap.remove();const oldT=card.querySelector('.caption-toggle');if(oldT)oldT.remove();const html=fn();if(!html)continue;const tri=document.createElement('div');tri.className='caption-toggle'+(wasOpen?' open':'');tri.setAttribute('aria-label','Toggle verbal report');tri.innerHTML='&#9660;';tri.onclick=function(e){e.stopPropagation();toggleCaption(k);};card.appendChild(tri);const ce=document.createElement('div');ce.className='card-caption'+(wasOpen?' open':'');ce.setAttribute('role','region');ce.setAttribute('aria-label','Verbal report for this chart');ce.innerHTML=`<div class="card-caption-inner">${html}</div>`;card.appendChild(ce);}}
+document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');if(tab.dataset.tab==='target'){if(typeof renderTarget==='function')renderTarget();if(typeof tgPlayEntrance==='function')tgPlayEntrance();}if(tab.dataset.tab==='ar'){requestAnimationFrame(arRecenter);}});});
+// ═══ VERBAL CAPTION DATA (used by PDF export) ═══
 const CAPTIONS={
 'ov-totalSales':function(){const d=window._ovData;if(!d)return'';const{tw,tt,ap,pw,won,ceT,fsT,pipT,tws,cw}=d;const gap=tt-tw;const hasPrev=hp();
   const qIdx=Q_TARGETS_USD.findIndex(q=>q.amount*USD_RATE<=tw);const curQi=qIdx>=0?qIdx:0;const nextQi=Math.min(curQi+1,3);const curQ=Q_TARGETS_USD[curQi];const nextQ=Q_TARGETS_USD[nextQi];
@@ -1510,6 +1533,7 @@ function renderPOC(){
   });
   th+='</tbody></table>';
   document.getElementById('pocTable').innerHTML=th;
+  const pocCard=document.querySelector('[data-vis="poc-table"]');if(pocCard)_addCardCopyBtn(pocCard);
 }
 
 let _pocChartMonth=null;
@@ -1529,7 +1553,55 @@ function togglePocChartDetail(month,entries){
   el.innerHTML=h;el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();injectCaptions();}
+// ═══ COPY TABLE TO CLIPBOARD ═══
+function _copyTbl(ev,tbl){
+  const rows=[];
+  tbl.querySelectorAll('tr').forEach(tr=>{
+    if(tr.style.display==='none')return;
+    const cells=[];
+    tr.querySelectorAll('th,td').forEach(td=>{
+      let txt=td.innerText.trim()
+        .replace(/[₱$▲▼]/g,'')
+        .replace(/,(?=\d)/g,'')
+        .replace(/\s+/g,' ')
+        .trim();
+      cells.push(txt);
+    });
+    if(cells.some(c=>c))rows.push(cells.join('\t'));
+  });
+  navigator.clipboard.writeText(rows.join('\n'));
+  _tip.textContent='Table Copied!';_tip.classList.add('show');tipMv(ev);
+  setTimeout(tipOut,1200);
+}
+// Add copy button to a card/container (absolute top-right)
+function _addCardCopyBtn(containerEl){
+  containerEl.querySelectorAll('.tbl-copy-btn').forEach(b=>b.remove());
+  const tbl=containerEl.querySelector('table');if(!tbl)return;
+  const ps=getComputedStyle(containerEl).position;
+  if(!ps||ps==='static')containerEl.style.position='relative';
+  const btn=document.createElement('button');
+  btn.className='tbl-copy-btn';
+  btn.textContent='Copy Table';
+  btn.onmouseenter=(e)=>{_tip.textContent='Copy table to clipboard';_tip.classList.add('show');tipMv(e);};
+  btn.onmousemove=tipMv;
+  btn.onmouseleave=tipOut;
+  btn.onclick=(e)=>{e.stopPropagation();e.preventDefault();_copyTbl(e,tbl);};
+  containerEl.appendChild(btn);
+}
+// Add inline copy button (for flex title bars)
+function _makeCopyBtnInline(tbl){
+  const btn=document.createElement('button');
+  btn.className='tbl-copy-btn';
+  btn.style.cssText='position:static;margin-left:auto';
+  btn.textContent='Copy Table';
+  btn.onmouseenter=(e)=>{_tip.textContent='Copy table to clipboard';_tip.classList.add('show');tipMv(e);};
+  btn.onmousemove=tipMv;
+  btn.onmouseleave=tipOut;
+  btn.onclick=(e)=>{e.stopPropagation();e.preventDefault();_copyTbl(e,tbl);};
+  return btn;
+}
+
+function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();renderAR();}
 
 // ═══ 1. OVERVIEW ═══
 let _activeQ=-1;
@@ -1599,13 +1671,14 @@ function renderOverview(cw){
   const wonSorted=[...won].sort((a,b)=>{const ma=dm(a),mb=dm(b);const ia=mo.indexOf(ma),ib=mo.indexOf(mb);if(ia!==ib)return ia-ib;return parseSD(a)-parseSD(b);});
   // Pre-compute monthly totals
   const monthTotals={};wonSorted.forEach(r=>{const m=dm(r);if(!monthTotals[m])monthTotals[m]={count:0,amt:0,gp:0};monthTotals[m].count++;monthTotals[m].amt+=pn(r['Amount (VAT-Ex.) (PHP)']);monthTotals[m].gp+=pn(r['GP']);});
-  let wth=`<table><thead><tr><th>Month</th><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th class="amt">Amount</th><th class="amt">GP</th></tr></thead><tbody>`;
+  let wth=`<table><thead><tr><th>Month</th><th>Project</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">GP</th></tr></thead><tbody>`;
   let lastM='';wonSorted.forEach(r=>{const m=dm(r),amt=pn(r['Amount (VAT-Ex.) (PHP)']),ga=pn(r['GP']);const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
     const showM=m!==lastM;lastM=m;const mt=monthTotals[m];const isNew=r['Week Number']==String(cw);
-    wth+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"${isNew?' style="background:rgba(241,194,50,.12)"':''}><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga):'—'} ${ga>0?dvRow(ga,pGa):''}</td></tr>`;});
+    wth+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"${isNew?' style="background:rgba(241,194,50,.12)"':''}><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga):'—'} ${ga>0?dvRow(ga,pGa):''}</td></tr>`;});
   const totalWonAmt=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalWonGP=won.reduce((s,r)=>s+pn(r['GP']),0);
-  wth+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="5" style="font-weight:700;color:var(--text)">Total — ${won.length} wins</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonGP)}</td></tr></tfoot></table>`;
+  wth+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${won.length} wins</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonGP)}</td></tr></tfoot></table>`;
   document.getElementById('ovWinsTable').innerHTML=wth;
+  _addCardCopyBtn(document.getElementById('ovWinsCard'));
   window._ovData={tw,tt,ap,pw,won,ceT,fsT,pipT,tws,tpip,cw};}
 
 // ═══ 2. PIPELINE (GP + 30% gross) ═══
@@ -1825,7 +1898,9 @@ function expandAM(am){const nk=AM_NICKS[am],el=document.getElementById('amExpand
   el.style.display='block';
   // Also show accounts table
   showAMAccounts(am);}
-function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection':2,'For Closing':3,'Fully Closed':4,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span><button class="am-close-btn" onclick="expandAM('${am.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Amount Collected (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Amount Collected (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
+function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection':2,'For Closing':3,'Fully Closed':4,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Amount Collected (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Amount Collected (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;
+  const amTbl=dr.querySelector('table');if(amTbl){const t=dr.querySelector('.am-detail-title');if(t)t.appendChild(_makeCopyBtnInline(amTbl));}
+  dr.classList.add('visible');}
 
 // ═══ 4. BD LEADS (donut with theme-aware text) ═══
 let bdState={month:null,activeBD:null};
@@ -1901,9 +1976,11 @@ function showBDDoorAccounts(bd){const dr=document.getElementById('bdDoorsDrawer'
   const y=DATA.filter(r=>r['Year']==='2026'&&(r['BD']||'').includes(bd)&&r['Status']!=='Talks In Progress'&&r['Status']!=='Talent Sourcing');
   const _doorGrp=s=>{if(WS.includes(s))return 0;if(s==='CE/Pitch Submitted')return 1;if(s==='For CE/Pitch Creation')return 2;return 3;};
   const sorted=[...y].sort((a,b)=>{const ga=_doorGrp(a['Status']),gb=_doorGrp(b['Status']);if(ga!==gb)return ga-gb;return pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']);});
-  let h=`<div class="am-detail-title"><span>${nick} — Doors Opened (${sorted.length})</span><button class="am-close-btn" onclick="expandBDDoor('${bd.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Status</th><th class="amt">Amount</th></tr></thead><tbody>`;
+  let h=`<div class="am-detail-title"><span>${nick} — Doors Opened (${sorted.length})</span></div><div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Status</th><th class="amt">Amount</th></tr></thead><tbody>`;
   sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']);h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)}</td></tr>`;});
-  h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
+  h+='</tbody></table></div>';dr.innerHTML=h;
+  const bdTbl=dr.querySelector('table');if(bdTbl){const t=dr.querySelector('.am-detail-title');if(t)t.appendChild(_makeCopyBtnInline(bdTbl));}
+  dr.classList.add('visible');}
 function renderBDDoors(){}
 function setBDMonth(m){bdState.month=m;bdState.activeBD=null;renderBD();}
 function getBDLeads(bd){return DATA.filter(r=>r['BD']&&r['BD'].includes(bd)&&r['Lead Month']&&r['Status']!=='Lost'&&(bdState.month==='all'||r['Lead Month']===bdState.month));}
@@ -1974,13 +2051,15 @@ function renderBDDetail(bd){const leads=getBDLeads(bd),po={'4 - ITQ/RFQ/RFP':0,'
 // ═══ 5. WIN RATE ═══
 let wrState={month:'all'};
 function dm(r,useSignDate){const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];if(useSignDate){const sd=r['Sign Date']||'';const d=new Date(sd);if(!isNaN(d))return mn[d.getMonth()];}const m=r['Month'];if(m){for(let i=0;i<12;i++){const mm=String(i+1).padStart(2,'0');if(m.startsWith(mm))return mn[i];}return m;}const lu=r['Last Updated']||r['RFP Received Date']||'';for(let i=0;i<12;i++){const mm=String(i+1).padStart(2,'0');if(lu.includes('2026/'+mm)||lu.includes('2026-'+mm))return mn[i];}return'Unknown';}
+// Loss month: prefer "Loss Month" column for lost projects, fallback to dm()
+function lossM(r){const raw=(r['Loss Month']||'').trim();if(raw){const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];for(let i=0;i<12;i++){if(raw.includes(mn[i]))return mn[i];}for(let i=0;i<12;i++){const mm=String(i+1).padStart(2,'0');if(raw.startsWith(mm))return mn[i];}}return dm(r);}
 function renderWinRate(){const y=DATA.filter(r=>r['Year']==='2026'),wins=y.filter(r=>WS.includes(r['Status'])),losses=y.filter(r=>r['Status']==='Lost'),mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],wm={},lm={};
   // Read live theme colors for canvas
   const sty=getComputedStyle(document.documentElement);
   const cGreen=sty.getPropertyValue('--green').trim()||'#10B981';
   const cRed=sty.getPropertyValue('--red').trim()||'#EF4444';
   const cBorder=sty.getPropertyValue('--border').trim()||'#2A3545';
-  wins.forEach(r=>{const m=dm(r);if(!wm[m])wm[m]={c:0,a:0};wm[m].c++;wm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});losses.forEach(r=>{const m=dm(r);if(!lm[m])lm[m]={c:0,a:0};lm[m].c++;lm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});
+  wins.forEach(r=>{const m=dm(r);if(!wm[m])wm[m]={c:0,a:0};wm[m].c++;wm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});losses.forEach(r=>{const m=lossM(r);if(!lm[m])lm[m]={c:0,a:0};lm[m].c++;lm[m].a+=pn(r['Amount (VAT-Ex.) (PHP)']);});
   const am=mo.filter(m=>wm[m]||lm[m]),tW=wins.length,tL=losses.length,td=tW+tL,wr=td>0?tW/td*100:0,twv=wins.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),tlv=losses.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),vwr=(twv+tlv)>0?twv/(twv+tlv)*100:0;
   document.getElementById('winrateKpis').innerHTML=`<div ${afc('kpi '+(wr>=60?'green':wr>=40?'amber':'red'),0)} aria-label="Win Rate: ${wr.toFixed(1)}%, ${tW} wins, ${tL} losses"><div class="kpi-label">Win Rate</div><div class="kpi-value">${wr.toFixed(1)}%</div><div class="kpi-sub">${tW}W / ${tL}L</div></div><div ${afc('kpi '+(vwr>=60?'green':vwr>=40?'amber':'red'),1)} aria-label="Value Win Rate: ${vwr.toFixed(1)}%, ${fmt(twv)} of ${fmt(twv+tlv)}"><div class="kpi-label">Value Win Rate</div><div class="kpi-value">${vwr.toFixed(1)}%</div><div class="kpi-sub">${fmt(twv)} of ${fmt(twv+tlv)}</div></div><div ${afc('kpi green',2)} aria-label="Won: ${tW} projects, ${fmt(twv)}"><div class="kpi-label">Won</div><div class="kpi-value">${tW}</div><div class="kpi-sub">${fmt(twv)}</div></div><div ${afc('kpi red clickable',3)} aria-label="Lost: ${tL} projects, ${fmt(tlv)}" onclick="document.getElementById('wrLostCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Lost</div><div class="kpi-value">${tL}</div><div class="kpi-sub">${fmt(tlv)}</div></div>`;
   if(CHARTS.wlc)CHARTS.wlc.destroy();CHARTS.wlc=new Chart(document.getElementById('winLossCountChart'),{type:'bar',data:{labels:am,datasets:[{label:'Wins',data:am.map(m=>(wm[m]||{}).c||0),backgroundColor:cGreen,borderRadius:6},{label:'Losses',data:am.map(m=>(lm[m]||{}).c||0),backgroundColor:cRed,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,animation:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cBorder}}},plugins:{legend:{labels:{font:{family:'DM Sans',size:11}}}}}});
@@ -1995,11 +2074,11 @@ function setWRM(m){wrState.month=m;
   // Only re-render filter buttons and table, not charts
   const y=DATA.filter(r=>r['Year']==='2026'),losses=y.filter(r=>r['Status']==='Lost');
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],wm={},lm={};
-  y.filter(r=>WS.includes(r['Status'])).forEach(r=>{const mm=dm(r);wm[mm]=1;});losses.forEach(r=>{lm[dm(r)]=1;});
+  y.filter(r=>WS.includes(r['Status'])).forEach(r=>{const mm=dm(r);wm[mm]=1;});losses.forEach(r=>{lm[lossM(r)]=1;});
   const am=mo.filter(mm=>wm[mm]||lm[mm]);
   let fH='<span class="filter-label">Month</span>';fH+=`<button class="filter-btn ${wrState.month==='all'?'active':''}" onclick="setWRM('all')">All</button>`;am.forEach(mm=>{fH+=`<button class="filter-btn ${wrState.month===mm?'active':''}" onclick="setWRM('${mm}')">${mm}</button>`;});
   document.getElementById('winrateMonthFilter').innerHTML=fH;renderLT(losses);}
-function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>dm(r)===wrState.month),sorted=f.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<table><thead><tr><th>Project</th><th>Client</th><th>BD</th><th>Tribe</th><th>Month</th><th class="amt">Amount</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">No lost projects</td></tr>';sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),bd=(r['BD']||'—').split(',')[0].split(' ').slice(0,2).join(' ');h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:280px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${bd}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${dm(r)}</td><td class="amt">${amt>0?fmt(amt):'—'}</td></tr>`;});h+='</tbody></table>';document.getElementById('lossTable').innerHTML=h;}
+function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>lossM(r)===wrState.month),sorted=f.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<table><thead><tr><th>Project</th><th>Client</th><th>BD</th><th>Tribe</th><th>Loss Month</th><th>Reason</th><th class="amt">Amount</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted)">No lost projects</td></tr>';sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),bd=(r['BD']||'—').split(',')[0].split(' ').slice(0,2).join(' '),reason=r['Reason for Loss']||'';h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:280px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${bd}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${lossM(r)}</td><td>${reason?`<span class="status-pill status-lost" style="font-size:10px">${escHtml(reason)}</span>`:'—'}</td><td class="amt">${amt>0?fmt(amt):'—'}</td></tr>`;});h+='</tbody></table>';document.getElementById('lossTable').innerHTML=h;_addCardCopyBtn(document.getElementById('wrLostCard'));}
 
 // ═══ 6. ATTAINMENT (pipeline bar fix) ═══
 let tribeWinsState={tribe:'all'};
@@ -2121,6 +2200,7 @@ function toggleOvTribeDetail(type,encodedTribe){
     h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="${tc-3}" style="font-weight:700;color:var(--text)">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
     el.innerHTML=h;
   }
+  _addCardCopyBtn(el);
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
@@ -2365,4 +2445,207 @@ document.addEventListener('DOMContentLoaded',()=>{
   const wr=document.getElementById('tgWrInput');
   if(wr){wr.addEventListener('input',e=>{const v=parseFloat(e.target.value);if(!isNaN(v)&&v>0){TG_STATE.winrateEst=v;renderTarget();}});}
 });
+
+// ═══ SALES AR TAB ═══
+let AR_DATA=[];
+let arState={week:null,showAll:true};
+
+async function loadARCSV(){
+  const name=CFG.arCSV||'ar.csv';
+  try{
+    const r=await fetch('data/'+name+'?_='+Date.now());if(!r.ok)return;
+    const ext=name.split('.').pop().toLowerCase();
+    let text;
+    if(ext==='enc'){
+      const buf=new Uint8Array(await r.arrayBuffer());
+      text=await decryptBuf(buf,ENC_PW);
+      if(!text)return;
+    }else{
+      text=await r.text();
+    }
+    AR_DATA=Papa.parse(text,{header:true,skipEmptyLines:true}).data;
+    renderAR();
+  }catch(_){}
+}
+function handleARUpload(input){
+  const f=input.files[0];if(!f)return;
+  const reader=new FileReader();reader.onload=ev=>{
+    AR_DATA=Papa.parse(ev.target.result,{header:true,skipEmptyLines:true}).data;
+    document.getElementById('sUploadAR').textContent='✓ '+f.name;
+    renderAR();
+  };reader.readAsText(f);
+}
+
+function arPn(s){if(!s)return 0;const n=parseFloat(String(s).replace(/[₱$,\s]/g,''));return isNaN(n)?0:n;}
+
+function renderAR(){
+  if(!AR_DATA.length)return;
+  const cw=gw(),now=new Date(),curMonth=now.getMonth(),curYear=now.getFullYear();
+
+  // KPIs
+  let outstanding=0,forInvoicing=0,forApproval=0,collectedMonth=0;
+  AR_DATA.forEach(r=>{
+    const st=(r['Status']||'').trim(),php=arPn(r['Amount (PHP)']);
+    if(st==='For Collection')outstanding+=php;
+    else if(st==='For Invoicing')forInvoicing+=php;
+    else if(st==='For Approval')forApproval+=php;
+    if(st==='Collected'){
+      const cd=(r['Collection Date']||'').trim();
+      if(cd){const d=new Date(cd.replace(/\//g,'-'));if(d.getMonth()===curMonth&&d.getFullYear()===curYear)collectedMonth+=arPn(r['Amount Collected (PHP)']);}
+    }
+  });
+  const strip=document.getElementById('arKpis');
+  strip.innerHTML=`
+    <div ${af(0)}><div class="kpi amber"><div class="kpi-label">Outstanding Invoices</div><div class="kpi-value">${fmt(outstanding)}</div><div class="kpi-sub">For Collection</div></div></div>
+    <div ${af(1)}><div class="kpi blue"><div class="kpi-label">For Invoicing</div><div class="kpi-value">${fmt(forInvoicing)}</div><div class="kpi-sub">Pending invoice</div></div></div>
+    <div ${af(2)}><div class="kpi purple"><div class="kpi-label">For Approval</div><div class="kpi-value">${fmt(forApproval)}</div><div class="kpi-sub">Awaiting approval</div></div></div>
+    <div ${af(3)}><div class="kpi green"><div class="kpi-label">Collected this Month</div><div class="kpi-value">${fmt(collectedMonth)}</div><div class="kpi-sub">${now.toLocaleString('en',{month:'long'})} ${curYear}</div></div></div>`;
+
+  // Week chart data — group Amount (PHP) by Collection Week
+  const lastWeek=getISOWeeksInYear(curYear);
+  const weekTotals={};
+  AR_DATA.forEach(r=>{
+    const w=parseInt(r['Collection Week'],10);
+    if(w>0&&w<=lastWeek)weekTotals[w]=(weekTotals[w]||0)+arPn(r['Amount (PHP)']);
+  });
+  const maxVal=Math.max(1,...Object.values(weekTotals));
+  const barH=280;
+
+  const inner=document.getElementById('arChartInner');
+  let cols='';
+  for(let w=1;w<=lastWeek;w++){
+    const val=weekTotals[w]||0;
+    const h=val>0?Math.max(6,Math.round((val/maxVal)*barH)):3;
+    const cls=w<cw?'past':w>cw?'future':'past';
+    const sel=arState.week===w?'active':'';
+    const tip=val>0?fmt(val):'No collections';
+    cols+=`<div class="ar-week-col ${cls} ${sel}" data-w="${w}" onclick="arClickWeek(${w})" onmouseenter="(e=>{_tip.textContent='W${w}: ${tip}';_tip.classList.add('show');tipMv(e);})(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()"><div class="ar-week-bar" style="height:${h}px"></div><div class="ar-week-lbl">W${w}</div></div>`;
+  }
+  inner.innerHTML=cols;
+  inner.style.width=(lastWeek*80)+'px';
+
+  // Now-line
+  const nowLine=document.createElement('div');nowLine.className='ar-now-line';
+  nowLine.style.left=(cw*80-40)+'px';
+  nowLine.innerHTML=`<div class="ar-now-label">Week ${cw}</div>`;
+  inner.appendChild(nowLine);
+
+  // Center on current week
+  requestAnimationFrame(()=>requestAnimationFrame(arRecenter));
+
+  // Init drag
+  arInitDrag();
+
+  // Sync All button state
+  const allBtn=document.getElementById('arAllBtn');
+  if(allBtn)allBtn.classList.toggle('active',arState.showAll&&!arState.week);
+
+  // Detail table
+  if(arState.week)arShowWeek(arState.week);
+  else arShowAll();
+}
+
+function getISOWeeksInYear(y){const d=new Date(y,11,28);const o=new Date(d.getFullYear(),0,1);return Math.ceil(((d-o)/864e5+o.getDay()+1)/7);}
+
+// Draggable chart with momentum physics
+function arInitDrag(){
+  const wrap=document.getElementById('arChartWrap');
+  const inner=document.getElementById('arChartInner');
+  if(!wrap||!inner)return;
+  let isDrag=false,startX=0,scrollStart=0,velocity=0,lastX=0,lastT=0,animId=0;
+
+  function getOff(){return parseFloat(inner.style.transform?.match(/translateX\(([^)]+)px\)/)?.[1]||0);}
+  function setOff(x){const maxOff=0,minOff=wrap.clientWidth-inner.scrollWidth;const clamped=Math.max(minOff,Math.min(maxOff,x));inner.style.transform=`translateX(${clamped}px)`;return clamped;}
+
+  wrap.onmousedown=wrap.ontouchstart=function(e){
+    cancelAnimationFrame(animId);isDrag=true;
+    const pt=e.touches?e.touches[0]:e;
+    startX=pt.clientX;scrollStart=getOff();velocity=0;lastX=pt.clientX;lastT=Date.now();
+    wrap.style.cursor='grabbing';
+  };
+  const onMove=function(e){
+    if(!isDrag)return;
+    const pt=e.touches?e.touches[0]:e;
+    const dx=pt.clientX-startX;
+    setOff(scrollStart+dx);
+    const now=Date.now(),dt=now-lastT;
+    if(dt>0){velocity=(pt.clientX-lastX)/dt;}
+    lastX=pt.clientX;lastT=now;
+  };
+  const onUp=function(){
+    if(!isDrag)return;isDrag=false;wrap.style.cursor='grab';
+    let v=velocity*15;
+    const decay=0.95;
+    function coast(){
+      if(Math.abs(v)<0.5)return;
+      const cur=getOff();
+      setOff(cur+v);
+      v*=decay;
+      animId=requestAnimationFrame(coast);
+    }
+    coast();
+  };
+  wrap.onmousemove=wrap.ontouchmove=onMove;
+  wrap.onmouseup=wrap.onmouseleave=wrap.ontouchend=onUp;
+}
+
+function arRecenter(){
+  const wrap=document.getElementById('arChartWrap');
+  const inner=document.getElementById('arChartInner');
+  if(!wrap||!inner)return;
+  const cw=gw();
+  const target=-(cw*80-40-wrap.clientWidth/2);
+  const minOff=wrap.clientWidth-inner.scrollWidth;
+  const clamped=Math.max(minOff,Math.min(0,target));
+  inner.style.transition='transform .4s cubic-bezier(.16,1,.3,1)';
+  inner.style.transform=`translateX(${clamped}px)`;
+  setTimeout(()=>{inner.style.transition='';},420);
+}
+
+function arClickWeek(w){
+  arState.week=w;arState.showAll=false;
+  document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.toggle('active',+c.dataset.w===w));
+  document.getElementById('arAllBtn').classList.remove('active');
+  arShowWeek(w);
+}
+
+function arToggleAll(){
+  arState.week=null;arState.showAll=true;
+  document.getElementById('arAllBtn').classList.add('active');
+  document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.remove('active'));
+  arShowAll();
+}
+
+function arShowWeek(w){
+  const rows=AR_DATA.filter(r=>parseInt(r['Collection Week'],10)===w);
+  arRenderTable(rows,`Week ${w} — ${rows.length} invoice${rows.length!==1?'s':''}`);
+}
+function arShowAll(){
+  arRenderTable(AR_DATA,`All AR — ${AR_DATA.length} invoices`);
+}
+
+const AR_STATUS_ORDER={'For Approval':0,'For Invoicing':1,'For Collection':2,'Collected':3};
+function arRenderTable(rows,title){
+  const card=document.getElementById('arDetailCard');
+  card.style.display='block';
+  document.getElementById('arDetailTitle').textContent=title;
+  const sorted=[...rows].sort((a,b)=>(AR_STATUS_ORDER[a['Status']]??9)-(AR_STATUS_ORDER[b['Status']]??9));
+  let h='<table class="tbl"><thead><tr><th>AR Name</th><th>Client</th><th style="text-align:right">Invoice Amt</th><th>Status</th><th>Est. Collection Date</th><th>AM</th></tr></thead><tbody>';
+  let totalPhp=0,totalCollectedPhp=0;
+  sorted.forEach((r,i)=>{
+    const invAmt=arPn(r['Invoice Amount']);
+    const invPhp=arPn(r['Amount (PHP)']);
+    const cur=(r['Currency']||'PHP').trim().toUpperCase();
+    const sym=cur==='USD'?'$':'₱';
+    const amtStr=invAmt>0?sym+invAmt.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+    const cd=(r['Collection Date']||'').trim().replace(/\//g,'-');
+    const am=(r['AM']||'').split(/\s+/)[0]||'—';
+    totalPhp+=invPhp;
+    totalCollectedPhp+=arPn(r['Amount Collected (PHP)']);
+    h+=`<tr ${af(i)}><td>${escHtml(r['AR Name']||'—')}</td><td>${escHtml(r['Client Name']||'—')}</td><td style="text-align:right;font-weight:600">${amtStr}</td><td>${sp(r['Status'])}</td><td>${cd||'—'}</td><td>${escHtml(am)}</td></tr>`;
+  });
+  h+=`</tbody><tfoot><tr><td colspan="2" style="font-weight:700">TOTAL (${sorted.length} invoices)</td><td style="text-align:right;font-weight:700">₱${totalPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td colspan="3" style="font-weight:700;color:var(--green)">Collected: ₱${totalCollectedPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr></tfoot></table>`;
+  document.getElementById('arDetailTable').innerHTML=h;
+  _addCardCopyBtn(card);
+}
 </script></body></html>
