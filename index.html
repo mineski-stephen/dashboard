@@ -213,6 +213,7 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .bd-charts-row{display:grid;grid-template-columns:1fr 200px;gap:20px;align-items:center}@media(max-width:800px){.bd-charts-row{grid-template-columns:1fr}}
 .bd-doors-filter{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pipeFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .filter-row{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
 .filter-label{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-right:8px}
 .filter-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);transition:all .15s}
@@ -253,10 +254,18 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 /* Pipeline KPI modal */
 .pipe-kpi-modal{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:150;display:none;align-items:center;justify-content:center}
 .pipe-kpi-modal.open{display:flex}
-.pipe-kpi-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;min-width:400px;max-width:92vw;max-height:85vh;overflow-y:auto;animation:slideDown .25s ease;-webkit-user-select:text;user-select:text;width:fit-content}
+.pipe-kpi-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0;max-width:95vw;height:78vh;overflow:hidden;animation:slideDown .25s ease;-webkit-user-select:text;user-select:text;display:flex;flex-direction:column}
+.pipe-kpi-wrap{display:flex;flex:1;min-height:0;overflow:hidden}
+.pipe-kpi-left{min-width:380px;display:flex;flex-direction:column;overflow:hidden;padding:0}
+.pipe-kpi-left-header{padding:12px 20px 0 28px;flex-shrink:0}
+.pipe-kpi-left-scroll{flex:1;min-height:0;overflow-y:auto;padding:0 20px 0 28px}
+.pipe-kpi-left-scroll thead th{position:sticky;top:0;background:var(--surface);z-index:1}
+.pipe-kpi-left-footer{padding:0 20px 20px 28px;flex-shrink:0}
+.pipe-kpi-right{width:480px;overflow-y:auto;padding:20px 28px 20px 20px;border-left:1px solid var(--border)}.pipe-kpi-right>:first-child{animation:pipeFadeIn .25s ease}
+.pipe-kpi-placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:13px;font-style:italic}
 .pipe-kpi-modal-box *{-webkit-user-select:text;user-select:text}
-.pipe-kpi-modal-box h3{text-align:center;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:4px}
-.pipe-kpi-modal-box .big-num{text-align:center;font-size:42px;font-weight:700;color:var(--text);margin-bottom:16px}
+.pipe-kpi-left-header h3{text-align:center;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:4px}
+.pipe-kpi-left-header .big-num{text-align:center;font-size:42px;font-weight:700;color:var(--text);margin-bottom:16px}
 .pipe-kpi-modal-box table{width:100%;border-collapse:collapse;font-size:13px}
 .pipe-kpi-modal-box thead th{text-align:left;padding:8px 12px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);border-bottom:1px solid var(--border)}
 .pipe-kpi-modal-box tbody td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text-dim)}
@@ -595,7 +604,7 @@ function getTotalGoalAllMonths(){
   const months=[...new Set(DATA.filter(r=>r['Lead Month']&&r['Status']!=='Lost').map(r=>r['Lead Month']))];
   return months.reduce((s,m)=>s+getMonthGoal(m),0);
 }
-const WS=['Signed CE','Won - Awaiting CE Signature','Collected - For Closing','For Collection - For Invoicing','For Collection - Invoice Sent','Fully Closed'];
+const WS=['Signed CE','Won - Awaiting CE Signature','For Closing','For Collection','Fully Closed'];
 const REQUIRED_COLS=['Client','Project','Status','Amount (VAT-Ex.) (PHP)','Year','Tribe','Pipeline Tier','BD','AM'];
 
 // ═══ PASSWORD MODAL ═══
@@ -735,7 +744,7 @@ function fmt(n){const v=cx(n),s=cs();if(Math.abs(v)>=1e9)return s+(v/1e9).toFixe
 function fmtF(n){return cs()+cx(n).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function pct(v,t){return t>0?((v/t)*100).toFixed(1):'0.0';}
 function dv(c,p,sm){const k=sm?'delta-sm':'delta';if(p===null||p===undefined)return '';if(Math.abs(c-p)<0.01)return `<span class="${k} flat">—</span>`;if(c>p)return `<span class="${k} up">▲</span>`;return `<span class="${k} down">▼</span>`;}
-function sp(st){const m={'Signed CE':['Won','status-won'],'Won - Awaiting CE Signature':['Won (Pending CE)','status-won'],'Collected - For Closing':['Collected','status-collection'],'Fully Closed':['Closed','status-collection'],'For Collection - For Invoicing':['For Invoicing','status-collection'],'For Collection - Invoice Sent':['Invoice Sent','status-collection'],'CE/Pitch Submitted':['CE Submitted','status-submitted'],'For CE/Pitch Creation':['For Submission','status-pitch'],'Talks In Progress':['In Progress','status-rfp'],'Talent Sourcing':['Talent Sourcing','status-rfp'],'Stalled':['Stalled','status-lost'],'Lost':['Lost','status-lost'],'Archived':['Archived','status-lost']};const[l,c]=m[st]||[st,''];return `<span class="status-pill ${c}">${l}</span>`;}
+function sp(st){const m={'Signed CE':['Won','status-won'],'Won - Awaiting CE Signature':['Won (Pending CE)','status-won'],'For Closing':['For Closing','status-collection'],'Fully Closed':['Closed','status-collection'],'For Collection':['For Collection','status-collection'],'CE/Pitch Submitted':['CE Submitted','status-submitted'],'For CE/Pitch Creation':['For Submission','status-pitch'],'Talks In Progress':['In Progress','status-rfp'],'Talent Sourcing':['Talent Sourcing','status-rfp'],'Stalled':['Stalled','status-lost'],'Lost':['Lost','status-lost'],'Archived':['Archived','status-lost']};const[l,c]=m[st]||[st,''];return `<span class="status-pill ${c}">${l}</span>`;}
 function gw(){const d=new Date(),o=new Date(d.getFullYear(),0,1);return Math.ceil(((d-o)/864e5+o.getDay()+1)/7);}
 function twp(d){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
 function twpT(d,t){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])&&r['Tribe']===t).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
@@ -777,8 +786,7 @@ function linkify(v){if(!v||v==='—')return '—';const escaped=escHtml(v);retur
 function linkifyOther(v){if(!v)return '—';const lines=v.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return '—';return lines.map(line=>{const m=line.match(/^(.+?)\s*-\s*(https?:\/\/\S+)$/);if(m)return `<a class="link-token" href="${escHtml(m[2])}" target="_blank" rel="noopener">${escHtml(m[1].trim())} ↗</a>`;const um=line.match(/(https?:\/\/\S+)/);if(um)return `<a class="link-token" href="${escHtml(um[1])}" target="_blank" rel="noopener">Link ↗</a>`;return escHtml(line);}).join(' ');}
 function wasTag(curVal,prevVal,isMoney){if(prevVal===null||prevVal===undefined)return '';const cv=typeof curVal==='string'?curVal.trim():curVal;const pv=typeof prevVal==='string'?prevVal.trim():prevVal;if(cv===pv)return '';if(isMoney&&typeof cv==='number'&&typeof pv==='number'&&cv===pv)return '';const display=isMoney?fmtF(pv):escHtml(String(pv||'—'));return `<div class="was-badge">was ${display}</div>`;}
 function wasTagPct(cur,prev){if(prev===null||prev===undefined)return '';if(cur===prev)return '';return `<div class="was-badge">was ${(prev*100).toFixed(1)}%</div>`;}
-function showProjModal(r,fromPipeKpi){
-  const box=document.getElementById('projModalContent');
+function _buildProjHtml(r,closeAction){
   const amt=pn(r['Amount (VAT-Ex.) (PHP)']),amtI=pn(r['Amount (VAT-Inc.)']),gp=pn(r['GP%']),ga=pn(r['GP']);
   const remarks=(r['Quick Remarks']||'').trim(),signDate=r['Sign Date']||'',rawCE=r['Signed CE (PDF)']||'',ceLink=/https?:\/\//.test(rawCE)?rawCE:'',rawIntCE=r['Internal CE (Sheet)']||'',intCE=/https?:\/\//.test(rawIntCE)?rawIntCE:'',otherLinks=r['Other Links']||'',rfpDate=r['RFP Received Date']||'';
   const pr=getPrev(r);
@@ -786,8 +794,7 @@ function showProjModal(r,fromPipeKpi){
   const pBD=pr?(pr['BD']||''):null,pAM=pr?(pr['AM']||''):null,pPM=pr?(pr['PM']||''):null;
   const pStatus=pr?(pr['Status']||''):null,pTribe=pr?(pr['Tribe']||''):null;
   const pRfp=pr?(pr['RFP Received Date']||''):null,pSign=pr?(pr['Sign Date']||''):null;
-  const closeAction='closeProjModal()';
-  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div>${wasTag((r['Tribe']||''),(pTribe),false)}<div>${sp(r['Status'])}</div></div><button class="am-close-btn" onclick="${closeAction}">✕</button></div>`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div>${wasTag((r['Tribe']||''),(pTribe),false)}<div>${sp(r['Status'])}</div></div>${closeAction?`<button class="am-close-btn" onclick="${closeAction}">✕</button>`:''}</div>`;
   // Project Code + PAR
   const par=r['PAR']||'';
   h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Code: <span style="color:var(--text);font-weight:600">${escHtml(r['Project Code']||'—')}</span>${par?` · PAR: <span style="color:var(--text);font-weight:600">${escHtml(par)}</span>`:''}</div>`;
@@ -832,7 +839,11 @@ function showProjModal(r,fromPipeKpi){
   // Tags pill list
   const tagsRaw=(r['Tags']||'').toString();const tagsList=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
   if(tagsList.length){h+=`<div class="proj-modal-remarks"><div class="fld-label">Tags</div><div class="fld-value" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${tagsList.map(t=>`<span class="proj-tag-pill">${escHtml(t)}</span>`).join('')}</div></div>`;}
-  box.innerHTML=h;document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');}
+  return h;}
+function showProjModal(r,fromPipeKpi){
+  if(fromPipeKpi){const rp=document.getElementById('pipeKpiRight');if(rp){const bx=rp.closest('.pipe-kpi-modal-box');if(bx)bx.querySelectorAll('.pipe-kpi-left tr[data-pi]').forEach(tr=>tr.style.background=String(tr.dataset.pi)===String(r._i)?'var(--surface2)':'');rp.innerHTML=_buildProjHtml(r,null);_scrollRemarks(rp);return;}}
+  const box=document.getElementById('projModalContent');box.innerHTML=_buildProjHtml(r,'closeProjModal()');_scrollRemarks(box);document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');}
+function _scrollRemarks(el){el.querySelectorAll('.proj-modal-remarks .fld-value').forEach(v=>{if(v.scrollHeight>v.clientHeight)v.scrollTop=v.scrollHeight;});}
 function closeProjModal(){
   document.getElementById('projModal').classList.remove('open');document.body.classList.remove('modal-open');
 }
@@ -844,14 +855,16 @@ function showPipeKpiModal(title,items,showGross){
   const tA=items.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const tG=items.reduce((s,r)=>s+pn(r['GP']),0);
   const avgGP=tA>0?tG/tA:0;
-  let h=`<div style="display:flex;justify-content:flex-end"><button class="am-close-btn" onclick="closePipeKpiModal()">✕</button></div>`;
-  h+=`<h3>${escHtml(title)}</h3><div class="big-num">${items.length}</div>`;
-  h+=`<div class="pipe-kpi-summary"><span>${fmtF(tA)}</span><span>${avgGP>0?(avgGP*100).toFixed(1)+'%':'-'}  GP</span><span>${tG>0?fmtF(tG):'-'}  GP</span></div>`;
-  h+=`<table><thead><tr><th>Project</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;
+  let h=`<div style="display:flex;justify-content:flex-end;padding:16px 20px 0"><button class="am-close-btn" onclick="closePipeKpiModal()">✕</button></div>`;
+  h+=`<div class="pipe-kpi-wrap"><div class="pipe-kpi-left">`;
+  h+=`<div class="pipe-kpi-left-header"><h3>${escHtml(title)}</h3><div class="big-num">${items.length}</div>`;
+  h+=`<div class="pipe-kpi-summary"><span>${fmtF(tA)}</span><span>${avgGP>0?(avgGP*100).toFixed(1)+'%':'-'}  GP</span><span>${tG>0?fmtF(tG):'-'}  GP</span></div></div>`;
+  h+=`<div class="pipe-kpi-left-scroll"><table><thead><tr><th>Project</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;
   const sorted=[...items].sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
-  sorted.forEach((r,i)=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']);h+=`<tr class="anim-fade" style="animation-delay:${(i*0.04).toFixed(2)}s;cursor:pointer" onclick="showProjModal(DATA[${r._i}],true)"><td style="font-weight:500;color:var(--text)">${escHtml(r['Project']||r['Client']||'—')}</td><td class="amt">${amt>0?fmtF(amt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga):'—'}</td></tr>`;});
-  h+=`</tbody></table>`;
-  if(showGross&&tA>0)h+=`<div class="pipe-kpi-gross">Gross Revenue if 30% Win Rate: <strong style="color:var(--gold)">${fmtF(tA*0.3)}</strong></div>`;
+  sorted.forEach((r,i)=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']);h+=`<tr class="anim-fade" style="animation-delay:${(i*0.04).toFixed(2)}s;cursor:pointer" onclick="showProjModal(DATA[${r._i}],true)" data-pi="${r._i}"><td style="font-weight:500;color:var(--text)">${escHtml(r['Project']||r['Client']||'—')}</td><td class="amt">${amt>0?fmtF(amt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga):'—'}</td></tr>`;});
+  h+=`</tbody></table></div>`;
+  if(showGross&&tA>0)h+=`<div class="pipe-kpi-left-footer"><div class="pipe-kpi-gross">Gross Revenue if 30% Win Rate: <strong style="color:var(--gold)">${fmtF(tA*0.3)}</strong></div></div>`;
+  h+=`</div><div class="pipe-kpi-right" id="pipeKpiRight"><div class="pipe-kpi-placeholder">Click on a project to show details</div></div></div>`;
   box.innerHTML=h;document.getElementById('pipeKpiModal').classList.add('open');document.body.classList.add('modal-open');
 }
 // AM segment tooltip
@@ -1530,7 +1543,7 @@ function toggleQDetail(i){
   const q=Q_TARGETS_USD[i],qTarget=q.amount*USD_RATE;
   const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(r=>WS.includes(r['Status']));
   const ytd=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
-  const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'];
+  const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation'];
   const pipTotal=y.filter(r=>pipStatuses.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const pctOfQ=(ytd/qTarget*100);
   const exceeded=ytd>=qTarget;
@@ -1556,7 +1569,7 @@ function renderOverview(cw){
   const tw=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),tt=Object.values(TRIBE_TARGETS).reduce((a,b)=>a+b,0);
   const ce=y.filter(r=>r['Status']==='CE/Pitch Submitted'),ceT=ce.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const fs=y.filter(r=>r['Status']==='For CE/Pitch Creation'),fsT=fs.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
-  const ps=['CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Talent Sourcing'],pip=y.filter(r=>ps.includes(r['Status'])),pipT=pip.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
+  const ps=['CE/Pitch Submitted','For CE/Pitch Creation'],pip=y.filter(r=>ps.includes(r['Status'])),pipT=pip.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const pw=hp()?twp(DATA_PREV):null,pce=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&r['Status']==='CE/Pitch Submitted').reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
   const pfs=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&r['Status']==='For CE/Pitch Creation').reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
   const pp=hp()?DATA_PREV.filter(r=>r['Year']==='2026'&&ps.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0):null;
@@ -1812,7 +1825,7 @@ function expandAM(am){const nk=AM_NICKS[am],el=document.getElementById('amExpand
   el.style.display='block';
   // Also show accounts table
   showAMAccounts(am);}
-function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection - Invoice Sent':2,'For Collection - For Invoicing':3,'Collected - For Closing':4,'Fully Closed':5,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span><button class="am-close-btn" onclick="expandAM('${am.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Amount Collected (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Amount Collected (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
+function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection':2,'For Closing':3,'Fully Closed':4,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span><button class="am-close-btn" onclick="expandAM('${am.replace(/'/g,"\\'")}')">✕</button></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Amount Collected (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Amount Collected (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;dr.classList.add('visible');}
 
 // ═══ 4. BD LEADS (donut with theme-aware text) ═══
 let bdState={month:null,activeBD:null};
@@ -1990,7 +2003,7 @@ function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>
 
 // ═══ 6. ATTAINMENT (pipeline bar fix) ═══
 let tribeWinsState={tribe:'all'};
-function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp={};const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talent Sourcing'];y.forEach(r=>{const t=r['Tribe']||'?',php=pn(r['Amount (VAT-Ex.) (PHP)']);if(WS.includes(r['Status']))tw[t]=(tw[t]||0)+php;if(pipStatuses.includes(r['Status']))tp[t]=(tp[t]||0)+php;});
+function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp={};const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation'];y.forEach(r=>{const t=r['Tribe']||'?',php=pn(r['Amount (VAT-Ex.) (PHP)']);if(WS.includes(r['Status']))tw[t]=(tw[t]||0)+php;if(pipStatuses.includes(r['Status']))tp[t]=(tp[t]||0)+php;});
   const totalW=Object.values(tw).reduce((a,b)=>a+b,0),totalT=Object.values(TRIBE_TARGETS).reduce((a,b)=>a+b,0),totalP=Object.values(tp).reduce((a,b)=>a+b,0),pvW=hp()?twp(DATA_PREV):null;
   document.getElementById('attainKpis').innerHTML=`<div ${afc('kpi green clickable',0)} aria-label="Total Won: ${fmt(totalW)}, ${pct(totalW,totalT)}% of target" onclick="document.getElementById('atWonCard').scrollIntoView({behavior:'smooth'})"><div class="kpi-label">Total Won</div><div class="kpi-value">${fmt(totalW)} ${dv(totalW,pvW)}</div><div class="kpi-sub">${pct(totalW,totalT)}% of target</div></div><div ${afc('kpi blue',1)} aria-label="Target: ${fmt(totalT)}"><div class="kpi-label">Target</div><div class="kpi-value">${fmt(totalT)}</div></div><div ${afc('kpi amber clickable',2)} aria-label="Pipeline: ${fmt(totalP)}" onclick="switchTab('pipeline')"><div class="kpi-label">Pipeline</div><div class="kpi-value">${fmt(totalP)}</div></div><div ${afc('kpi red',3)} aria-label="Gap to target: ${fmt(totalT-totalW)}"><div class="kpi-label">Gap</div><div class="kpi-value">${fmt(totalT-totalW)}</div></div>`;
   const tribes=Object.keys(TRIBE_TARGETS);
@@ -2017,7 +2030,7 @@ function setTWF(t){tribeWinsState.tribe=t;
   const tl=[...new Set(wp.map(r=>r['Tribe']).filter(Boolean))].sort();
   let tf='<span class="filter-label">Tribe</span>';tf+=`<button class="filter-btn ${tribeWinsState.tribe==='all'?'active':''}" onclick="setTWF('all')">All</button>`;tl.forEach(tr=>{tf+=`<button class="filter-btn ${tribeWinsState.tribe===tr?'active':''}" onclick="setTWF('${tr}')">${tr.replace('PDEI - ','')}</button>`;});
   document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);}
-function renderTWT(wp){const so={'Signed CE':0,'Won - Awaiting CE Signature':1,'Collected - For Closing':2,'Fully Closed':3,'For Collection - Invoice Sent':4,'For Collection - For Invoicing':5},f=tribeWinsState.tribe==='all'?wp:wp.filter(r=>r['Tribe']===tribeWinsState.tribe);const sorted=f.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)'])),totalAmt=sorted.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
+function renderTWT(wp){const so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Closing':2,'Fully Closed':3,'For Collection':4},f=tribeWinsState.tribe==='all'?wp:wp.filter(r=>r['Tribe']===tribeWinsState.tribe);const sorted=f.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)'])),totalAmt=sorted.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   let h=`<table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th>AM</th><th class="amt">Amount</th><th class="amt">GP%</th><th class="amt">GP</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted)">No won projects</td></tr>';
   sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:300px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;});
   h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)" colspan="5">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(sorted.reduce((s,r)=>s+pn(r['GP']),0))}</td></tr></tfoot></table>`;document.getElementById('tribeWinsTable').innerHTML=h;}
@@ -2037,13 +2050,13 @@ function toggleOvTribeDetail(type,encodedTribe){
     // Find ghost rows: projects won last week for this tribe but no longer won this week
     const ghosts=[];
     if(hp()){
-      const curKeys=new Set(won.map(r=>(r['Project']||'')+'|||'+(r['Client']||'')));
+      const curKeys=new Set(won.map(r=>_pmKey(r)));
       const prevTribe=DATA_PREV.filter(r=>r['Year']==='2026'&&r['Tribe']===tribe&&WS.includes(r['Status']));
       prevTribe.forEach(pr=>{
-        const k=(pr['Project']||'')+'|||'+(pr['Client']||'');
+        const k=_pmKey(pr);
         if(!curKeys.has(k)){
           // Find this project in current data to determine what happened
-          const curRow=DATA.find(r=>(r['Project']||'')+'|||'+(r['Client']||'')===k&&r['Year']==='2026');
+          const curRow=DATA.find(r=>_pmKey(r)===k&&r['Year']==='2026');
           let reason='Removed';
           if(curRow){
             const cs=curRow['Status']||'';
@@ -2069,19 +2082,19 @@ function toggleOvTribeDetail(type,encodedTribe){
     h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${won.length} win${won.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
     el.innerHTML=h;
   } else {
-    const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation','Talent Sourcing'];
+    const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation'];
     const pip=y.filter(r=>pipStatuses.includes(r['Status']));
-    const pipOrd={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1,'Talent Sourcing':2};
+    const pipOrd={'CE/Pitch Submitted':0,'For CE/Pitch Creation':1};
     const sorted=[...pip].sort((a,b)=>(pipOrd[a['Status']]??99)-(pipOrd[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
     // Find ghost rows: projects in pipeline last week for this tribe but no longer in pipeline this week
     const ghosts=[];
     if(hp()){
-      const curKeys=new Set(pip.map(r=>(r['Project']||'')+'|||'+(r['Client']||'')));
+      const curKeys=new Set(pip.map(r=>_pmKey(r)));
       const prevPip=DATA_PREV.filter(r=>r['Year']==='2026'&&r['Tribe']===tribe&&pipStatuses.includes(r['Status']));
       prevPip.forEach(pr=>{
-        const k=(pr['Project']||'')+'|||'+(pr['Client']||'');
+        const k=_pmKey(pr);
         if(!curKeys.has(k)){
-          const curRow=DATA.find(r=>(r['Project']||'')+'|||'+(r['Client']||'')===k&&r['Year']==='2026');
+          const curRow=DATA.find(r=>_pmKey(r)===k&&r['Year']==='2026');
           let reason='Removed';
           if(curRow){
             const cs=curRow['Status']||'';
