@@ -1,9 +1,9 @@
 {
   "theme": "system",
-  "defaultCSV": "20260520_AMBD_Universe_Raw.enc",
-  "lastWeekCSV": "20260512_AMBD_Universe_Raw.enc",
+  "defaultCSV": "20260528_AMBD_Universe_Raw.enc",
+  "lastWeekCSV": "20260520_AMBD_Universe_Raw.enc",
   "targetCSV": "targets.enc",
-  "arCSV": "ar.enc",
+  "arCSV": "ar20260528_ar.enc",
   "currency": "PHP",
   "usdRate": 57,
   "showPDFBtn": false,
