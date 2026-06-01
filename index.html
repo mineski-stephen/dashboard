@@ -231,7 +231,21 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .proj-modal{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:160;display:none;align-items:center;justify-content:center}
 .proj-modal.open{display:flex}
 .proj-modal-box,.proj-modal-box *{-webkit-user-select:text;user-select:text}
-.proj-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:580px;max-width:92vw;max-height:85vh;overflow-y:auto;animation:slideDown .25s ease}
+.proj-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:580px;max-width:92vw;max-height:85vh;overflow-y:auto;animation:slideDown .25s ease;flex-shrink:0}
+.proj-modal-wrap{display:flex;align-items:flex-start;justify-content:center;max-width:96vw}
+.proj-modal-invoice{background:var(--surface);border-radius:var(--radius);max-height:85vh;overflow-y:auto;width:0;opacity:0;border:0 solid var(--border);box-sizing:border-box;flex-shrink:0;transition:width .38s cubic-bezier(.16,1,.3,1),opacity .3s ease,padding .38s,margin-left .38s,border-width .38s;-webkit-user-select:text;user-select:text}
+.proj-modal-invoice.open{width:520px;max-width:44vw;opacity:1;padding:28px;border-width:1px;margin-left:16px}
+.proj-modal-invoice *{-webkit-user-select:text;user-select:text}
+.proj-inv-inner{animation:pipeFadeIn .3s ease}
+.proj-invoices{margin-top:4px}
+.proj-invoice-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);margin-bottom:6px;font-size:12px}
+.proj-invoice-row[onclick]{cursor:pointer;transition:background .15s,border-color .15s}
+.proj-invoice-row[onclick]:hover{background:var(--surface3);border-color:var(--accent)}
+.proj-invoice-row.active{border-color:var(--accent);background:var(--accent-glow)}
+.proj-invoice-row .inv-name{font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.proj-invoice-row .status-pill{flex-shrink:0}
+.proj-invoice-row .inv-amt{font-weight:600;color:var(--text-dim);white-space:nowrap}
+.ar-coin{display:inline-block;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a3,#f1c232 62%,#caa01f);box-shadow:inset 0 0 0 1px rgba(170,125,15,.6),0 1px 2px rgba(0,0,0,.25);vertical-align:-1px;margin-right:6px;flex-shrink:0;cursor:help}
 .proj-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:16px}
 .proj-modal-field{display:flex;flex-direction:column;gap:2px}
 .proj-modal-field .fld-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
@@ -478,7 +492,10 @@ body.settings-open,body.modal-open{overflow:hidden}
 </style></head><body>
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
-  <div class="proj-modal-box" id="projModalContent"></div>
+  <div class="proj-modal-wrap">
+    <div class="proj-modal-box" id="projModalContent"></div>
+    <div class="proj-modal-invoice" id="projInvoicePanel"></div>
+  </div>
 </div>
 <!-- Pipeline KPI Modal -->
 <div class="pipe-kpi-modal" id="pipeKpiModal" onclick="if(event.target===this)closePipeKpiModal()">
@@ -769,7 +786,7 @@ function fmt(n){const v=cx(n),s=cs();if(Math.abs(v)>=1e9)return s+(v/1e9).toFixe
 function fmtF(n){return cs()+cx(n).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function pct(v,t){return t>0?((v/t)*100).toFixed(1):'0.0';}
 function dv(c,p,sm){const k=sm?'delta-sm':'delta';if(p===null||p===undefined)return '';if(Math.abs(c-p)<0.01)return `<span class="${k} flat">—</span>`;if(c>p)return `<span class="${k} up">▲</span>`;return `<span class="${k} down">▼</span>`;}
-function sp(st){const m={'Signed CE':['Won','status-won'],'Won - Awaiting CE Signature':['Won (Pending CE)','status-won'],'For Closing':['For Closing','status-collection'],'Fully Closed':['Closed','status-collection'],'For Collection':['For Collection','status-collection'],'CE/Pitch Submitted':['CE Submitted','status-submitted'],'For CE/Pitch Creation':['For Submission','status-pitch'],'Talks In Progress':['In Progress','status-rfp'],'Talent Sourcing':['Talent Sourcing','status-rfp'],'Stalled':['Stalled','status-lost'],'Lost':['Lost','status-lost'],'Archived':['Archived','status-lost'],'Collected':['Collected','status-won'],'For Invoicing':['For Invoicing','status-submitted'],'For Approval':['For Approval','status-rfp']};const[l,c]=m[st]||[st,''];return `<span class="status-pill ${c}">${l}</span>`;}
+function sp(st){const m={'Signed CE':['Won','status-won'],'Won - Awaiting CE Signature':['Won (Pending CE)','status-won'],'For Closing':['For Closing','status-collection'],'Fully Closed':['Closed','status-collection'],'For Collection':['For Collection','status-collection'],'CE/Pitch Submitted':['CE Submitted','status-submitted'],'For CE/Pitch Creation':['For Submission','status-pitch'],'Talks In Progress':['In Progress','status-rfp'],'Talent Sourcing':['Talent Sourcing','status-rfp'],'Stalled':['Stalled','status-lost'],'Lost':['Lost','status-lost'],'Archived':['Archived','status-lost'],'Collected':['Collected','status-won'],'For Invoicing':['For Invoicing','status-submitted'],'For Approval':['For Approval','status-rfp'],'Pending Invoice Request Approval':['Pending Approval','status-rfp']};const[l,c]=m[st]||[st,''];return `<span class="status-pill ${c}">${l}</span>`;}
 function gw(){const d=new Date(),o=new Date(d.getFullYear(),0,1);return Math.ceil(((d-o)/864e5+o.getDay()+1)/7);}
 function twp(d){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
 function twpT(d,t){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])&&r['Tribe']===t).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
@@ -813,7 +830,8 @@ function linkify(v){if(!v||v==='—')return '—';const escaped=escHtml(v);retur
 function linkifyOther(v){if(!v)return '—';const lines=v.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return '—';return lines.map(line=>{const m=line.match(/^(.+?)\s*-\s*(https?:\/\/\S+)$/);if(m)return `<a class="link-token" href="${escHtml(m[2])}" target="_blank" rel="noopener">${escHtml(m[1].trim())} ↗</a>`;const um=line.match(/(https?:\/\/\S+)/);if(um)return `<a class="link-token" href="${escHtml(um[1])}" target="_blank" rel="noopener">Link ↗</a>`;return escHtml(line);}).join(' ');}
 function wasTag(curVal,prevVal,isMoney){if(prevVal===null||prevVal===undefined)return '';const cv=typeof curVal==='string'?curVal.trim():curVal;const pv=typeof prevVal==='string'?prevVal.trim():prevVal;if(cv===pv)return '';if(isMoney&&typeof cv==='number'&&typeof pv==='number'&&cv===pv)return '';const display=isMoney?fmtF(pv):escHtml(String(pv||'—'));return `<div class="was-badge">was ${display}</div>`;}
 function wasTagPct(cur,prev){if(prev===null||prev===undefined)return '';if(cur===prev)return '';return `<div class="was-badge">was ${(prev*100).toFixed(1)}%</div>`;}
-function _buildProjHtml(r,closeAction){
+function _buildProjHtml(r,closeAction,ctx){
+  ctx=ctx||'standalone';
   const amt=pn(r['Amount (VAT-Ex.) (PHP)']),amtI=pn(r['Amount (VAT-Inc.)']),gp=pn(r['GP%']),ga=pn(r['GP']);
   const remarks=(r['Quick Remarks']||'').trim(),signDate=r['Sign Date']||'',rawCE=r['Signed CE (PDF)']||'',ceLink=/https?:\/\//.test(rawCE)?rawCE:'',rawIntCE=r['Internal CE (Sheet)']||'',intCE=/https?:\/\//.test(rawIntCE)?rawIntCE:'',otherLinks=r['Other Links']||'',rfpDate=r['RFP Received Date']||'';
   const pr=getPrev(r);
@@ -866,13 +884,38 @@ function _buildProjHtml(r,closeAction){
   // Tags pill list
   const tagsRaw=(r['Tags']||'').toString();const tagsList=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
   if(tagsList.length){h+=`<div class="proj-modal-remarks"><div class="fld-label">Tags</div><div class="fld-value" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${tagsList.map(t=>`<span class="proj-tag-pill">${escHtml(t)}</span>`).join('')}</div></div>`;}
+  // Invoices (from AR data, matched by Project Code)
+  const projCode=(r['Project Code']||'').trim();
+  const invoices=projCode&&typeof AR_DATA!=='undefined'?AR_DATA.filter(a=>(a['Project Code']||'').trim()===projCode):[];
+  if(invoices.length){
+    h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0"><div class="proj-invoices"><div class="fld-label" style="margin-bottom:6px">Invoices (${invoices.length})</div>`;
+    invoices.forEach(a=>{const cur=(a['Currency']||'PHP').trim().toUpperCase(),sym=cur==='USD'?'$':'₱',amt=arPn(a['Invoice Amount']);const amtStr=amt>0?sym+amt.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';const click=ctx==='standalone'?` onclick="showProjInvoice(${a._ai})"`:'';h+=`<div class="proj-invoice-row" data-ai="${a._ai}"${click}><span style="display:flex;align-items:center;gap:8px;min-width:0"><span class="inv-name">${escHtml(a['AR Name']||'—')}</span>${a['Status']?sp(a['Status']):''}</span><span class="inv-amt">${amtStr}</span></div>`;});
+    h+=`</div>`;
+  }
   return h;}
 function showProjModal(r,fromPipeKpi){
-  if(fromPipeKpi){const rp=document.getElementById('pipeKpiRight');if(rp){const bx=rp.closest('.pipe-kpi-modal-box');if(bx)bx.querySelectorAll('.pipe-kpi-left tr[data-pi]').forEach(tr=>tr.style.background=String(tr.dataset.pi)===String(r._i)?'var(--surface2)':'');rp.innerHTML=_buildProjHtml(r,null);_scrollRemarks(rp);return;}}
-  const box=document.getElementById('projModalContent');box.innerHTML=_buildProjHtml(r,'closeProjModal()');_scrollRemarks(box);document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');}
+  if(fromPipeKpi){const rp=document.getElementById('pipeKpiRight');if(rp){const bx=rp.closest('.pipe-kpi-modal-box');if(bx)bx.querySelectorAll('.pipe-kpi-left tr[data-pi]').forEach(tr=>tr.style.background=String(tr.dataset.pi)===String(r._i)?'var(--surface2)':'');rp.innerHTML=_buildProjHtml(r,null,'pipe');_scrollRemarks(rp);return;}}
+  const box=document.getElementById('projModalContent');box.innerHTML=_buildProjHtml(r,'closeProjModal()','standalone');_scrollRemarks(box);
+  const panel=document.getElementById('projInvoicePanel');if(panel){panel.classList.remove('open');panel.innerHTML='';}
+  document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');}
+function showProjInvoice(ai){
+  const r=(typeof AR_DATA!=='undefined')?AR_DATA[ai]:null;if(!r)return;
+  document.querySelectorAll('#projModalContent .proj-invoice-row').forEach(row=>row.classList.toggle('active',String(row.dataset.ai)===String(ai)));
+  const panel=document.getElementById('projInvoicePanel');
+  panel.innerHTML='<div class="proj-inv-inner">'+_buildARHtml(r,'_closeProjInvoice()')+'</div>';
+  panel.classList.add('open');
+  _scrollRemarks(panel);
+}
+function _closeProjInvoice(){
+  const panel=document.getElementById('projInvoicePanel');if(!panel)return;
+  panel.classList.remove('open');
+  document.querySelectorAll('#projModalContent .proj-invoice-row.active').forEach(row=>row.classList.remove('active'));
+  setTimeout(()=>{if(!panel.classList.contains('open'))panel.innerHTML='';},420);
+}
 function _scrollRemarks(el){el.querySelectorAll('.proj-modal-remarks .fld-value').forEach(v=>{if(v.scrollHeight>v.clientHeight)v.scrollTop=v.scrollHeight;});}
 function closeProjModal(){
   document.getElementById('projModal').classList.remove('open');document.body.classList.remove('modal-open');
+  const panel=document.getElementById('projInvoicePanel');if(panel){panel.classList.remove('open');panel.innerHTML='';document.querySelectorAll('#projModalContent .proj-invoice-row.active').forEach(row=>row.classList.remove('active'));}
 }
 function closePipeKpiModal(){document.getElementById('pipeKpiModal').classList.remove('open');window._lastPipeKpi=null;document.body.classList.remove('modal-open');}
 let _lastPipeKpi=null;
@@ -1677,7 +1720,7 @@ function renderOverview(cw){
   let wth=`<table><thead><tr><th>Month</th><th>Project</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">GP</th></tr></thead><tbody>`;
   let lastM='';wonSorted.forEach(r=>{const m=dm(r),amt=pn(r['Amount (VAT-Ex.) (PHP)']),ga=pn(r['GP']);const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
     const showM=m!==lastM;lastM=m;const mt=monthTotals[m];const isNew=r['Week Number']==String(cw);
-    wth+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"${isNew?' style="background:rgba(241,194,50,.12)"':''}><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga):'—'} ${ga>0?dvRow(ga,pGa):''}</td></tr>`;});
+    wth+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"${isNew?' style="background:rgba(241,194,50,.12)"':''}><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${arCoin(r)}${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga):'—'} ${ga>0?dvRow(ga,pGa):''}</td></tr>`;});
   const totalWonAmt=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalWonGP=won.reduce((s,r)=>s+pn(r['GP']),0);
   wth+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${won.length} wins</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalWonGP)}</td></tr></tfoot></table>`;
   document.getElementById('ovWinsTable').innerHTML=wth;
@@ -2081,7 +2124,7 @@ function setWRM(m){wrState.month=m;
   const am=mo.filter(mm=>wm[mm]||lm[mm]);
   let fH='<span class="filter-label">Month</span>';fH+=`<button class="filter-btn ${wrState.month==='all'?'active':''}" onclick="setWRM('all')">All</button>`;am.forEach(mm=>{fH+=`<button class="filter-btn ${wrState.month===mm?'active':''}" onclick="setWRM('${mm}')">${mm}</button>`;});
   document.getElementById('winrateMonthFilter').innerHTML=fH;renderLT(losses);}
-function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>lossM(r)===wrState.month),sorted=f.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<table><thead><tr><th>Project</th><th>Client</th><th>BD</th><th>Tribe</th><th>Loss Month</th><th>Reason</th><th class="amt">Amount</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted)">No lost projects</td></tr>';sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),bd=(r['BD']||'—').split(',')[0].split(' ').slice(0,2).join(' '),reason=r['Reason for Loss']||'';h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:280px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${bd}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${lossM(r)}</td><td>${reason?`<span class="status-pill status-lost" style="font-size:10px">${escHtml(reason)}</span>`:'—'}</td><td class="amt">${amt>0?fmt(amt):'—'}</td></tr>`;});h+='</tbody></table>';document.getElementById('lossTable').innerHTML=h;_addCardCopyBtn(document.getElementById('wrLostCard'));}
+function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>lossM(r)===wrState.month),sorted=f.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Loss Month</th><th>Reason</th><th class="amt">Amount</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">No lost projects</td></tr>';sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),reason=r['Reason for Loss']||'';h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:280px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${lossM(r)}</td><td>${reason?`<span class="status-pill status-lost" style="font-size:10px">${escHtml(reason)}</span>`:'—'}</td><td class="amt">${amt>0?fmt(amt):'—'}</td></tr>`;});h+='</tbody></table>';document.getElementById('lossTable').innerHTML=h;_addCardCopyBtn(document.getElementById('wrLostCard'));}
 
 // ═══ 6. ATTAINMENT (pipeline bar fix) ═══
 let tribeWinsState={tribe:'all'};
@@ -2159,7 +2202,7 @@ function toggleOvTribeDetail(type,encodedTribe){
     let lastM='',idx=0;sorted.forEach((r)=>{const m=dm(r),amt=pn(r['Amount (VAT-Ex.) (PHP)']),ga=pn(r['GP']);
       const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
       const showM=m!==lastM;lastM=m;const mt=monthTotals[m];const isNew=r['Week Number']==curWk;
-      h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;cursor:pointer${isNew?';background:rgba(241,194,50,.12)':''}" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;idx++;});
+      h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;cursor:pointer${isNew?';background:rgba(241,194,50,.12)':''}" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${showM?m+` <span style="font-weight:500;font-size:12px;color:var(--text-muted)">(${mt.count}) ${fmtF(mt.amt)}</span>`:m}</td><td style="font-weight:500;color:var(--text)">${arCoin(r)}${r['Project']||'—'}${isNew?' <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--gold);color:#000;vertical-align:middle;margin-left:4px">NEW</span>':''}</td><td>${r['Client']||'—'}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)} ${dvRow(amt,pAmt)}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;idx++;});
     ghosts.forEach(g=>{const click=g.di!==null?` onclick="showProjModal(DATA[${g.di}])" onmouseenter="tipIn(event,${g.di})" onmousemove="tipMv(event)" onmouseleave="tipOut()" style="cursor:pointer"`:'';h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;background:var(--surface);opacity:.55"${click}><td style="color:var(--text-muted);font-style:italic">${g.month||''}</td><td colspan="2" style="font-style:italic;color:var(--text-muted)">${g.proj} — ${g.client} <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:var(--red);color:#fff;vertical-align:middle;margin-left:4px">${g.reason.toUpperCase()}</span></td><td colspan="3"></td></tr>`;idx++;});
     const totalAmt=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalGP=won.reduce((s,r)=>s+pn(r['GP']),0);
     h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="4" style="font-weight:700;color:var(--text)">Total — ${won.length} win${won.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
@@ -2197,7 +2240,7 @@ function toggleOvTribeDetail(type,encodedTribe){
     let idx=0;
     sorted.forEach((r)=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),gp=pn(r['GP%']),ga=pn(r['GP']),an=(r['AM']||'—').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));
       const pr=getPrev(r),pAmt=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pGa=pr?pn(pr['GP']):null;
-      h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;cursor:pointer" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td>${isAll?`<td>${(r['Tribe']||'—').replace('PDEI - ','')}</td>`:''}<td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;idx++;});
+      h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;cursor:pointer" data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${arCoin(r)}${r['Project']||'—'}</td><td>${r['Client']||'—'}</td>${isAll?`<td>${(r['Tribe']||'—').replace('PDEI - ','')}</td>`:''}<td>${sp(r['Status'])}</td><td>${sn?sn[1]:an.split(' ').slice(0,2).join(' ')}</td><td class="amt">${amt>0?fmtF(amt)+' '+dvRow(amt,pAmt):'—'}</td><td class="amt">${gp>0?(gp*100).toFixed(1)+'%':'—'}</td><td class="amt">${ga>0?fmtF(ga)+' '+dvRow(ga,pGa):'—'}</td></tr>`;idx++;});
     ghosts.forEach(g=>{const bg=g.reason==='Won'?'var(--green)':'var(--red)';const click=g.di!==null?` onclick="showProjModal(DATA[${g.di}])" onmouseenter="tipIn(event,${g.di})" onmousemove="tipMv(event)" onmouseleave="tipOut()" style="cursor:pointer"`:'';h+=`<tr class="anim-fade" style="animation-delay:${(idx*0.03).toFixed(2)}s;background:var(--surface);opacity:.55"${click}><td colspan="2" style="font-style:italic;color:var(--text-muted)">${g.proj} — ${g.client} <span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;background:${bg};color:#fff;vertical-align:middle;margin-left:4px">${g.reason.toUpperCase()}</span></td><td colspan="${tc-2}"></td></tr>`;idx++;});
     const totalAmt=pip.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),totalGP=pip.reduce((s,r)=>s+pn(r['GP']),0);
     h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="${tc-3}" style="font-weight:700;color:var(--text)">Total — ${sorted.length} project${sorted.length!==1?'s':''}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalAmt)}</td><td></td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalGP)}</td></tr></tfoot></table></div>`;
@@ -2452,7 +2495,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ═══ SALES AR TAB ═══
 let AR_DATA=[];
 let arState={week:null,filters:[]};
-const AR_STATUSES=['For Approval','For Invoicing','For Collection','Collected'];
+const AR_STATUSES=['Pending Invoice Request Approval','For Invoicing','For Collection','Collected'];
 
 async function loadARCSV(){
   const name=CFG.arCSV||'ar.csv';
@@ -2469,7 +2512,7 @@ async function loadARCSV(){
     }
     AR_DATA=Papa.parse(text,{header:true,skipEmptyLines:true}).data;
     AR_DATA.forEach((r,i)=>r._ai=i);
-    renderAR();
+    if(typeof DATA!=='undefined'&&DATA.length)renderAll();else renderAR();
   }catch(_){}
 }
 function handleARUpload(input){
@@ -2478,23 +2521,28 @@ function handleARUpload(input){
     AR_DATA=Papa.parse(ev.target.result,{header:true,skipEmptyLines:true}).data;
     AR_DATA.forEach((r,i)=>r._ai=i);
     document.getElementById('sUploadAR').textContent='✓ '+f.name;
-    renderAR();
+    if(typeof DATA!=='undefined'&&DATA.length)renderAll();else renderAR();
   };reader.readAsText(f);
 }
 
 function arPn(s){if(!s)return 0;const n=parseFloat(String(s).replace(/[₱$,\s]/g,''));return isNaN(n)?0:n;}
-function showARModal(r){
-  const box=document.getElementById('projModalContent');
+function deSci(v){const s=String(v??'').trim();if(/^-?\d*\.?\d+e[+-]?\d+$/i.test(s)){const n=Number(s);if(isFinite(n))return n.toLocaleString('en-US',{useGrouping:false,maximumFractionDigits:20});}return s;}
+let _arCodeSet=null,_arCodeSetLen=-1;
+function arCodeSet(){if(typeof AR_DATA==='undefined')return new Set();if(_arCodeSet&&_arCodeSetLen===AR_DATA.length)return _arCodeSet;_arCodeSet=new Set(AR_DATA.map(a=>(a['Project Code']||'').trim()).filter(Boolean));_arCodeSetLen=AR_DATA.length;return _arCodeSet;}
+function hasAR(r){const pc=(r['Project Code']||'').trim();return !!pc&&arCodeSet().has(pc);}
+function arCoin(r){return hasAR(r)?`<span class="ar-coin" onmouseenter="arCoinTip(event)" onmousemove="tipMv(event)" onmouseleave="tipOut();tipIn(event,${r._i})"></span>`:'';}
+function arCoinTip(e){if(typeof _tip==='undefined'||!_tip)return;_tip.textContent='Has invoice in Collections';_tip.classList.add('show');tipMv(e);}
+function _buildARHtml(r,closeAction){
   const cur=(r['Currency']||'PHP').trim().toUpperCase(),sym=cur==='USD'?'$':'₱';
   const invAmt=arPn(r['Invoice Amount']),invPhp=arPn(r['Amount (PHP)']),collected=arPn(r['Amount Collected']),collectedPhp=arPn(r['Amount Collected (PHP)']),balPhp=arPn(r['Balance (PHP)']);
   const intCE=r['Internal CE']||'',ceLink=/https?:\/\//.test(intCE)?intCE:'';
   const signedCE=r['Signed CE']||'',scLink=/https?:\/\//.test(signedCE)?signedCE:'';
-  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['AR Name']||'—')}</h3></div><button class="am-close-btn" onclick="closeProjModal()">✕</button></div>`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['AR Name']||'—')}</h3></div>${closeAction?`<button class="am-close-btn" onclick="${closeAction}">✕</button>`:''}</div>`;
   // Client / Project info
   h+=`<div class="proj-modal-grid"><div class="proj-modal-field"><span class="fld-label">Client Name</span><span class="fld-value">${escHtml(r['Client Name']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Project Name</span><span class="fld-value">${escHtml(r['Project Name']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Project Code</span><span class="fld-value">${escHtml(r['Project Code']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">PAR</span><span class="fld-value">${escHtml(r['PAR']||'—')}</span></div></div>`;
   h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
   // Invoice references
-  h+=`<div class="proj-modal-grid" style="grid-template-columns:1fr 1fr 1fr"><div class="proj-modal-field"><span class="fld-label">Invoice Request</span><span class="fld-value">${escHtml(r['Invoice Request']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Invoice Number</span><span class="fld-value">${escHtml(r['Invoice Number']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">SI Number</span><span class="fld-value">${escHtml(r['SI Number']||'—')}</span></div></div>`;
+  h+=`<div class="proj-modal-grid" style="grid-template-columns:1fr 1fr 1fr"><div class="proj-modal-field"><span class="fld-label">Invoice Request</span><span class="fld-value">${escHtml(deSci(r['Invoice Request'])||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Invoice Number</span><span class="fld-value">${escHtml(r['Invoice Number']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">SI Number</span><span class="fld-value">${escHtml(r['SI Number']||'—')}</span></div></div>`;
   h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
   // Status pill
   h+=`<div style="margin-bottom:12px">${sp(r['Status'])}</div>`;
@@ -2515,15 +2563,20 @@ function showARModal(r){
   h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
   h+=`<div class="proj-modal-grid" style="grid-template-columns:1fr 1fr"><div class="proj-modal-field"><span class="fld-label">AM</span><span class="fld-value">${escHtml(r['AM']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Business Unit</span><span class="fld-value">${escHtml(r['Business Unit']||'—')}</span></div></div>`;
   // Links
-  if(ceLink||scLink){h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0"><div class="proj-modal-field" style="display:flex;gap:8px;flex-wrap:wrap">`;
-    if(ceLink)h+=`<a class="link-token" href="${escHtml(ceLink)}" target="_blank" rel="noopener">Internal CE</a>`;
-    if(scLink)h+=`<a class="link-token" href="${escHtml(scLink)}" target="_blank" rel="noopener">Signed CE</a>`;
-    h+=`</div>`;}
+  if(ceLink||scLink){h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0"><div class="proj-modal-field"><span class="fld-label">Link to CE</span><span class="fld-value">`;
+    if(ceLink)h+=`<a class="link-token" href="${escHtml(ceLink)}" target="_blank" rel="noopener">Internal CE ↗</a>`;
+    if(scLink)h+=`<a class="link-token" href="${escHtml(scLink)}" target="_blank" rel="noopener">Signed CE ↗</a>`;
+    h+=`</span></div>`;}
   // Remarks
   const sr=(r['Sales Remarks']||'').trim(),fr=(r['Finance Remarks']||'').trim();
   if(sr)h+=`<div class="proj-modal-remarks"><div class="fld-label">Sales Remarks</div><div class="fld-value">${escHtml(sr)}</div></div>`;
   if(fr)h+=`<div class="proj-modal-remarks"><div class="fld-label">Finance Remarks</div><div class="fld-value">${escHtml(fr)}</div></div>`;
-  box.innerHTML=h;document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');
+  return h;
+}
+function showARModal(r){
+  document.getElementById('projModalContent').innerHTML=_buildARHtml(r,'closeProjModal()');
+  const panel=document.getElementById('projInvoicePanel');if(panel){panel.classList.remove('open');panel.innerHTML='';}
+  document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');
 }
 
 function renderAR(){
@@ -2536,7 +2589,7 @@ function renderAR(){
     const st=(r['Status']||'').trim(),php=arPn(r['Amount (PHP)']);
     if(st==='For Collection')outstanding+=php;
     else if(st==='For Invoicing')forInvoicing+=php;
-    else if(st==='For Approval')forApproval+=php;
+    else if(st==='Pending Invoice Request Approval')forApproval+=php;
     if(st==='Collected'){
       const cd=(r['Collection Date']||'').trim();
       if(cd){const d=new Date(cd.replace(/\//g,'-'));if(d.getMonth()===curMonth&&d.getFullYear()===curYear)collectedMonth+=arPn(r['Amount Collected (PHP)']);}
@@ -2544,9 +2597,9 @@ function renderAR(){
   });
   const strip=document.getElementById('arKpis');
   strip.innerHTML=`
-    <div ${af(0)}><div class="kpi amber"><div class="kpi-label">Outstanding Invoices</div><div class="kpi-value">${fmt(outstanding)}</div><div class="kpi-sub">For Collection</div></div></div>
-    <div ${af(1)}><div class="kpi blue"><div class="kpi-label">For Invoicing</div><div class="kpi-value">${fmt(forInvoicing)}</div><div class="kpi-sub">Pending invoice</div></div></div>
-    <div ${af(2)}><div class="kpi purple"><div class="kpi-label">For Approval</div><div class="kpi-value">${fmt(forApproval)}</div><div class="kpi-sub">Awaiting approval</div></div></div>
+    <div ${af(0)}><div class="kpi amber clickable" onclick="arSetFilter('For Collection')"><div class="kpi-label">Outstanding Invoices</div><div class="kpi-value">${fmt(outstanding)}</div><div class="kpi-sub">For Collection</div></div></div>
+    <div ${af(1)}><div class="kpi blue clickable" onclick="arSetFilter('For Invoicing')"><div class="kpi-label">For Invoicing</div><div class="kpi-value">${fmt(forInvoicing)}</div><div class="kpi-sub">Pending invoice</div></div></div>
+    <div ${af(2)}><div class="kpi purple clickable" onclick="arSetFilter('Pending Invoice Request Approval')"><div class="kpi-label">Pending Invoice Request Approval</div><div class="kpi-value">${fmt(forApproval)}</div><div class="kpi-sub">Awaiting approval</div></div></div>
     <div ${af(3)}><div class="kpi green"><div class="kpi-label">Collected this Month</div><div class="kpi-value">${fmt(collectedMonth)}</div><div class="kpi-sub">${now.toLocaleString('en',{month:'long'})} ${curYear}</div></div></div>`;
 
   // Week chart data — group Amount (PHP) by Collection Week
@@ -2652,7 +2705,14 @@ function arFilteredRows(){
 }
 function arRenderFilters(){
   const el=document.getElementById('arStatusFilters');if(!el)return;
-  el.innerHTML=AR_STATUSES.map(s=>`<button class="ar-filter-pill${arState.filters.includes(s)?' active':''}" onclick="arToggleFilter('${s}')">${s}</button>`).join('');
+  const unique=[...new Set(AR_DATA.map(r=>(r['Status']||'').trim()).filter(Boolean))];
+  unique.sort((a,b)=>(AR_STATUS_ORDER[a]??99)-(AR_STATUS_ORDER[b]??99));
+  el.innerHTML=unique.map(s=>`<button class="ar-filter-pill${arState.filters.includes(s)?' active':''}" onclick="arToggleFilter('${s}')">${s}</button>`).join('');
+}
+function arSetFilter(s){
+  arState.filters=arState.filters[0]===s?[]:[s];
+  arRenderFilters();arRenderTable(arFilteredRows());
+  document.getElementById('arDetailCard').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function arToggleFilter(s){
   arState.filters=arState.filters[0]===s?[]:[s];
@@ -2698,7 +2758,7 @@ function arRenderDrawer(rows,w){
   drawer.innerHTML=h;
 }
 
-const AR_STATUS_ORDER={'For Approval':0,'For Invoicing':1,'For Collection':2,'Collected':3};
+const AR_STATUS_ORDER={'Pending Invoice Request Approval':0,'For Invoicing':1,'For Collection':2,'Collected':3};
 function arRenderTable(rows){
   const card=document.getElementById('arDetailCard');
   card.style.display='block';
