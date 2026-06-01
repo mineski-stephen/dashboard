@@ -470,8 +470,11 @@ body.settings-open,body.modal-open{overflow:hidden}
 .ar-now-label{position:absolute;top:4px;left:6px;font-size:9px;font-weight:700;color:var(--red);white-space:nowrap}
 .ar-recenter{position:absolute;top:8px;right:8px;z-index:4;padding:4px 12px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer;transition:all .15s}
 .ar-recenter:hover{background:var(--accent);color:#fff}
-.ar-all-btn{padding:4px 14px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;transition:all .15s;margin-left:auto}
-.ar-all-btn:hover,.ar-all-btn.active{background:var(--accent);color:#fff}
+.ar-week-drawer{overflow:hidden;max-height:0;transition:max-height .35s cubic-bezier(.16,1,.3,1),border-top .35s;border-top:0px solid var(--border)}
+.ar-week-drawer.open{max-height:600px;border-top:1px solid var(--border);margin-top:12px}
+.ar-filter-pill{padding:4px 12px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.ar-filter-pill:hover{border-color:var(--accent);color:var(--accent)}
+.ar-filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 </style></head><body>
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
@@ -569,8 +572,8 @@ body.settings-open,body.modal-open{overflow:hidden}
   <!-- AR TAB -->
   <div class="section" id="sec-ar">
     <div class="kpi-strip vis-section" data-vis="ar-kpis" id="arKpis"></div>
-    <div class="card vis-section" data-vis="ar-chart"><div class="card-title" style="display:flex;align-items:center"><div class="dot" style="background:var(--accent)"></div>Collections by Week<button class="ar-all-btn" id="arAllBtn" onclick="arToggleAll()">All</button></div><div class="ar-chart-wrap" id="arChartWrap"><button class="ar-recenter" onclick="arRecenter()">Re-center</button><div class="ar-chart-inner" id="arChartInner"></div></div></div>
-    <div class="card vis-section" data-vis="ar-table" id="arDetailCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div><span id="arDetailTitle">AR Details</span></div><div class="table-wrap" id="arDetailTable"></div></div>
+    <div class="card vis-section" data-vis="ar-chart"><div class="card-title" style="display:flex;align-items:center"><div class="dot" style="background:var(--accent)"></div>Collections by Week</div><div class="ar-chart-wrap" id="arChartWrap"><button class="ar-recenter" onclick="arRecenter()">Re-center</button><div class="ar-chart-inner" id="arChartInner"></div></div><div class="ar-week-drawer" id="arWeekDrawer"></div></div>
+    <div class="card vis-section" data-vis="ar-table" id="arDetailCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div><span id="arDetailTitle">AR Details</span></div><div id="arStatusFilters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div><div class="table-wrap" id="arDetailTable"></div></div>
   </div>
   <!-- ENCRYPT TAB -->
   <div class="section" id="sec-encrypt"><div class="card"><div class="card-title"><div class="dot" style="background:var(--red)"></div>File Encryption / Decryption</div>
@@ -2448,7 +2451,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ═══ SALES AR TAB ═══
 let AR_DATA=[];
-let arState={week:null,showAll:true};
+let arState={week:null,filters:[]};
+const AR_STATUSES=['For Approval','For Invoicing','For Collection','Collected'];
 
 async function loadARCSV(){
   const name=CFG.arCSV||'ar.csv';
@@ -2464,6 +2468,7 @@ async function loadARCSV(){
       text=await r.text();
     }
     AR_DATA=Papa.parse(text,{header:true,skipEmptyLines:true}).data;
+    AR_DATA.forEach((r,i)=>r._ai=i);
     renderAR();
   }catch(_){}
 }
@@ -2471,12 +2476,55 @@ function handleARUpload(input){
   const f=input.files[0];if(!f)return;
   const reader=new FileReader();reader.onload=ev=>{
     AR_DATA=Papa.parse(ev.target.result,{header:true,skipEmptyLines:true}).data;
+    AR_DATA.forEach((r,i)=>r._ai=i);
     document.getElementById('sUploadAR').textContent='✓ '+f.name;
     renderAR();
   };reader.readAsText(f);
 }
 
 function arPn(s){if(!s)return 0;const n=parseFloat(String(s).replace(/[₱$,\s]/g,''));return isNaN(n)?0:n;}
+function showARModal(r){
+  const box=document.getElementById('projModalContent');
+  const cur=(r['Currency']||'PHP').trim().toUpperCase(),sym=cur==='USD'?'$':'₱';
+  const invAmt=arPn(r['Invoice Amount']),invPhp=arPn(r['Amount (PHP)']),collected=arPn(r['Amount Collected']),collectedPhp=arPn(r['Amount Collected (PHP)']),balPhp=arPn(r['Balance (PHP)']);
+  const intCE=r['Internal CE']||'',ceLink=/https?:\/\//.test(intCE)?intCE:'';
+  const signedCE=r['Signed CE']||'',scLink=/https?:\/\//.test(signedCE)?signedCE:'';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['AR Name']||'—')}</h3></div><button class="am-close-btn" onclick="closeProjModal()">✕</button></div>`;
+  // Client / Project info
+  h+=`<div class="proj-modal-grid"><div class="proj-modal-field"><span class="fld-label">Client Name</span><span class="fld-value">${escHtml(r['Client Name']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Project Name</span><span class="fld-value">${escHtml(r['Project Name']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Project Code</span><span class="fld-value">${escHtml(r['Project Code']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">PAR</span><span class="fld-value">${escHtml(r['PAR']||'—')}</span></div></div>`;
+  h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
+  // Invoice references
+  h+=`<div class="proj-modal-grid" style="grid-template-columns:1fr 1fr 1fr"><div class="proj-modal-field"><span class="fld-label">Invoice Request</span><span class="fld-value">${escHtml(r['Invoice Request']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Invoice Number</span><span class="fld-value">${escHtml(r['Invoice Number']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">SI Number</span><span class="fld-value">${escHtml(r['SI Number']||'—')}</span></div></div>`;
+  h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
+  // Status pill
+  h+=`<div style="margin-bottom:12px">${sp(r['Status'])}</div>`;
+  // Big Invoice Amount
+  const fmtBig=invAmt>0?sym+invAmt.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+  h+=`<div style="text-align:center;margin:8px 0 4px"><div style="font-size:36px;font-weight:700;color:var(--text)">${fmtBig}</div><div style="font-size:12px;color:var(--text-muted);font-weight:600;margin-bottom:12px">${cur}${invPhp>0&&cur==='USD'?' · ₱'+invPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})+' PHP':''}</div></div>`;
+  h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
+  // Collected / Balance
+  const fmtColl=collected>0?sym+collected.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+  const fmtBal=balPhp>0?'₱'+balPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'₱0.00';
+  h+=`<div class="proj-modal-grid"><div class="proj-modal-field"><span class="fld-label">Amount Collected</span><span class="fld-value" style="color:var(--green);font-weight:600">${fmtColl}${collectedPhp>0&&cur==='USD'?` <span style="font-size:11px;color:var(--text-muted);font-weight:500">(₱${collectedPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})})</span>`:''}</span></div><div class="proj-modal-field"><span class="fld-label">Balance</span><span class="fld-value" style="color:${balPhp>0?'var(--red)':'var(--green)'};font-weight:600">${fmtBal}</span></div></div>`;
+  // Dates
+  const invDate=(r['Invoice Date']||'').trim().replace(/\//g,'-'),collDate=(r['Collection Date']||'').trim().replace(/\//g,'-'),ceCollDate=(r['CE Collection Date']||'').trim().replace(/\//g,'-');
+  const aging=r['Invoice Aging (days)']||'',ceAging=r['CE Aging']||'';
+  h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
+  h+=`<div class="proj-modal-grid" style="grid-template-columns:1fr 1fr 1fr 1fr"><div class="proj-modal-field"><span class="fld-label">Invoice Date</span><span class="fld-value">${escHtml(invDate||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Collection Date</span><span class="fld-value">${escHtml(collDate||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">CE Collection Date</span><span class="fld-value">${escHtml(ceCollDate||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Invoice Aging</span><span class="fld-value">${escHtml(aging||'—')}${aging?' days':''}</span></div></div>`;
+  // AM + Business Unit
+  h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">`;
+  h+=`<div class="proj-modal-grid" style="grid-template-columns:1fr 1fr"><div class="proj-modal-field"><span class="fld-label">AM</span><span class="fld-value">${escHtml(r['AM']||'—')}</span></div><div class="proj-modal-field"><span class="fld-label">Business Unit</span><span class="fld-value">${escHtml(r['Business Unit']||'—')}</span></div></div>`;
+  // Links
+  if(ceLink||scLink){h+=`<hr style="border:none;border-top:1px solid var(--border);margin:12px 0"><div class="proj-modal-field" style="display:flex;gap:8px;flex-wrap:wrap">`;
+    if(ceLink)h+=`<a class="link-token" href="${escHtml(ceLink)}" target="_blank" rel="noopener">Internal CE</a>`;
+    if(scLink)h+=`<a class="link-token" href="${escHtml(scLink)}" target="_blank" rel="noopener">Signed CE</a>`;
+    h+=`</div>`;}
+  // Remarks
+  const sr=(r['Sales Remarks']||'').trim(),fr=(r['Finance Remarks']||'').trim();
+  if(sr)h+=`<div class="proj-modal-remarks"><div class="fld-label">Sales Remarks</div><div class="fld-value">${escHtml(sr)}</div></div>`;
+  if(fr)h+=`<div class="proj-modal-remarks"><div class="fld-label">Finance Remarks</div><div class="fld-value">${escHtml(fr)}</div></div>`;
+  box.innerHTML=h;document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');
+}
 
 function renderAR(){
   if(!AR_DATA.length)return;
@@ -2536,13 +2584,9 @@ function renderAR(){
   // Init drag
   arInitDrag();
 
-  // Sync All button state
-  const allBtn=document.getElementById('arAllBtn');
-  if(allBtn)allBtn.classList.toggle('active',arState.showAll&&!arState.week);
-
-  // Detail table
-  if(arState.week)arShowWeek(arState.week);
-  else arShowAll();
+  // Detail table + filters
+  arRenderFilters();
+  arRenderTable(arFilteredRows());
 }
 
 function getISOWeeksInYear(y){const d=new Date(y,11,28);const o=new Date(d.getFullYear(),0,1);return Math.ceil(((d-o)/864e5+o.getDay()+1)/7);}
@@ -2602,33 +2646,64 @@ function arRecenter(){
   setTimeout(()=>{inner.style.transition='';},420);
 }
 
+function arFilteredRows(){
+  if(!arState.filters.length)return AR_DATA;
+  return AR_DATA.filter(r=>arState.filters.includes((r['Status']||'').trim()));
+}
+function arRenderFilters(){
+  const el=document.getElementById('arStatusFilters');if(!el)return;
+  el.innerHTML=AR_STATUSES.map(s=>`<button class="ar-filter-pill${arState.filters.includes(s)?' active':''}" onclick="arToggleFilter('${s}')">${s}</button>`).join('');
+}
+function arToggleFilter(s){
+  arState.filters=arState.filters[0]===s?[]:[s];
+  arRenderFilters();arRenderTable(arFilteredRows());
+}
 function arClickWeek(w){
-  arState.week=w;arState.showAll=false;
-  document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.toggle('active',+c.dataset.w===w));
-  document.getElementById('arAllBtn').classList.remove('active');
-  arShowWeek(w);
+  const drawer=document.getElementById('arWeekDrawer');
+  if(arState.week===w){
+    arState.week=null;
+    document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.remove('active'));
+    drawer.classList.remove('open');
+    setTimeout(()=>{drawer.innerHTML='';},360);
+  } else {
+    arState.week=w;
+    document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.toggle('active',+c.dataset.w===w));
+    const rows=AR_DATA.filter(r=>parseInt(r['Collection Week'],10)===w);
+    arRenderDrawer(rows,w);
+    drawer.classList.add('open');
+    setTimeout(()=>drawer.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+  }
 }
-
-function arToggleAll(){
-  arState.week=null;arState.showAll=true;
-  document.getElementById('arAllBtn').classList.add('active');
+function arCloseDrawer(){
+  const drawer=document.getElementById('arWeekDrawer');
+  arState.week=null;
   document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.remove('active'));
-  arShowAll();
+  drawer.classList.remove('open');
+  setTimeout(()=>{drawer.innerHTML='';},360);
 }
-
-function arShowWeek(w){
-  const rows=AR_DATA.filter(r=>parseInt(r['Collection Week'],10)===w);
-  arRenderTable(rows,`Week ${w} — ${rows.length} invoice${rows.length!==1?'s':''}`);
-}
-function arShowAll(){
-  arRenderTable(AR_DATA,`All AR — ${AR_DATA.length} invoices`);
+function arRenderDrawer(rows,w){
+  const drawer=document.getElementById('arWeekDrawer');
+  const sorted=[...rows].sort((a,b)=>(AR_STATUS_ORDER[a['Status']]??9)-(AR_STATUS_ORDER[b['Status']]??9));
+  let h=`<div style="padding:10px 0 8px;display:flex;align-items:center;justify-content:space-between"><span style="font-weight:700;font-size:14px;color:var(--accent)">Week ${w} — ${rows.length} invoice${rows.length!==1?'s':''}</span><button class="am-close-btn" onclick="arCloseDrawer()">✕</button></div>`;
+  h+='<div class="table-wrap"><table class="tbl"><thead><tr><th>AR Name</th><th>Client</th><th style="text-align:right">Invoice Amt</th><th>Status</th><th>Est. Collection Date</th><th>AM</th></tr></thead><tbody>';
+  let totalPhp=0,totalCollectedPhp=0;
+  sorted.forEach((r,i)=>{
+    const invAmt=arPn(r['Invoice Amount']),invPhp=arPn(r['Amount (PHP)']),cur=(r['Currency']||'PHP').trim().toUpperCase(),sym=cur==='USD'?'$':'₱';
+    const amtStr=invAmt>0?sym+invAmt.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+    const cd=(r['Collection Date']||'').trim().replace(/\//g,'-'),am=(r['AM']||'').split(/\s+/)[0]||'—';
+    totalPhp+=invPhp;totalCollectedPhp+=arPn(r['Amount Collected (PHP)']);
+    h+=`<tr ${af(i)} style="cursor:pointer" onclick="showARModal(AR_DATA[${r._ai}])"><td>${escHtml(r['AR Name']||'—')}</td><td>${escHtml(r['Client Name']||'—')}</td><td style="text-align:right;font-weight:600">${amtStr}</td><td>${sp(r['Status'])}</td><td>${cd||'—'}</td><td>${escHtml(am)}</td></tr>`;
+  });
+  h+=`</tbody><tfoot><tr><td colspan="2" style="font-weight:700">TOTAL (${sorted.length} invoices)</td><td style="text-align:right;font-weight:700">₱${totalPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td colspan="3" style="font-weight:700;color:var(--green)">Collected: ₱${totalCollectedPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr></tfoot></table></div>`;
+  drawer.innerHTML=h;
 }
 
 const AR_STATUS_ORDER={'For Approval':0,'For Invoicing':1,'For Collection':2,'Collected':3};
-function arRenderTable(rows,title){
+function arRenderTable(rows){
   const card=document.getElementById('arDetailCard');
   card.style.display='block';
-  document.getElementById('arDetailTitle').textContent=title;
+  const label=arState.filters.length?arState.filters.join(', '):('All Statuses');
+  document.getElementById('arDetailTitle').textContent=`AR Details — ${rows.length} invoice${rows.length!==1?'s':''} · ${label}`;
   const sorted=[...rows].sort((a,b)=>(AR_STATUS_ORDER[a['Status']]??9)-(AR_STATUS_ORDER[b['Status']]??9));
   let h='<table class="tbl"><thead><tr><th>AR Name</th><th>Client</th><th style="text-align:right">Invoice Amt</th><th>Status</th><th>Est. Collection Date</th><th>AM</th></tr></thead><tbody>';
   let totalPhp=0,totalCollectedPhp=0;
@@ -2642,7 +2717,7 @@ function arRenderTable(rows,title){
     const am=(r['AM']||'').split(/\s+/)[0]||'—';
     totalPhp+=invPhp;
     totalCollectedPhp+=arPn(r['Amount Collected (PHP)']);
-    h+=`<tr ${af(i)}><td>${escHtml(r['AR Name']||'—')}</td><td>${escHtml(r['Client Name']||'—')}</td><td style="text-align:right;font-weight:600">${amtStr}</td><td>${sp(r['Status'])}</td><td>${cd||'—'}</td><td>${escHtml(am)}</td></tr>`;
+    h+=`<tr ${af(i)} style="cursor:pointer" onclick="showARModal(AR_DATA[${r._ai}])"><td>${escHtml(r['AR Name']||'—')}</td><td>${escHtml(r['Client Name']||'—')}</td><td style="text-align:right;font-weight:600">${amtStr}</td><td>${sp(r['Status'])}</td><td>${cd||'—'}</td><td>${escHtml(am)}</td></tr>`;
   });
   h+=`</tbody><tfoot><tr><td colspan="2" style="font-weight:700">TOTAL (${sorted.length} invoices)</td><td style="text-align:right;font-weight:700">₱${totalPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td colspan="3" style="font-weight:700;color:var(--green)">Collected: ₱${totalCollectedPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr></tfoot></table>`;
   document.getElementById('arDetailTable').innerHTML=h;
