@@ -468,18 +468,28 @@ body.settings-open,body.modal-open{overflow:hidden}
 .tg-table tfoot td{padding:12px 10px;background:var(--surface2);border-top:2px solid var(--border);font-weight:700;font-size:14px}
 .tg-table tfoot td.won{color:var(--green)}.tg-table tfoot td.gap{color:var(--red)}.tg-table tfoot td.rfp{color:var(--amber)}
 /* ═══ AR TAB ═══ */
-.ar-chart-wrap{position:relative;overflow:hidden;height:400px;background:var(--surface2);border-radius:var(--radius);cursor:grab;user-select:none;margin-bottom:20px}
+.ar-chart-wrap{position:relative;overflow:hidden;height:430px;background:var(--surface2);border-radius:var(--radius);cursor:grab;user-select:none;margin-bottom:20px}
 .ar-chart-wrap:active{cursor:grabbing}
-.ar-chart-inner{display:flex;align-items:flex-end;height:100%;padding:36px 0 36px;position:absolute;top:0;left:0;will-change:transform}
+.ar-chart-inner{display:flex;align-items:flex-end;height:100%;padding:30px 0 44px;position:absolute;top:0;left:0;will-change:transform}
 .ar-week-col{display:flex;flex-direction:column;align-items:center;width:80px;flex-shrink:0;position:relative;cursor:pointer;transition:background .12s}
 .ar-week-col:hover{background:var(--surface3);border-radius:8px}
 .ar-week-col.active{background:var(--accent-glow);border-radius:8px}
+.ar-week-val{font-size:10px;font-weight:700;color:var(--text-dim);margin-bottom:4px;white-space:nowrap}
 .ar-week-bar{width:48px;border-radius:6px 6px 0 0;background:var(--accent);transition:height .3s ease,opacity .3s;min-height:3px;opacity:.7}
 .ar-week-col:hover .ar-week-bar,.ar-week-col.active .ar-week-bar{opacity:1}
 .ar-week-col.past .ar-week-bar{background:var(--green)}
 .ar-week-col.future .ar-week-bar{background:var(--accent);opacity:.5}
 .ar-week-col.future:hover .ar-week-bar{opacity:.8}
 .ar-week-lbl{font-size:13px;color:var(--text-muted);margin-top:6px;font-weight:700}
+.ar-month-band{position:absolute;left:0;bottom:8px;height:32px;pointer-events:none}
+.ar-month-seg{position:absolute;top:0;height:100%;display:flex;flex-direction:column;align-items:center;pointer-events:auto;cursor:pointer}
+.ar-month-seg::before{content:"";position:absolute;top:0;left:8px;right:8px;height:1.5px;background:var(--border)}
+.ar-month-lbl{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;padding:2px 10px;border-radius:6px;transition:all .15s;white-space:nowrap}
+.ar-month-seg:hover .ar-month-lbl{color:var(--accent);background:var(--accent-glow)}
+.ar-month-seg.active .ar-month-lbl{color:#fff;background:var(--accent)}
+.ar-aging-pill{border-color:var(--amber);color:var(--amber)}
+.ar-aging-pill:hover{border-color:var(--amber);color:var(--amber)}
+.ar-aging-pill.active{background:var(--amber);border-color:var(--amber);color:#000}
 .ar-now-line{position:absolute;top:0;bottom:0;width:2px;background:var(--red);z-index:3;pointer-events:none}
 .ar-now-label{position:absolute;top:4px;left:6px;font-size:9px;font-weight:700;color:var(--red);white-space:nowrap}
 .ar-recenter{position:absolute;top:8px;right:8px;z-index:4;padding:4px 12px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);cursor:pointer;transition:all .15s}
@@ -2494,8 +2504,11 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // ═══ SALES AR TAB ═══
 let AR_DATA=[];
-let arState={week:null,filters:[]};
+let arState={week:null,month:null,aging:false,filters:[]};
 const AR_STATUSES=['Pending Invoice Request Approval','For Invoicing','For Collection','Collected'];
+const AR_MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+let _arYear=new Date().getFullYear();
+function arWeekMonth(w){return new Date(_arYear,0,(w-1)*7+4).getMonth();}
 
 async function loadARCSV(){
   const name=CFG.arCSV||'ar.csv';
@@ -2603,6 +2616,7 @@ function renderAR(){
     <div ${af(3)}><div class="kpi green"><div class="kpi-label">Collected this Month</div><div class="kpi-value">${fmt(collectedMonth)}</div><div class="kpi-sub">${now.toLocaleString('en',{month:'long'})} ${curYear}</div></div></div>`;
 
   // Week chart data — group Amount (PHP) by Collection Week
+  _arYear=curYear;
   const lastWeek=getISOWeeksInYear(curYear);
   const weekTotals={};
   AR_DATA.forEach(r=>{
@@ -2620,7 +2634,7 @@ function renderAR(){
     const cls=w<cw?'past':w>cw?'future':'past';
     const sel=arState.week===w?'active':'';
     const tip=val>0?fmt(val):'No collections';
-    cols+=`<div class="ar-week-col ${cls} ${sel}" data-w="${w}" onclick="arClickWeek(${w})" onmouseenter="(e=>{_tip.textContent='W${w}: ${tip}';_tip.classList.add('show');tipMv(e);})(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()"><div class="ar-week-bar" style="height:${h}px"></div><div class="ar-week-lbl">W${w}</div></div>`;
+    cols+=`<div class="ar-week-col ${cls} ${sel}" data-w="${w}" onclick="arClickWeek(${w})" onmouseenter="(e=>{_tip.textContent='W${w}: ${tip}';_tip.classList.add('show');tipMv(e);})(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()">${val>0?`<div class="ar-week-val">${fmt(val)}</div>`:''}<div class="ar-week-bar" style="height:${h}px"></div><div class="ar-week-lbl">W${w}</div></div>`;
   }
   inner.innerHTML=cols;
   inner.style.width=(lastWeek*80)+'px';
@@ -2630,6 +2644,14 @@ function renderAR(){
   nowLine.style.left=(cw*80-40)+'px';
   nowLine.innerHTML=`<div class="ar-now-label">Week ${cw}</div>`;
   inner.appendChild(nowLine);
+
+  // Month band — group weeks by month, clickable to filter drawer by month
+  const runs=[];let runM=-1,runStart=1;
+  for(let w=1;w<=lastWeek;w++){const m=arWeekMonth(w);if(m!==runM){if(runM!==-1)runs.push({m:runM,a:runStart,b:w-1});runM=m;runStart=w;}}
+  runs.push({m:runM,a:runStart,b:lastWeek});
+  let band='';
+  runs.forEach(run=>{const left=(run.a-1)*80,width=(run.b-run.a+1)*80;band+=`<div class="ar-month-seg${arState.month===run.m?' active':''}" data-m="${run.m}" style="left:${left}px;width:${width}px" onclick="arClickMonth(${run.m})"><span class="ar-month-lbl">${AR_MONTHS[run.m]}</span></div>`;});
+  const bandEl=document.createElement('div');bandEl.className='ar-month-band';bandEl.style.width=(lastWeek*80)+'px';bandEl.innerHTML=band;inner.appendChild(bandEl);
 
   // Center on current week
   requestAnimationFrame(()=>requestAnimationFrame(arRecenter));
@@ -2700,6 +2722,7 @@ function arRecenter(){
 }
 
 function arFilteredRows(){
+  if(arState.aging)return AR_DATA.filter(r=>(r['Status']||'').trim()==='For Collection');
   if(!arState.filters.length)return AR_DATA;
   return AR_DATA.filter(r=>arState.filters.includes((r['Status']||'').trim()));
 }
@@ -2707,15 +2730,24 @@ function arRenderFilters(){
   const el=document.getElementById('arStatusFilters');if(!el)return;
   const unique=[...new Set(AR_DATA.map(r=>(r['Status']||'').trim()).filter(Boolean))];
   unique.sort((a,b)=>(AR_STATUS_ORDER[a]??99)-(AR_STATUS_ORDER[b]??99));
-  el.innerHTML=unique.map(s=>`<button class="ar-filter-pill${arState.filters.includes(s)?' active':''}" onclick="arToggleFilter('${s}')">${s}</button>`).join('');
+  let html=unique.map(s=>`<button class="ar-filter-pill${(!arState.aging&&arState.filters.includes(s))?' active':''}" onclick="arToggleFilter('${s}')">${s}</button>`).join('');
+  html+=`<button class="ar-filter-pill ar-aging-pill${arState.aging?' active':''}" onclick="arToggleAging()">Aging</button>`;
+  el.innerHTML=html;
 }
 function arSetFilter(s){
+  arState.aging=false;
   arState.filters=arState.filters[0]===s?[]:[s];
   arRenderFilters();arRenderTable(arFilteredRows());
   document.getElementById('arDetailCard').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function arToggleFilter(s){
+  arState.aging=false;
   arState.filters=arState.filters[0]===s?[]:[s];
+  arRenderFilters();arRenderTable(arFilteredRows());
+}
+function arToggleAging(){
+  arState.aging=!arState.aging;
+  if(arState.aging)arState.filters=[];
   arRenderFilters();arRenderTable(arFilteredRows());
 }
 function arClickWeek(w){
@@ -2726,35 +2758,54 @@ function arClickWeek(w){
     drawer.classList.remove('open');
     setTimeout(()=>{drawer.innerHTML='';},360);
   } else {
-    arState.week=w;
+    arState.week=w;arState.month=null;
+    document.querySelectorAll('.ar-month-seg').forEach(s=>s.classList.remove('active'));
     document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.toggle('active',+c.dataset.w===w));
     const rows=AR_DATA.filter(r=>parseInt(r['Collection Week'],10)===w);
-    arRenderDrawer(rows,w);
+    arRenderDrawer(rows,`Week ${w}`);
+    drawer.classList.add('open');
+    setTimeout(()=>drawer.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+  }
+}
+function arClickMonth(m){
+  const drawer=document.getElementById('arWeekDrawer');
+  if(arState.month===m){
+    arState.month=null;
+    document.querySelectorAll('.ar-month-seg').forEach(s=>s.classList.remove('active'));
+    drawer.classList.remove('open');
+    setTimeout(()=>{drawer.innerHTML='';},360);
+  } else {
+    arState.month=m;arState.week=null;
+    document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('.ar-month-seg').forEach(s=>s.classList.toggle('active',+s.dataset.m===m));
+    const rows=AR_DATA.filter(r=>{const w=parseInt(r['Collection Week'],10);return w>0&&arWeekMonth(w)===m;});
+    arRenderDrawer(rows,AR_MONTHS[m]);
     drawer.classList.add('open');
     setTimeout(()=>drawer.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
   }
 }
 function arCloseDrawer(){
   const drawer=document.getElementById('arWeekDrawer');
-  arState.week=null;
+  arState.week=null;arState.month=null;
   document.querySelectorAll('.ar-week-col').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.ar-month-seg').forEach(s=>s.classList.remove('active'));
   drawer.classList.remove('open');
   setTimeout(()=>{drawer.innerHTML='';},360);
 }
-function arRenderDrawer(rows,w){
+function arRenderDrawer(rows,title){
   const drawer=document.getElementById('arWeekDrawer');
   const sorted=[...rows].sort((a,b)=>(AR_STATUS_ORDER[a['Status']]??9)-(AR_STATUS_ORDER[b['Status']]??9));
-  let h=`<div style="padding:10px 0 8px;display:flex;align-items:center;justify-content:space-between"><span style="font-weight:700;font-size:14px;color:var(--accent)">Week ${w} — ${rows.length} invoice${rows.length!==1?'s':''}</span><button class="am-close-btn" onclick="arCloseDrawer()">✕</button></div>`;
+  let h=`<div style="padding:10px 0 8px;display:flex;align-items:center;justify-content:space-between"><span style="font-weight:700;font-size:14px;color:var(--accent)">${title} — ${rows.length} invoice${rows.length!==1?'s':''}</span><button class="am-close-btn" onclick="arCloseDrawer()">✕</button></div>`;
   h+='<div class="table-wrap"><table class="tbl"><thead><tr><th>AR Name</th><th>Client</th><th style="text-align:right">Invoice Amt</th><th>Status</th><th>Est. Collection Date</th><th>AM</th></tr></thead><tbody>';
-  let totalPhp=0,totalCollectedPhp=0;
+  let totalPhp=0;
   sorted.forEach((r,i)=>{
     const invAmt=arPn(r['Invoice Amount']),invPhp=arPn(r['Amount (PHP)']),cur=(r['Currency']||'PHP').trim().toUpperCase(),sym=cur==='USD'?'$':'₱';
     const amtStr=invAmt>0?sym+invAmt.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
     const cd=(r['Collection Date']||'').trim().replace(/\//g,'-'),am=(r['AM']||'').split(/\s+/)[0]||'—';
-    totalPhp+=invPhp;totalCollectedPhp+=arPn(r['Amount Collected (PHP)']);
+    totalPhp+=invPhp;
     h+=`<tr ${af(i)} style="cursor:pointer" onclick="showARModal(AR_DATA[${r._ai}])"><td>${escHtml(r['AR Name']||'—')}</td><td>${escHtml(r['Client Name']||'—')}</td><td style="text-align:right;font-weight:600">${amtStr}</td><td>${sp(r['Status'])}</td><td>${cd||'—'}</td><td>${escHtml(am)}</td></tr>`;
   });
-  h+=`</tbody><tfoot><tr><td colspan="2" style="font-weight:700">TOTAL (${sorted.length} invoices)</td><td style="text-align:right;font-weight:700">₱${totalPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td colspan="3" style="font-weight:700;color:var(--green)">Collected: ₱${totalCollectedPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr></tfoot></table></div>`;
+  h+=`</tbody><tfoot><tr><td colspan="2" style="font-weight:700">TOTAL (${sorted.length} invoices)</td><td style="text-align:right;font-weight:700">₱${totalPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td colspan="3"></td></tr></tfoot></table></div>`;
   drawer.innerHTML=h;
 }
 
@@ -2762,11 +2813,13 @@ const AR_STATUS_ORDER={'Pending Invoice Request Approval':0,'For Invoicing':1,'F
 function arRenderTable(rows){
   const card=document.getElementById('arDetailCard');
   card.style.display='block';
-  const label=arState.filters.length?arState.filters.join(', '):('All Statuses');
+  const aging=arState.aging;
+  const label=aging?'For Collection · by Aging':(arState.filters.length?arState.filters.join(', '):'All Statuses');
   document.getElementById('arDetailTitle').textContent=`AR Details — ${rows.length} invoice${rows.length!==1?'s':''} · ${label}`;
-  const sorted=[...rows].sort((a,b)=>(AR_STATUS_ORDER[a['Status']]??9)-(AR_STATUS_ORDER[b['Status']]??9));
-  let h='<table class="tbl"><thead><tr><th>AR Name</th><th>Client</th><th style="text-align:right">Invoice Amt</th><th>Status</th><th>Est. Collection Date</th><th>AM</th></tr></thead><tbody>';
-  let totalPhp=0,totalCollectedPhp=0;
+  const sorted=aging?[...rows].sort((a,b)=>arPn(b['Invoice Aging (days)'])-arPn(a['Invoice Aging (days)'])):[...rows].sort((a,b)=>(AR_STATUS_ORDER[a['Status']]??9)-(AR_STATUS_ORDER[b['Status']]??9));
+  const col5=aging?'Aging (days)':'Est. Collection Date';
+  let h=`<table class="tbl"><thead><tr><th>AR Name</th><th>Client</th><th style="text-align:right">Invoice Amt</th><th>Status</th><th>${col5}</th><th>AM</th></tr></thead><tbody>`;
+  let totalPhp=0;
   sorted.forEach((r,i)=>{
     const invAmt=arPn(r['Invoice Amount']);
     const invPhp=arPn(r['Amount (PHP)']);
@@ -2774,12 +2827,12 @@ function arRenderTable(rows){
     const sym=cur==='USD'?'$':'₱';
     const amtStr=invAmt>0?sym+invAmt.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
     const cd=(r['Collection Date']||'').trim().replace(/\//g,'-');
+    const col5v=aging?((r['Invoice Aging (days)']||'').toString().trim()||'—'):(cd||'—');
     const am=(r['AM']||'').split(/\s+/)[0]||'—';
     totalPhp+=invPhp;
-    totalCollectedPhp+=arPn(r['Amount Collected (PHP)']);
-    h+=`<tr ${af(i)} style="cursor:pointer" onclick="showARModal(AR_DATA[${r._ai}])"><td>${escHtml(r['AR Name']||'—')}</td><td>${escHtml(r['Client Name']||'—')}</td><td style="text-align:right;font-weight:600">${amtStr}</td><td>${sp(r['Status'])}</td><td>${cd||'—'}</td><td>${escHtml(am)}</td></tr>`;
+    h+=`<tr ${af(i)} style="cursor:pointer" onclick="showARModal(AR_DATA[${r._ai}])"><td>${escHtml(r['AR Name']||'—')}</td><td>${escHtml(r['Client Name']||'—')}</td><td style="text-align:right;font-weight:600">${amtStr}</td><td>${sp(r['Status'])}</td><td>${escHtml(col5v)}</td><td>${escHtml(am)}</td></tr>`;
   });
-  h+=`</tbody><tfoot><tr><td colspan="2" style="font-weight:700">TOTAL (${sorted.length} invoices)</td><td style="text-align:right;font-weight:700">₱${totalPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td colspan="3" style="font-weight:700;color:var(--green)">Collected: ₱${totalCollectedPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr></tfoot></table>`;
+  h+=`</tbody><tfoot><tr><td colspan="2" style="font-weight:700">TOTAL (${sorted.length} invoices)</td><td style="text-align:right;font-weight:700">₱${totalPhp.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td colspan="3"></td></tr></tfoot></table>`;
   document.getElementById('arDetailTable').innerHTML=h;
   _addCardCopyBtn(card);
 }
