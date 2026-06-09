@@ -622,8 +622,8 @@ const Q_TARGETS_USD=[{label:'Q1',amount:1277001.02,pct:19.65,qtrPip:1277001.02},
 let TRIBE_TARGETS={};
 function rebuildTargets(){TRIBE_TARGETS={};for(const[k,v]of Object.entries(TRIBE_TARGETS_USD))TRIBE_TARGETS[k]=v*USD_RATE;}
 rebuildTargets();
-const AM_TARGETS={'Alvaro Miguel Dela Vega Santos':0,'Carla Andrea Calma Crespo':25650000,'Carlos Roberto Francisco, David, IV Coscolluela':25650000,'Catherine Bautista Pumarega':0,'Marcus Joaquin Viray Gonzales':57000000,'Shanna Mae Alindada Sacsi':25650000};
-const AM_NICKS={'Alvaro Miguel Dela Vega Santos':'Iggy','Catherine Bautista Pumarega':'Cathy','Carla Andrea Calma Crespo':'Carla','Carlos Roberto Francisco, David, IV Coscolluela':'CC','Marcus Joaquin Viray Gonzales':'Marcus','Shanna Mae Alindada Sacsi':'Shanna'};
+const AM_TARGETS={'Alvaro Miguel Dela Vega Santos':0,'Carla Andrea Calma Crespo':25650000,'Carlos Roberto Francisco, David, IV Coscolluela':25650000,'Catherine Bautista Pumarega':0,'Kryztl Bopeep Tan Nuñez':25650000,'Marcus Joaquin Viray Gonzales':57000000,'Shanna Mae Alindada Sacsi':25650000};
+const AM_NICKS={'Alvaro Miguel Dela Vega Santos':'Iggy','Catherine Bautista Pumarega':'Cathy','Carla Andrea Calma Crespo':'Carla','Carlos Roberto Francisco, David, IV Coscolluela':'CC','Kryztl Bopeep Tan Nuñez':'Bopeep','Marcus Joaquin Viray Gonzales':'Marcus','Shanna Mae Alindada Sacsi':'Shanna'};
 const BD_NICKS={'Diana Lou Perocho Gosamo':'Diana','Marinella M. Casabuena':'Ella','Kewen Ysan Tolentino Sy':'Kewen','Jorge Luis Tesoro':'H','Vince':'Vince', 'Pepito Laureola Garcia Jr.':'Moki','Christine Joyce Jimenez Cahigas':'Ceij','Kirk Terrence Agcaoili':'Kirk','Jared Jose Santos Matias':'Jared'};
 const BD_SPECIAL_GOALS={'Jorge Luis Tesoro':10,'Vince':0}; // H has special goal of 10, Vince has no goal
 const BD_DEFAULT_GOAL=15; // All other BDs get 15
@@ -732,7 +732,7 @@ function isTabVis(t){return CFG[t]?.visible!==false;}
 function isSecVis(k){for(const t of Object.keys(TAB_NAMES)){if(CFG[t]&&CFG[t][k]!==undefined)return CFG[t][k]!==false;}return true;}
 function applyTheme(){let t=CFG.theme;if(t==='system')t=window.matchMedia('(prefers-color-scheme:light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);Chart.defaults.color=t==='dark'?'#8B95A5':'#4B5563';Chart.defaults.borderColor=t==='dark'?'#2A3545':'#D1D5DB';if(CHARTS.bdDonut&&DATA.length){renderBDCharts();}if(DATA.length){renderBDDoorsChart();}}
 function applyVis(){document.querySelectorAll('.nav-tab').forEach(b=>{b.style.display=isTabVis(b.dataset.tab)?'':'none';});const a=document.querySelector('.nav-tab.active');if(a&&a.style.display==='none'){const f=document.querySelector('.nav-tab:not([style*="display: none"])');if(f)f.click();}document.querySelectorAll('.vis-section').forEach(el=>{const k=el.dataset.vis;if(k&&!isSecVis(k))el.classList.add('hidden-section');else el.classList.remove('hidden-section');});}
-function applyCfg(){applyTheme();applyVis();CURRENCY=CFG.currency||'PHP';USD_RATE=CFG.usdRate||57;rebuildTargets();document.getElementById('usdRateInput').value=USD_RATE;document.getElementById('btnPHP').classList.toggle('active',CURRENCY==='PHP');document.getElementById('btnUSD').classList.toggle('active',CURRENCY==='USD');const pdfBtn=document.getElementById('pdfDownloadBtn');if(pdfBtn)pdfBtn.style.display=CFG.showPDFBtn?'':'none';}
+function applyCfg(){applyTheme();applyVis();CURRENCY=CFG.currency||'PHP';USD_RATE=CFG.usdRate||57;rebuildTargets();document.getElementById('usdRateInput').value=USD_RATE;document.getElementById('btnPHP').classList.toggle('active',CURRENCY==='PHP');document.getElementById('btnUSD').classList.toggle('active',CURRENCY==='USD');const pdfBtn=document.getElementById('pdfDownloadBtn');if(pdfBtn)pdfBtn.style.display=CFG.showPDFBtn?'':'none';const encPw=document.getElementById('encPwInput');if(encPw&&CFG.debugKey&&!encPw.value){try{encPw.value=atob(CFG.debugKey);}catch(e){encPw.value=CFG.debugKey;}}}
 
 let showCSVFields=false;
 function renderSettings(){
@@ -2582,8 +2582,7 @@ function _buildARHtml(r,closeAction){
     h+=`</span></div>`;}
   // Remarks
   const sr=(r['Sales Remarks']||'').trim(),fr=(r['Finance Remarks']||'').trim();
-  if(sr)h+=`<div class="proj-modal-remarks"><div class="fld-label">Sales Remarks</div><div class="fld-value">${escHtml(sr)}</div></div>`;
-  if(fr)h+=`<div class="proj-modal-remarks"><div class="fld-label">Finance Remarks</div><div class="fld-value">${escHtml(fr)}</div></div>`;
+  if(sr||fr)h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px"><div class="proj-modal-remarks" style="margin-top:0"><div class="fld-label">Sales Remarks</div><div class="fld-value">${sr?escHtml(sr):'—'}</div></div><div class="proj-modal-remarks" style="margin-top:0"><div class="fld-label">Finance Remarks</div><div class="fld-value">${fr?escHtml(fr):'—'}</div></div></div>`;
   return h;
 }
 function showARModal(r){
