@@ -237,6 +237,61 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .proj-modal-invoice.open{width:520px;max-width:44vw;opacity:1;padding:28px;border-width:1px;margin-left:16px}
 .proj-modal-invoice *{-webkit-user-select:text;user-select:text}
 .proj-inv-inner{animation:pipeFadeIn .3s ease}
+/* Search (shared by header + in-modal) */
+.search-results{position:absolute;top:calc(100% + 6px);right:0;min-width:340px;max-width:440px;max-height:380px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.4);padding:6px;z-index:120;display:none}
+.search-results.show{display:block;animation:slideDown .18s ease}
+.search-result-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .12s}
+.search-result-row:hover,.search-result-row.active{background:var(--surface2)}
+.search-result-chip{flex-shrink:0;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:10px}
+.search-result-chip.p{background:var(--accent-glow);color:var(--accent)}
+.search-result-chip.i{background:var(--green-dim);color:var(--green)}
+.search-result-main{min-width:0;flex:1}
+.search-result-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-result-sub{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-empty{padding:14px;text-align:center;font-size:12px;color:var(--text-muted)}
+/* Header search */
+.hdr-search{position:relative;display:flex;align-items:center}
+.hdr-search input{width:170px;background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--text);font-size:12px;padding:7px 14px;outline:none;font-family:'DM Sans',sans-serif;transition:width .2s,border-color .15s}
+.hdr-search input:focus{width:230px;border-color:var(--accent)}
+.hdr-search input::placeholder{color:var(--text-muted)}
+/* In-modal search */
+.proj-search-slot{position:relative;flex-shrink:0;align-self:flex-start;width:40px;height:40px;margin-right:12px;transition:width .3s cubic-bezier(.16,1,.3,1)}
+.proj-search-slot.expanded{width:300px}
+.proj-search-btn{position:absolute;inset:0;width:40px;height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:opacity .18s ease,border-color .15s,color .15s}
+.proj-search-btn:hover{border-color:var(--accent);color:var(--accent)}
+.proj-search-slot.expanded .proj-search-btn{opacity:0;pointer-events:none}
+.proj-search-box{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .22s ease}
+.proj-search-slot.expanded .proj-search-box{opacity:1;pointer-events:auto}
+.proj-search-box input{width:100%;height:100%;box-sizing:border-box;background:var(--surface);border:1px solid var(--accent);border-radius:10px;color:var(--text);font-size:13px;padding:0 14px;outline:none;font-family:'DM Sans',sans-serif}
+.proj-search-slot .search-results{left:0;right:auto}
+/* Project list modal (client/tag) */
+.proj-list-modal{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:170;display:none;align-items:center;justify-content:center}
+.proj-list-modal.open{display:flex}
+.proj-list-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0;max-width:95vw;height:80vh;overflow:hidden;animation:slideDown .25s ease;display:flex;flex-direction:column;-webkit-user-select:text;user-select:text}
+.proj-list-box *{-webkit-user-select:text;user-select:text}
+.proj-list-wrap{display:flex;flex:1;min-height:0;overflow:hidden}
+.proj-list-left{width:560px;max-width:60vw;display:flex;flex-direction:column;overflow:hidden}
+.proj-list-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 10px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.proj-list-head h3{font-size:14px;font-weight:700;color:var(--text)}
+.proj-list-scroll{flex:1;min-height:0;overflow-y:auto;padding:6px 18px 16px 12px}
+.proj-list-right{width:520px;max-width:44vw;overflow-y:auto;padding:20px 24px;border-left:1px solid var(--border)}
+.proj-list-right>:first-child{animation:pipeFadeIn .25s ease}
+.proj-list-placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:13px;font-style:italic}
+.proj-list-modal table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.proj-list-modal thead th{position:sticky;top:0;background:var(--surface);text-align:left;padding:8px 10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);border-bottom:1px solid var(--border);z-index:1}
+.proj-list-modal tbody td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim)}
+.proj-list-modal th:nth-child(2),.proj-list-modal td:nth-child(2){width:23%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-list-modal th:nth-child(3),.proj-list-modal td:nth-child(3){width:118px}
+.proj-list-modal th:nth-child(4),.proj-list-modal td:nth-child(4){width:96px}
+.proj-list-modal td.pl-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
+.proj-list-modal td.pl-date{white-space:nowrap}
+.proj-list-modal tbody tr{cursor:pointer;transition:background .12s}
+.proj-list-modal tbody tr:hover td,.proj-list-modal tbody tr.active td{background:var(--surface2);color:var(--text)}
+/* Clickable client/tag in project modal */
+.proj-link{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px}
+.proj-link:hover{color:var(--accent)}
+.proj-tag-pill.clk{cursor:pointer;transition:all .15s}
+.proj-tag-pill.clk:hover{border-color:var(--accent);color:var(--accent)}
 .proj-invoices{margin-top:4px}
 .proj-invoice-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);margin-bottom:6px;font-size:12px}
 .proj-invoice-row[onclick]{cursor:pointer;transition:background .15s,border-color .15s}
@@ -503,8 +558,21 @@ body.settings-open,body.modal-open{overflow:hidden}
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
   <div class="proj-modal-wrap">
+    <div class="proj-search-slot" id="projSearchSlot">
+      <button class="proj-search-btn" onclick="toggleProjSearch()" onmouseenter="_projSearchTip(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()" aria-label="Search">🔍</button>
+      <div class="proj-search-box"><input id="projSearchInput" type="text" placeholder="Search projects & invoices…" autocomplete="off" oninput="renderSearchResults(document.getElementById('projSearchResults'),this.value)" onkeydown="if(event.key==='Enter')openSearchList(this.value)"><div class="search-results" id="projSearchResults"></div></div>
+    </div>
     <div class="proj-modal-box" id="projModalContent"></div>
     <div class="proj-modal-invoice" id="projInvoicePanel"></div>
+  </div>
+</div>
+<!-- Project List Modal (by Client / Tag) -->
+<div class="proj-list-modal" id="projListModal" onclick="if(event.target===this)closeProjListModal()">
+  <div class="proj-list-box">
+    <div class="proj-list-wrap">
+      <div class="proj-list-left" id="projListContent"></div>
+      <div class="proj-list-right" id="projListRight"></div>
+    </div>
   </div>
 </div>
 <!-- Pipeline KPI Modal -->
@@ -547,6 +615,7 @@ body.settings-open,body.modal-open{overflow:hidden}
   <div class="header"><h1><span>INT</span> Revenue Dashboard</h1>
     <div class="header-meta">
       <div class="currency-controls"><span class="rate-label">USD Rate</span><input type="number" class="rate-input" id="usdRateInput" value="57" min="1" step="0.1"><div class="currency-toggle"><button class="currency-toggle-btn active" id="btnPHP" onclick="setCurrency('PHP')">PHP</button><button class="currency-toggle-btn" id="btnUSD" onclick="setCurrency('USD')">USD</button></div></div>
+      <div class="hdr-search"><input id="hdrSearchInput" type="text" placeholder="Search projects & invoices…" autocomplete="off" oninput="renderSearchResults(document.getElementById('hdrSearchResults'),this.value)" onkeydown="if(event.key==='Enter')openSearchList(this.value)"><div class="search-results" id="hdrSearchResults"></div></div>
       <div class="tag" id="weekTag">Week —</div><div class="tag" id="dateTag">—</div><div class="tag live" id="statusTag">● LIVE</div>
       <button class="settings-btn" id="pdfDownloadBtn" onclick="downloadPDF()" title="Download PDF report">⬇</button>
       <button class="settings-btn" onclick="toggleSettings()" title="Settings">⚙</button>
@@ -836,6 +905,79 @@ function reconcile(){
 // ═══ PROJECT DETAIL MODAL & TOOLTIP ═══
 function getLastRemark(r){const qr=(r['Quick Remarks']||'').trim();if(!qr)return '';const lines=qr.split(/\r?\n/).filter(l=>l.trim());return lines.length?lines[lines.length-1].trim():'';}
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return escHtml(s).replace(/"/g,'&quot;');}
+// ═══ DATE HELPERS + GLOBAL SEARCH ═══
+function _parseDateLoose(s){if(!s)return null;const d=new Date(String(s).trim().replace(/\//g,'-'));return isNaN(d)?null:d;}
+function _fmtDate(d){return d?d.toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'}):'';}
+function _mostRecentUpdated(){let mx=null;for(const r of DATA){const d=_parseDateLoose(r['Last Updated']);if(d&&(!mx||d>mx))mx=d;}return mx;}
+function _searchTs(row,isAR){const d=_parseDateLoose(isAR?row['Invoice Date']:row['Last Updated']);return d?d.getTime():0;}
+function _searchBlob(row){if(row._sblob!=null)return row._sblob;let s='';for(const k in row){if(k.charAt(0)==='_')continue;const v=row[k];if(v!=null&&v!=='')s+=String(v).toLowerCase()+' ';}row._sblob=s;return s;}
+function searchAll(q,limit){limit=limit||10;q=(q||'').trim().toLowerCase();if(q.length<2)return[];const ps=[],is=[];
+  for(const r of DATA){if(_searchBlob(r).includes(q))ps.push({kind:'p',idx:r._i,ts:_searchTs(r,false),row:r});}
+  if(typeof AR_DATA!=='undefined')for(const a of AR_DATA){if(_searchBlob(a).includes(q))is.push({kind:'i',idx:a._ai,ts:_searchTs(a,true),row:a});}
+  ps.sort((x,y)=>y.ts-x.ts);is.sort((x,y)=>y.ts-x.ts);
+  // Reserve a few slots for invoices so recent projects don't crowd them out; then re-sort the kept set by date.
+  let out;
+  if(ps.length&&is.length){const invSlots=Math.min(is.length,Math.max(2,Math.floor(limit*0.3)));out=ps.slice(0,limit-invSlots).concat(is.slice(0,invSlots));out.sort((x,y)=>y.ts-x.ts);}
+  else{out=ps.concat(is).sort((x,y)=>y.ts-x.ts).slice(0,limit);}
+  return out;}
+function renderSearchResults(container,q){if(!container)return;q=(q||'').trim();if(q.length<2){container.classList.remove('show');container.innerHTML='';return;}
+  const res=searchAll(q);
+  if(!res.length){container.innerHTML='<div class="search-empty">No matches</div>';container.classList.add('show');return;}
+  let h='';res.forEach(it=>{const r=it.row;
+    if(it.kind==='p'){const sub=[r['Client'],(r['Tribe']||'').replace('PDEI - ',''),r['Status']].filter(Boolean).join(' · ');
+      h+=`<div class="search-result-row" onclick="searchPick('p',${it.idx})"><span class="search-result-chip p">Project</span><div class="search-result-main"><div class="search-result-name">${arCoin(r)}${escHtml(r['Project']||r['Client']||'—')}</div><div class="search-result-sub">${escHtml(sub)}</div></div></div>`;
+    }else{const sub=[r['Client Name'],r['Status'],r['Invoice Number']].filter(Boolean).join(' · ');
+      h+=`<div class="search-result-row" onclick="searchPick('i',${it.idx})"><span class="search-result-chip i">Invoice</span><div class="search-result-main"><div class="search-result-name">${escHtml(r['AR Name']||r['Project Name']||'—')}</div><div class="search-result-sub">${escHtml(sub)}</div></div></div>`;
+    }});
+  container.innerHTML=h;container.classList.add('show');}
+function searchPick(kind,idx){
+  const hr=document.getElementById('hdrSearchResults');if(hr){hr.classList.remove('show');hr.innerHTML='';}
+  const hi=document.getElementById('hdrSearchInput');if(hi)hi.value='';
+  _collapseProjSearch();
+  if(kind==='p')showProjModal(DATA[idx]);else if(typeof AR_DATA!=='undefined')showARModal(AR_DATA[idx]);
+}
+function _projSearchTip(e){if(typeof _tip!=='undefined'&&_tip){_tip.textContent='Click to search';_tip.classList.add('show');tipMv(e);}}
+function _collapseProjSearch(){const slot=document.getElementById('projSearchSlot');if(!slot)return;slot.classList.remove('expanded');const rr=document.getElementById('projSearchResults');if(rr){rr.classList.remove('show');rr.innerHTML='';}const inp=document.getElementById('projSearchInput');if(inp)inp.value='';}
+function toggleProjSearch(){const slot=document.getElementById('projSearchSlot');if(!slot)return;if(slot.classList.contains('expanded')){_collapseProjSearch();}else{slot.classList.add('expanded');const inp=document.getElementById('projSearchInput');if(inp){inp.value='';setTimeout(()=>inp.focus(),0);}}}
+// Project list modal — opened from clicking Client Name or a Tag in a project modal
+function _plEntryP(r){return {kind:'p',idx:r._i,row:r,ts:_searchTs(r,false)};}
+function showClientProjects(client){if(!client)return;showProjListModal('Client — '+client,DATA.filter(r=>(r['Client']||'')===client).map(_plEntryP));}
+function showTagProjects(tag){if(!tag)return;showProjListModal('Tag — '+tag,DATA.filter(r=>(r['Tags']||'').split(',').map(t=>t.trim()).includes(tag)).map(_plEntryP));}
+function openSearchList(q){q=(q||'').trim();if(q.length<2)return;
+  const hr=document.getElementById('hdrSearchResults');if(hr){hr.classList.remove('show');}_collapseProjSearch();
+  showProjListModal('Search: "'+q+'"',searchAll(q,1000000));
+}
+function showProjListModal(title,entries){
+  const box=document.getElementById('projListContent');if(!box)return;
+  const sorted=[...entries].sort((a,b)=>(b.ts||0)-(a.ts||0));
+  let h=`<div class="proj-list-head"><h3>${escHtml(title)} <span style="font-weight:500;color:var(--text-muted)">(${sorted.length})</span></h3><button class="am-close-btn" onclick="closeProjListModal()">✕</button></div>`;
+  h+=`<div class="proj-list-scroll"><table><thead><tr><th>Name</th><th>Client</th><th>Status</th><th>Date</th></tr></thead><tbody>`;
+  if(!sorted.length)h+='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted)">No results</td></tr>';
+  sorted.forEach(e=>{const r=e.row,isP=e.kind==='p';
+    const name=isP?(r['Project']||'—'):(r['AR Name']||r['Project Name']||'—');
+    const client=isP?(r['Client']||'—'):(r['Client Name']||'—');
+    const d=_parseDateLoose(isP?r['Last Updated']:r['Invoice Date']);
+    const lead=isP?arCoin(r):'<span class="search-result-chip i" style="margin-right:6px">Invoice</span>';
+    h+=`<tr data-row="${e.kind}:${e.idx}" onclick="_projListPick('${e.kind}',${e.idx})"><td class="pl-name" style="font-weight:500;color:var(--text)">${lead}${escHtml(name)}</td><td>${escHtml(client)}</td><td>${sp(r['Status'])}</td><td class="pl-date">${d?escHtml(_fmtDate(d)):'—'}</td></tr>`;});
+  h+=`</tbody></table></div>`;
+  box.innerHTML=h;
+  document.getElementById('projListRight').innerHTML='<div class="proj-list-placeholder">Click a result to show details</div>';
+  document.getElementById('projListModal').classList.add('open');document.body.classList.add('modal-open');
+}
+function _projListPick(kind,i){
+  document.querySelectorAll('#projListContent tbody tr').forEach(tr=>tr.classList.toggle('active',tr.dataset.row===kind+':'+i));
+  const rp=document.getElementById('projListRight');
+  if(kind==='p'){const r=DATA[i];if(!r)return;rp.innerHTML='<div class="proj-inv-inner">'+_buildProjHtml(r,null,'list')+'</div>';}
+  else{const a=(typeof AR_DATA!=='undefined')?AR_DATA[i]:null;if(!a)return;rp.innerHTML='<div class="proj-inv-inner">'+_buildARHtml(a,null)+'</div>';}
+  _scrollRemarks(rp);
+}
+function closeProjListModal(){document.getElementById('projListModal').classList.remove('open');if(!document.querySelector('.proj-modal.open, .pipe-kpi-modal.open'))document.body.classList.remove('modal-open');}
+document.addEventListener('click',function(e){
+  const hs=document.querySelector('.hdr-search');if(hs&&!hs.contains(e.target)){const hr=document.getElementById('hdrSearchResults');if(hr)hr.classList.remove('show');}
+  const slot=document.getElementById('projSearchSlot');if(slot&&slot.classList.contains('expanded')&&!slot.contains(e.target))_collapseProjSearch();
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){const hr=document.getElementById('hdrSearchResults');if(hr)hr.classList.remove('show');_collapseProjSearch();}});
 function linkify(v){if(!v||v==='—')return '—';const escaped=escHtml(v);return escaped.replace(/(https?:\/\/[^\s,&lt;]+)/g,'<a href="$1" target="_blank" rel="noopener">Link ↗</a>');}
 function linkifyOther(v){if(!v)return '—';const lines=v.split(/\r?\n/).filter(l=>l.trim());if(!lines.length)return '—';return lines.map(line=>{const m=line.match(/^(.+?)\s*-\s*(https?:\/\/\S+)$/);if(m)return `<a class="link-token" href="${escHtml(m[2])}" target="_blank" rel="noopener">${escHtml(m[1].trim())} ↗</a>`;const um=line.match(/(https?:\/\/\S+)/);if(um)return `<a class="link-token" href="${escHtml(um[1])}" target="_blank" rel="noopener">Link ↗</a>`;return escHtml(line);}).join(' ');}
 function wasTag(curVal,prevVal,isMoney){if(prevVal===null||prevVal===undefined)return '';const cv=typeof curVal==='string'?curVal.trim():curVal;const pv=typeof prevVal==='string'?prevVal.trim():prevVal;if(cv===pv)return '';if(isMoney&&typeof cv==='number'&&typeof pv==='number'&&cv===pv)return '';const display=isMoney?fmtF(pv):escHtml(String(pv||'—'));return `<div class="was-badge">was ${display}</div>`;}
@@ -849,7 +991,7 @@ function _buildProjHtml(r,closeAction,ctx){
   const pBD=pr?(pr['BD']||''):null,pAM=pr?(pr['AM']||''):null,pPM=pr?(pr['PM']||''):null;
   const pStatus=pr?(pr['Status']||''):null,pTribe=pr?(pr['Tribe']||''):null;
   const pRfp=pr?(pr['RFP Received Date']||''):null,pSign=pr?(pr['Sign Date']||''):null;
-  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${escHtml(r['Client']||'—')} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div>${wasTag((r['Tribe']||''),(pTribe),false)}<div>${sp(r['Status'])}${r['Status']==='Lost'&&r['Reason for Loss']?` <span class="status-pill status-lost" style="font-size:10px">${escHtml(r['Reason for Loss'])}</span>`:''}</div></div>${closeAction?`<button class="am-close-btn" onclick="${closeAction}">✕</button>`:''}</div>`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px"><div><h3 style="font-size:16px;font-weight:700;margin-bottom:4px">${escHtml(r['Project']||'—')}</h3><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${(r['Client']||'')?`<span class="proj-link" data-client="${escAttr(r['Client'])}" onclick="showClientProjects(this.dataset.client)">${escHtml(r['Client'])}</span>`:'—'} · ${escHtml((r['Tribe']||'—').replace('PDEI - ',''))}</div>${wasTag((r['Tribe']||''),(pTribe),false)}<div>${sp(r['Status'])}${r['Status']==='Lost'&&r['Reason for Loss']?` <span class="status-pill status-lost" style="font-size:10px">${escHtml(r['Reason for Loss'])}</span>`:''}</div></div>${closeAction?`<button class="am-close-btn" onclick="${closeAction}">✕</button>`:''}</div>`;
   // Project Code + PAR
   const par=r['PAR']||'';
   h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Code: <span style="color:var(--text);font-weight:600">${escHtml(r['Project Code']||'—')}</span>${par?` · PAR: <span style="color:var(--text);font-weight:600">${escHtml(par)}</span>`:''}</div>`;
@@ -893,7 +1035,7 @@ function _buildProjHtml(r,closeAction,ctx){
   if(remarks)h+=`<div class="proj-modal-remarks"><div class="fld-label">Quick Remarks</div><div class="fld-value">${escHtml(remarks)}</div></div>`;
   // Tags pill list
   const tagsRaw=(r['Tags']||'').toString();const tagsList=tagsRaw.split(',').map(t=>t.trim()).filter(Boolean);
-  if(tagsList.length){h+=`<div class="proj-modal-remarks"><div class="fld-label">Tags</div><div class="fld-value" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${tagsList.map(t=>`<span class="proj-tag-pill">${escHtml(t)}</span>`).join('')}</div></div>`;}
+  if(tagsList.length){h+=`<div class="proj-modal-remarks"><div class="fld-label">Tags</div><div class="fld-value" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${tagsList.map(t=>`<span class="proj-tag-pill clk" data-tag="${escAttr(t)}" onclick="showTagProjects(this.dataset.tag)">${escHtml(t)}</span>`).join('')}</div></div>`;}
   // Invoices (from AR data, matched by Project Code)
   const projCode=(r['Project Code']||'').trim();
   const invoices=projCode&&typeof AR_DATA!=='undefined'?AR_DATA.filter(a=>(a['Project Code']||'').trim()===projCode):[];
@@ -907,6 +1049,7 @@ function showProjModal(r,fromPipeKpi){
   if(fromPipeKpi){const rp=document.getElementById('pipeKpiRight');if(rp){const bx=rp.closest('.pipe-kpi-modal-box');if(bx)bx.querySelectorAll('.pipe-kpi-left tr[data-pi]').forEach(tr=>tr.style.background=String(tr.dataset.pi)===String(r._i)?'var(--surface2)':'');rp.innerHTML=_buildProjHtml(r,null,'pipe');_scrollRemarks(rp);return;}}
   const box=document.getElementById('projModalContent');box.innerHTML=_buildProjHtml(r,'closeProjModal()','standalone');_scrollRemarks(box);
   const panel=document.getElementById('projInvoicePanel');if(panel){panel.classList.remove('open');panel.innerHTML='';}
+  _collapseProjSearch();
   document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');}
 function showProjInvoice(ai){
   const r=(typeof AR_DATA!=='undefined')?AR_DATA[ai]:null;if(!r)return;
@@ -1657,7 +1800,7 @@ function _makeCopyBtnInline(tbl){
   return btn;
 }
 
-function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});document.getElementById('statusTag').textContent='● LIVE — '+DATA.length+' records';applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();renderAR();}
+function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});(function(){const _mru=_mostRecentUpdated();document.getElementById('statusTag').textContent=_mru?'Last Updated: '+_fmtDate(_mru):'● LIVE — '+DATA.length+' records';})();applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();renderAR();}
 
 // ═══ 1. OVERVIEW ═══
 let _activeQ=-1;
@@ -2588,6 +2731,7 @@ function _buildARHtml(r,closeAction){
 function showARModal(r){
   document.getElementById('projModalContent').innerHTML=_buildARHtml(r,'closeProjModal()');
   const panel=document.getElementById('projInvoicePanel');if(panel){panel.classList.remove('open');panel.innerHTML='';}
+  _collapseProjSearch();
   document.getElementById('projModal').classList.add('open');document.body.classList.add('modal-open');
 }
 
