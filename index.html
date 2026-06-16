@@ -168,6 +168,7 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .am-legend{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}.am-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim)}.am-legend-dot{width:10px;height:10px;border-radius:3px}
 /* AM expanded detail */
 .am-expand{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin:8px 0 16px;animation:slideDown .2s ease}
+.am-expand,.am-expand *{-webkit-user-select:text;user-select:text;cursor:auto}
 .am-expand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media(max-width:800px){.am-expand-grid{grid-template-columns:1fr 1fr}}
 .am-expand-item{text-align:center;padding:10px 6px;border-radius:8px;background:var(--surface)}
@@ -285,6 +286,11 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .proj-list-modal th:nth-child(4),.proj-list-modal td:nth-child(4){width:96px}
 .proj-list-modal td.pl-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
 .proj-list-modal td.pl-date{white-space:nowrap}
+.proj-list-filters{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px 4px}
+.proj-list-modal th.pl-sort{cursor:pointer;user-select:none;white-space:nowrap}
+.proj-list-modal th.pl-sort:hover{color:var(--text)}
+.am-view-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.am-view-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted)}
 .proj-list-modal tbody tr{cursor:pointer;transition:background .12s}
 .proj-list-modal tbody tr:hover td,.proj-list-modal tbody tr.active td{background:var(--surface2);color:var(--text)}
 /* Clickable client/tag in project modal */
@@ -627,7 +633,7 @@ body.settings-open,body.modal-open{overflow:hidden}
   </div>
   <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div><div id="ovTribeDetail" style="margin-top:12px"></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
   <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="card" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Monthly Pipeline</div><div style="position:relative"><div style="height:300px"><canvas id="monthlyPipeChart"></canvas></div><div id="qtrPipeBars" style="position:relative;height:24px;margin-top:2px"></div></div><div id="monthlyPipeDetail" style="margin-top:12px"></div><div id="qtrPipeDetail" style="margin-top:12px"></div></div><div class="pipeline-cols" id="pipelineCols"></div></div>
-  <div class="section" id="sec-am"><div class="card vis-section" data-vis="am-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Account Manager Weighted Performance</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#ffd966;border:1px solid #ccc"></div>Collection Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f0c132"></div>Awarded Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3c78d8"></div>Pitch Phase</div><div class="am-legend-item"><div style="width:10px;height:2px;background:var(--red)"></div>Target</div></div><div id="amBars"></div></div><div class="card vis-section" data-vis="am-actual" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:#cc0000"></div>Account Manager — Actual Collection</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#cc0000"></div>Actual Collection</div></div><div id="amActualBars"></div></div><div id="amDetailContainer" class="vis-section" data-vis="am-detail"></div></div>
+  <div class="section" id="sec-am"><div class="am-view-bar"><span class="am-view-label">View</span><div class="currency-toggle"><button class="currency-toggle-btn active" id="amViewWeighted" onclick="setAMView('weighted')">Weighted</button><button class="currency-toggle-btn" id="amViewStandard" onclick="setAMView('standard')">Standard</button></div></div><div class="card vis-section" data-vis="am-chart"><div class="card-title"><div class="dot" style="background:var(--purple)"></div><span id="amMainTitle">Account Manager Weighted Performance</span></div><div class="am-legend" id="amMainLegend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#ffd966;border:1px solid #ccc"></div>Collection Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f0c132"></div>Awarded Phase</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3c78d8"></div>Pitch Phase</div><div class="am-legend-item"><div style="width:10px;height:2px;background:var(--red)"></div>Target</div></div><div id="amBars"></div></div><div class="card vis-section" data-vis="am-actual" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:#cc0000"></div>Account Manager — Actual Collection</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#cc0000"></div>Actual Collection</div></div><div id="amActualBars"></div></div><div id="amDetailContainer" class="vis-section" data-vis="am-detail"></div></div>
   <div class="section" id="sec-bd"><div class="card vis-section" data-vis="bd-charts"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>BD Leads Attainment</div><div class="bd-charts-row"><div class="chart-container short"><canvas id="bdAttainChart"></canvas></div><div style="display:flex;flex-direction:column;align-items:center"><canvas id="bdDonutChart" width="180" height="180"></canvas></div></div></div><div class="card vis-section" data-vis="bd-doors-chart" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Doors Opened by BD</div><div class="am-legend"><div class="am-legend-item"><div class="am-legend-dot" style="background:#f1c232"></div>Won</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3b82f6"></div>CE Submitted</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f59e0b"></div>For Submission</div><div class="am-legend-item"><div class="am-legend-dot" style="background:rgba(100,116,139,.4)"></div>Archived</div></div><div class="bd-doors-filter" id="bdDoorsChartFilter"></div><div id="bdDoorsBars"></div><div id="bdDoorsDetailContainer"><div class="am-detail-drawer" id="bdDoorsDrawer"></div></div></div><div class="filter-row vis-section" data-vis="bd-filter" id="bdMonthFilter"></div><div class="bd-grid vis-section" data-vis="bd-filter" id="bdGrid"></div><div class="bd-detail vis-section" data-vis="bd-filter" id="bdDetail"></div><div class="card vis-section" data-vis="bd-wins" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--green)"></div>BD Wins — 2026</div><div class="table-wrap" id="bdWinsTable"></div></div></div>
   <div class="section" id="sec-winrate"><div class="kpi-strip vis-section" data-vis="wr-kpis" id="winrateKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="wr-count"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Win vs Loss (Count)</div><div class="chart-container"><canvas id="winLossCountChart"></canvas></div></div><div class="card vis-section" data-vis="wr-value"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>Win vs Loss (Value)</div><div class="chart-container"><canvas id="winLossValueChart"></canvas></div></div></div><div class="grid-2"><div class="card vis-section" data-vis="wr-trend"><div class="card-title"><div class="dot" style="background:var(--amber)"></div>Win Rate Trend</div><div class="chart-container short"><canvas id="winRateTrendChart"></canvas></div></div><div class="card vis-section" data-vis="wr-tribe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Win Rate by Tribe</div><div class="chart-container short"><canvas id="winRateTribeChart"></canvas></div></div></div><div class="card vis-section" data-vis="wr-table" id="wrLostCard"><div class="card-title"><div class="dot" style="background:var(--red)"></div>Lost Projects</div><div class="filter-row" id="winrateMonthFilter"></div><div class="table-wrap" id="lossTable"></div></div></div>
   <div class="section" id="sec-attainment"><div class="kpi-strip vis-section" data-vis="at-kpis" id="attainKpis"></div><div class="grid-2"><div class="card vis-section" data-vis="at-attChart"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Attainment by Tribe</div><div class="chart-container"><canvas id="attainChart"></canvas></div></div><div class="card vis-section" data-vis="at-ytdPipe"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>YTD vs Pipeline</div><div class="chart-container"><canvas id="ytdPipeChart"></canvas></div></div></div><div class="card vis-section" data-vis="at-ytdPipeline"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>YTD + Pipeline by Tribe</div><div class="chart-container tall"><canvas id="tribeChart"></canvas></div></div><div class="card vis-section" data-vis="at-wonTable" id="atWonCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>Projects Won</div><div class="filter-row" id="tribeWinsFilter"></div><div class="table-wrap" id="tribeWinsTable"></div></div></div>
@@ -948,22 +954,33 @@ function openSearchList(q){q=(q||'').trim();if(q.length<2)return;
   const hr=document.getElementById('hdrSearchResults');if(hr){hr.classList.remove('show');}_collapseProjSearch();
   showProjListModal('Search: "'+q+'"',searchAll(q,1000000));
 }
+let _plState=null;
 function showProjListModal(title,entries){
-  const box=document.getElementById('projListContent');if(!box)return;
-  const sorted=[...entries].sort((a,b)=>(b.ts||0)-(a.ts||0));
-  let h=`<div class="proj-list-head"><h3>${escHtml(title)} <span style="font-weight:500;color:var(--text-muted)">(${sorted.length})</span></h3><button class="am-close-btn" onclick="closeProjListModal()">✕</button></div>`;
-  h+=`<div class="proj-list-scroll"><table><thead><tr><th>Name</th><th>Client</th><th>Status</th><th>Date</th></tr></thead><tbody>`;
-  if(!sorted.length)h+='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted)">No results</td></tr>';
-  sorted.forEach(e=>{const r=e.row,isP=e.kind==='p';
-    const name=isP?(r['Project']||'—'):(r['AR Name']||r['Project Name']||'—');
-    const client=isP?(r['Client']||'—'):(r['Client Name']||'—');
-    const d=_parseDateLoose(isP?r['Last Updated']:r['Invoice Date']);
-    const lead=isP?arCoin(r):'<span class="search-result-chip i" style="margin-right:6px">Invoice</span>';
-    h+=`<tr data-row="${e.kind}:${e.idx}" onclick="_projListPick('${e.kind}',${e.idx})"><td class="pl-name" style="font-weight:500;color:var(--text)">${lead}${escHtml(name)}</td><td>${escHtml(client)}</td><td>${sp(r['Status'])}</td><td class="pl-date">${d?escHtml(_fmtDate(d)):'—'}</td></tr>`;});
-  h+=`</tbody></table></div>`;
-  box.innerHTML=h;
+  if(!document.getElementById('projListContent'))return;
+  entries.forEach(e=>{const r=e.row,isP=e.kind==='p';e._name=isP?(r['Project']||'—'):(r['AR Name']||r['Project Name']||'—');e._client=isP?(r['Client']||'—'):(r['Client Name']||'—');e._status=r['Status']||'';e._year=(((r['Year']||'').toString().match(/\d{4}/))||[''])[0];});
+  const years=[...new Set(entries.map(e=>e._year).filter(Boolean))].sort();
+  const cy=String(new Date().getFullYear());
+  let year=null;if(years.length>1)year=years.includes(cy)?cy:years[years.length-1];
+  _plState={title,entries,years,year,sortKey:'date',sortDir:-1};
+  _plRender();
   document.getElementById('projListRight').innerHTML='<div class="proj-list-placeholder">Click a result to show details</div>';
   document.getElementById('projListModal').classList.add('open');document.body.classList.add('modal-open');
+}
+function _plSetYear(y){if(!_plState)return;_plState.year=y||null;_plRender();}
+function _plSort(k){if(!_plState)return;if(_plState.sortKey===k)_plState.sortDir*=-1;else{_plState.sortKey=k;_plState.sortDir=(k==='date')?-1:1;}_plRender();}
+function _plRender(){
+  const box=document.getElementById('projListContent');if(!box||!_plState)return;const st=_plState;
+  let ents=st.entries;if(st.year)ents=ents.filter(e=>e._year===st.year);
+  const cmps={name:(a,b)=>a._name.localeCompare(b._name),client:(a,b)=>a._client.localeCompare(b._client),status:(a,b)=>(a._status||'').localeCompare(b._status||''),date:(a,b)=>(a.ts||0)-(b.ts||0)};
+  const cmp=cmps[st.sortKey]||cmps.date;const sorted=[...ents].sort((a,b)=>cmp(a,b)*st.sortDir);
+  const arrow=k=>st.sortKey===k?(st.sortDir<0?' ▼':' ▲'):'';
+  let h=`<div class="proj-list-head"><h3>${escHtml(st.title)} <span style="font-weight:500;color:var(--text-muted)">(${sorted.length})</span></h3><button class="am-close-btn" onclick="closeProjListModal()">✕</button></div>`;
+  if(st.years.length>1){h+=`<div class="proj-list-filters"><button class="ar-filter-pill${!st.year?' active':''}" onclick="_plSetYear('')">All</button>`+st.years.map(y=>`<button class="ar-filter-pill${st.year===y?' active':''}" onclick="_plSetYear('${escAttr(y)}')">${escHtml(y)}</button>`).join('')+`</div>`;}
+  h+=`<div class="proj-list-scroll"><table><thead><tr><th class="pl-sort" onclick="_plSort('name')">Name${arrow('name')}</th><th class="pl-sort" onclick="_plSort('client')">Client${arrow('client')}</th><th class="pl-sort" onclick="_plSort('status')">Status${arrow('status')}</th><th class="pl-sort" onclick="_plSort('date')">Last Updated${arrow('date')}</th></tr></thead><tbody>`;
+  if(!sorted.length)h+='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted)">No results</td></tr>';
+  sorted.forEach(e=>{const r=e.row,isP=e.kind==='p';const d=_parseDateLoose(isP?r['Last Updated']:r['Invoice Date']);const lead=isP?arCoin(r):'<span class="search-result-chip i" style="margin-right:6px">Invoice</span>';h+=`<tr data-row="${e.kind}:${e.idx}" onclick="_projListPick('${e.kind}',${e.idx})"><td class="pl-name" style="font-weight:500;color:var(--text)">${lead}${escHtml(e._name)}</td><td>${escHtml(e._client)}</td><td>${sp(e._status)}</td><td class="pl-date">${d?escHtml(_fmtDate(d)):'—'}</td></tr>`;});
+  h+=`</tbody></table></div>`;
+  box.innerHTML=h;
 }
 function _projListPick(kind,i){
   document.querySelectorAll('#projListContent tbody tr').forEach(tr=>tr.classList.toggle('active',tr.dataset.row===kind+':'+i));
@@ -1753,17 +1770,20 @@ function togglePocChartDetail(month,entries){
 }
 
 // ═══ COPY TABLE TO CLIPBOARD ═══
+function _amtCopy(v){return v?cx(v).toFixed(2):'';}
 function _copyTbl(ev,tbl){
   const rows=[];
   tbl.querySelectorAll('tr').forEach(tr=>{
     if(tr.style.display==='none')return;
     const cells=[];
     tr.querySelectorAll('th,td').forEach(td=>{
-      let txt=td.innerText.trim()
+      let txt;
+      if(td.dataset.copy!==undefined){txt=td.dataset.copy;}
+      else{txt=td.innerText.trim()
         .replace(/[₱$▲▼]/g,'')
         .replace(/,(?=\d)/g,'')
         .replace(/\s+/g,' ')
-        .trim();
+        .trim();}
       cells.push(txt);
     });
     if(cells.some(c=>c))rows.push(cells.join('\t'));
@@ -2055,19 +2075,28 @@ function toggleQtrPipeDetail(qi){
 }
 
 // ═══ 3. AM (expandable phase detail on click) ═══
+let amViewMode='weighted';
+function _amPhaseVals(r){
+  if(amViewMode==='standard'){const amt=pn(r['Amount (VAT-Ex.) (PHP)']),st=r['Status'];return {p:(st==='For CE/Pitch Creation'||st==='CE/Pitch Submitted')?amt:0,a:(st==='Signed CE'||st==='Won - Awaiting CE Signature')?amt:0,c:(st==='For Collection')?amt:0,d:pn(r['Amount Collected (PHP)'])};}
+  return {p:pn(r['Weighted Pitch Phase (PHP)']),a:pn(r['Weighted Awarded Phase (PHP)']),c:pn(r['Weighted Collection Phase (PHP)']),d:pn(r['Amount Collected (PHP)'])};
+}
+function setAMView(m){amViewMode=m;amExpandedName=null;var w=document.getElementById('amViewWeighted'),s=document.getElementById('amViewStandard');if(w)w.classList.toggle('active',m==='weighted');if(s)s.classList.toggle('active',m==='standard');renderAM();}
 let amDataCache={};
-function renderAM(){const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost'),ad={},ao=Object.keys(AM_NICKS);ao.forEach(a=>{ad[a]={p:0,a:0,c:0,d:0};});y.forEach(r=>{const a=r['AM'];if(!ad[a])return;ad[a].p+=pn(r['Weighted Pitch Phase (PHP)']);ad[a].a+=pn(r['Weighted Awarded Phase (PHP)']);ad[a].c+=pn(r['Weighted Collection Phase (PHP)']);ad[a].d+=pn(r['Amount Collected (PHP)']);});amDataCache=ad;
+function renderAM(){const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost'),ad={},ao=Object.keys(AM_NICKS);ao.forEach(a=>{ad[a]={p:0,a:0,c:0,d:0};});y.forEach(r=>{const a=r['AM'];if(!ad[a])return;const v=_amPhaseVals(r);ad[a].p+=v.p;ad[a].a+=v.a;ad[a].c+=v.c;ad[a].d+=v.d;});amDataCache=ad;
   // Prev-week totals — split into phase total (Pitch+Awarded+Collection) and actual collection (D), so each chart compares cleanly.
-  let apd=null,apdActual=null;if(hp()){apd={};apdActual={};ao.forEach(a=>{apd[a]=0;apdActual[a]=0;});DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost').forEach(r=>{const a=r['AM'];if(apd[a]===undefined)return;apd[a]+=pn(r['Weighted Pitch Phase (PHP)'])+pn(r['Weighted Awarded Phase (PHP)'])+pn(r['Weighted Collection Phase (PHP)']);apdActual[a]+=pn(r['Amount Collected (PHP)']);});}
+  let apd=null,apdActual=null;if(hp()){apd={};apdActual={};ao.forEach(a=>{apd[a]=0;apdActual[a]=0;});DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']&&r['Pipeline Tier']!=='Lost').forEach(r=>{const a=r['AM'];if(apd[a]===undefined)return;const v=_amPhaseVals(r);apd[a]+=v.p+v.a+v.c;apdActual[a]+=v.d;});}
   // Main chart scale excludes Actual Collection — bars now reflect Pitch+Awarded+Collection only.
-  const mx=Math.max(...ao.map(a=>{const d=ad[a];return Math.max(d.p+d.a+d.c,AM_TARGETS[a]||0);}),1);let h='';let amIdx=0;
+  const mx=Math.max(...ao.map(a=>{const d=ad[a];return Math.max(d.p+d.a+d.c,AM_TARGETS[a]||0);}),1);let h='';let amIdx=0;const std=amViewMode==='standard',lblC=std?'Raw Collection Phase':'Collection Phase',lblA=std?'Raw Awarded Phase':'Awarded Phase',lblP=std?'Raw Pitch Phase':'Pitch Phase';
   ao.forEach(a=>{const d=ad[a],t=d.p+d.a+d.c,tg=AM_TARGETS[a],nk=AM_NICKS[a],sc=mx*1.1,pt=apd?apd[a]:null;
     const clW=(d.c/sc*100).toFixed(2),aW=(d.a/sc*100).toFixed(2),pW=(d.p/sc*100).toFixed(2),tp=tg>0?(tg/sc*100).toFixed(2):-1;
     const dl=t-tg,dc=dl>=0?'green':'red',ds=dl>=0?'+'+fmt(dl):'-'+fmt(Math.abs(dl));
     const acctCount=DATA.filter(r=>r['Year']==='2026'&&r['AM']===a&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress').length;
-    h+=`<div class="am-bar-row anim-fade" style="animation-delay:${(amIdx*0.08).toFixed(2)}s" onclick="expandAM('${a.replace(/'/g,"\\'")}')"><div class="am-bar-name">${nk} <span style="font-size:11px;font-weight:400;color:var(--text-muted)">(${acctCount})</span></div><div class="am-bar-container"><div class="am-bar-bg"><div class="am-bar-seg s-col" style="width:${clW}%;background:#ffd966" onmouseenter="amSegIn(event,'Collection Phase',${d.c})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg s-aw" style="width:${aW}%;background:#f0c132" onmouseenter="amSegIn(event,'Awarded Phase',${d.a})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg s-pi" style="width:${pW}%;background:#3c78d8" onmouseenter="amSegIn(event,'Pitch Phase',${d.p})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div>${tp>=0?`<div class="am-bar-target" style="left:${tp}%"></div>`:''}</div></div><div class="am-bar-values"><div class="val" style="color:var(--text)">${fmt(t)} ${dv(t,pt,true)}</div>${tg>0?`<div class="val" style="color:var(--${dc})">${ds}</div>`:''}</div></div><div id="amExpand_${nk}" style="display:none"></div>`;amIdx++;});
+    h+=`<div class="am-bar-row anim-fade" style="animation-delay:${(amIdx*0.08).toFixed(2)}s" onclick="expandAM('${a.replace(/'/g,"\\'")}')"><div class="am-bar-name">${nk} <span style="font-size:11px;font-weight:400;color:var(--text-muted)">(${acctCount})</span></div><div class="am-bar-container"><div class="am-bar-bg"><div class="am-bar-seg s-col" style="width:${clW}%;background:#ffd966" onmouseenter="amSegIn(event,'${lblC}',${d.c})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg s-aw" style="width:${aW}%;background:#f0c132" onmouseenter="amSegIn(event,'${lblA}',${d.a})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg s-pi" style="width:${pW}%;background:#3c78d8" onmouseenter="amSegIn(event,'${lblP}',${d.p})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div>${tp>=0?`<div class="am-bar-target" style="left:${tp}%"></div>`:''}</div></div><div class="am-bar-values"><div class="val" style="color:var(--text)">${fmt(t)} ${dv(t,pt,true)}</div>${tg>0?`<div class="val" style="color:var(--${dc})">${ds}</div>`:''}</div></div><div id="amExpand_${nk}" style="display:none"></div>`;amIdx++;});
   h+=`<div style="text-align:center;margin-top:12px;font-size:11px;color:var(--text-muted)">Tap a name to expand details and accounts</div>`;
-  document.getElementById('amBars').innerHTML=h;document.getElementById('amDetailContainer').innerHTML='<div class="am-detail-drawer" id="amDrawer"></div>';
+  document.getElementById('amBars').innerHTML=h;
+  document.getElementById('amMainTitle').textContent=std?'Account Manager Standard Performance':'Account Manager Weighted Performance';
+  document.getElementById('amMainLegend').innerHTML=`<div class="am-legend-item"><div class="am-legend-dot" style="background:#ffd966;border:1px solid #ccc"></div>${lblC}</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#f0c132"></div>${lblA}</div><div class="am-legend-item"><div class="am-legend-dot" style="background:#3c78d8"></div>${lblP}</div><div class="am-legend-item"><div style="width:10px;height:2px;background:var(--red)"></div>Target</div>`;
+  document.getElementById('amDetailContainer').innerHTML='<div class="am-detail-drawer" id="amDrawer"></div>';
   window._amDataAll={ad,ao};
   renderAMActual(ad,ao,apdActual);}
 function renderAMActual(ad,ao,apdActual){
@@ -2085,19 +2114,19 @@ function expandAM(am){const nk=AM_NICKS[am],el=document.getElementById('amExpand
   if(amExpandedName===am){el.style.display='none';amExpandedName=null;document.getElementById('amDrawer').classList.remove('visible');return;}
   // Collapse previous
   if(amExpandedName){const prev=AM_NICKS[amExpandedName];const pe=document.getElementById('amExpand_'+prev);if(pe)pe.style.display='none';document.getElementById('amDrawer').classList.remove('visible');}
-  amExpandedName=am;const d=amDataCache[am];
+  amExpandedName=am;const d=amDataCache[am];const std=amViewMode==='standard';
   let pd={p:null,a:null,c:null,d:null};
-  if(hp()){const py=DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost');pd={p:py.reduce((s,r)=>s+pn(r['Weighted Pitch Phase (PHP)']),0),a:py.reduce((s,r)=>s+pn(r['Weighted Awarded Phase (PHP)']),0),c:py.reduce((s,r)=>s+pn(r['Weighted Collection Phase (PHP)']),0),d:py.reduce((s,r)=>s+pn(r['Amount Collected (PHP)']),0)};}
+  if(hp()){const py=DATA_PREV.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost');pd={p:py.reduce((s,r)=>s+_amPhaseVals(r).p,0),a:py.reduce((s,r)=>s+_amPhaseVals(r).a,0),c:py.reduce((s,r)=>s+_amPhaseVals(r).c,0),d:py.reduce((s,r)=>s+_amPhaseVals(r).d,0)};}
   el.innerHTML=`<div class="am-expand"><div class="am-expand-grid">
-    <div class="am-expand-item"><div class="phase-color" style="background:#3c78d8"></div><span class="phase-name">Pitch Phase</span><span class="phase-val" style="color:#3c78d8">${fmtF(d.p)} ${hp()?dv(d.p,pd.p,true):''}</span></div>
-    <div class="am-expand-item"><div class="phase-color" style="background:#f0c132"></div><span class="phase-name">Awarded Phase</span><span class="phase-val" style="color:#f0c132">${fmtF(d.a)} ${hp()?dv(d.a,pd.a,true):''}</span></div>
-    <div class="am-expand-item"><div class="phase-color" style="background:#ffd966"></div><span class="phase-name">Collection Phase</span><span class="phase-val" style="color:#b8860b">${fmtF(d.c)} ${hp()?dv(d.c,pd.c,true):''}</span></div>
+    <div class="am-expand-item"><div class="phase-color" style="background:#3c78d8"></div><span class="phase-name">${std?'Raw Pitch Phase':'Pitch Phase'}</span><span class="phase-val" style="color:#3c78d8">${fmtF(d.p)} ${hp()?dv(d.p,pd.p,true):''}</span></div>
+    <div class="am-expand-item"><div class="phase-color" style="background:#f0c132"></div><span class="phase-name">${std?'Raw Awarded Phase':'Awarded Phase'}</span><span class="phase-val" style="color:#f0c132">${fmtF(d.a)} ${hp()?dv(d.a,pd.a,true):''}</span></div>
+    <div class="am-expand-item"><div class="phase-color" style="background:#ffd966"></div><span class="phase-name">${std?'Raw Collection Phase':'Collection Phase'}</span><span class="phase-val" style="color:#b8860b">${fmtF(d.c)} ${hp()?dv(d.c,pd.c,true):''}</span></div>
     <div class="am-expand-item"><div class="phase-color" style="background:#cc0000"></div><span class="phase-name">Actual Collection</span><span class="phase-val" style="color:#cc0000">${fmtF(d.d)} ${hp()?dv(d.d,pd.d,true):''}</span></div>
   </div><div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-muted)">Total: <strong style="color:var(--text)">${fmtF(d.p+d.a+d.c+d.d)} ${hp()?dv(d.p+d.a+d.c+d.d,pd.p+pd.a+pd.c+pd.d,true):''}</strong></div></div>`;
   el.style.display='block';
   // Also show accounts table
   showAMAccounts(am);}
-function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection':2,'For Closing':3,'Fully Closed':4,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),pp=pn(r['Weighted Pitch Phase (PHP)']),ap=pn(r['Weighted Awarded Phase (PHP)']),cp=pn(r['Weighted Collection Phase (PHP)']),dp=pn(r['Amount Collected (PHP)']);const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,ppp=pr?pn(pr['Weighted Pitch Phase (PHP)']):null,pap=pr?pn(pr['Weighted Awarded Phase (PHP)']):null,pcp=pr?pn(pr['Weighted Collection Phase (PHP)']):null,pdp=pr?pn(pr['Amount Collected (PHP)']):null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;
+function showAMAccounts(am){const dr=document.getElementById('amDrawer');dr.dataset.am=am;const y=DATA.filter(r=>r['Year']==='2026'&&r['AM']===am&&r['Pipeline Tier']!=='Lost'&&r['Status']!=='Talks In Progress'),so={'Signed CE':0,'Won - Awaiting CE Signature':1,'For Collection':2,'For Closing':3,'Fully Closed':4,'CE/Pitch Submitted':6,'For CE/Pitch Creation':7};const sorted=y.sort((a,b)=>(so[a['Status']]??99)-(so[b['Status']]??99)||pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<div class="am-detail-title"><span>${AM_NICKS[am]||am} — Accounts (${sorted.length})</span></div><div class="table-wrap"><table><thead><tr><th>Account</th><th>Client</th><th>Status</th><th class="amt">Amount</th><th class="amt">Pitch</th><th class="amt">Awarded</th><th class="amt">Collection</th><th class="amt">Actual</th></tr></thead><tbody>`;sorted.forEach(r=>{const pr=getPrev(r),a=pn(r['Amount (VAT-Ex.) (PHP)']),v=_amPhaseVals(r),pp=v.p,ap=v.a,cp=v.c,dp=v.d;const pa=pr?pn(pr['Amount (VAT-Ex.) (PHP)']):null,pv=pr?_amPhaseVals(pr):null,ppp=pv?pv.p:null,pap=pv?pv.a:null,pcp=pv?pv.c:null,pdp=pv?pv.d:null;h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td>${r['Project']}</td><td>${r['Client']}</td><td>${sp(r['Status'])}</td><td class="amt" data-copy="${cx(a).toFixed(2)}">${fmt(a)} ${dvRow(a,pa)}</td><td class="amt" data-copy="${_amtCopy(pp)}">${pp?fmt(pp)+' '+dvRow(pp,ppp):'—'}</td><td class="amt" data-copy="${_amtCopy(ap)}">${ap?fmt(ap)+' '+dvRow(ap,pap):'—'}</td><td class="amt" data-copy="${_amtCopy(cp)}">${cp?fmt(cp)+' '+dvRow(cp,pcp):'—'}</td><td class="amt" data-copy="${_amtCopy(dp)}">${dp?fmt(dp)+' '+dvRow(dp,pdp):'—'}</td></tr>`;});h+='</tbody></table></div>';dr.innerHTML=h;
   const amTbl=dr.querySelector('table');if(amTbl){const t=dr.querySelector('.am-detail-title');if(t)t.appendChild(_makeCopyBtnInline(amTbl));}
   dr.classList.add('visible');}
 
