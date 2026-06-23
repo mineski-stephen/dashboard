@@ -283,9 +283,9 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .proj-list-modal tbody td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-dim)}
 .proj-list-modal th:nth-child(2),.proj-list-modal td:nth-child(2){width:23%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .proj-list-modal th:nth-child(3),.proj-list-modal td:nth-child(3){width:118px}
-.proj-list-modal th:nth-child(4),.proj-list-modal td:nth-child(4){width:96px}
+.proj-list-modal th:nth-child(4),.proj-list-modal td:nth-child(4){width:120px}
 .proj-list-modal td.pl-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
-.proj-list-modal td.pl-date{white-space:nowrap}
+.proj-list-modal td.pl-amt{white-space:nowrap}
 .proj-list-filters{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px 4px}
 .proj-list-modal th.pl-sort{cursor:pointer;user-select:none;white-space:nowrap}
 .proj-list-modal th.pl-sort:hover{color:var(--text)}
@@ -957,11 +957,11 @@ function openSearchList(q){q=(q||'').trim();if(q.length<2)return;
 let _plState=null;
 function showProjListModal(title,entries){
   if(!document.getElementById('projListContent'))return;
-  entries.forEach(e=>{const r=e.row,isP=e.kind==='p';e._name=isP?(r['Project']||'—'):(r['AR Name']||r['Project Name']||'—');e._client=isP?(r['Client']||'—'):(r['Client Name']||'—');e._status=r['Status']||'';e._year=(((r['Year']||'').toString().match(/\d{4}/))||[''])[0];});
+  entries.forEach(e=>{const r=e.row,isP=e.kind==='p';e._name=isP?(r['Project']||'—'):(r['AR Name']||r['Project Name']||'—');e._client=isP?(r['Client']||'—'):(r['Client Name']||'—');e._status=r['Status']||'';e._year=(((r['Year']||'').toString().match(/\d{4}/))||[''])[0];e._amt=isP?pn(r['Amount (VAT-Ex.) (PHP)']):arPn(r['Amount (PHP)']);});
   const years=[...new Set(entries.map(e=>e._year).filter(Boolean))].sort();
   const cy=String(new Date().getFullYear());
   let year=null;if(years.length>1)year=years.includes(cy)?cy:years[years.length-1];
-  _plState={title,entries,years,year,sortKey:'date',sortDir:-1};
+  _plState={title,entries,years,year,sortKey:'amount',sortDir:-1};
   _plRender();
   document.getElementById('projListRight').innerHTML='<div class="proj-list-placeholder">Click a result to show details</div>';
   document.getElementById('projListModal').classList.add('open');document.body.classList.add('modal-open');
@@ -971,16 +971,19 @@ function _plSort(k){if(!_plState)return;if(_plState.sortKey===k)_plState.sortDir
 function _plRender(){
   const box=document.getElementById('projListContent');if(!box||!_plState)return;const st=_plState;
   let ents=st.entries;if(st.year)ents=ents.filter(e=>e._year===st.year);
-  const cmps={name:(a,b)=>a._name.localeCompare(b._name),client:(a,b)=>a._client.localeCompare(b._client),status:(a,b)=>(a._status||'').localeCompare(b._status||''),date:(a,b)=>(a.ts||0)-(b.ts||0)};
-  const cmp=cmps[st.sortKey]||cmps.date;const sorted=[...ents].sort((a,b)=>cmp(a,b)*st.sortDir);
+  const cmps={name:(a,b)=>a._name.localeCompare(b._name),client:(a,b)=>a._client.localeCompare(b._client),status:(a,b)=>(a._status||'').localeCompare(b._status||''),amount:(a,b)=>(a._amt||0)-(b._amt||0)};
+  const cmp=cmps[st.sortKey]||cmps.amount;const sorted=[...ents].sort((a,b)=>cmp(a,b)*st.sortDir);
   const arrow=k=>st.sortKey===k?(st.sortDir<0?' ▼':' ▲'):'';
-  let h=`<div class="proj-list-head"><h3>${escHtml(st.title)} <span style="font-weight:500;color:var(--text-muted)">(${sorted.length})</span></h3><button class="am-close-btn" onclick="closeProjListModal()">✕</button></div>`;
+  const total=ents.reduce((s,e)=>s+(e._amt||0),0);
+  let h=`<div class="proj-list-head"><h3>${escHtml(st.title)} <span style="font-weight:500;color:var(--text-muted)">(${sorted.length})</span> <span style="font-weight:700;color:var(--text)">· ${fmt(total)}</span></h3><button class="am-close-btn" onclick="closeProjListModal()">✕</button></div>`;
   if(st.years.length>1){h+=`<div class="proj-list-filters"><button class="ar-filter-pill${!st.year?' active':''}" onclick="_plSetYear('')">All</button>`+st.years.map(y=>`<button class="ar-filter-pill${st.year===y?' active':''}" onclick="_plSetYear('${escAttr(y)}')">${escHtml(y)}</button>`).join('')+`</div>`;}
-  h+=`<div class="proj-list-scroll"><table><thead><tr><th class="pl-sort" onclick="_plSort('name')">Name${arrow('name')}</th><th class="pl-sort" onclick="_plSort('client')">Client${arrow('client')}</th><th class="pl-sort" onclick="_plSort('status')">Status${arrow('status')}</th><th class="pl-sort" onclick="_plSort('date')">Last Updated${arrow('date')}</th></tr></thead><tbody>`;
+  h+=`<div class="proj-list-scroll"><table><thead><tr><th class="pl-sort" onclick="_plSort('name')">Name${arrow('name')}</th><th class="pl-sort" onclick="_plSort('client')">Client${arrow('client')}</th><th class="pl-sort" onclick="_plSort('status')">Status${arrow('status')}</th><th class="pl-sort" onclick="_plSort('amount')">Amount (VAT-Ex.)${arrow('amount')}</th></tr></thead><tbody>`;
   if(!sorted.length)h+='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted)">No results</td></tr>';
-  sorted.forEach(e=>{const r=e.row,isP=e.kind==='p';const d=_parseDateLoose(isP?r['Last Updated']:r['Invoice Date']);const lead=isP?arCoin(r):'<span class="search-result-chip i" style="margin-right:6px">Invoice</span>';h+=`<tr data-row="${e.kind}:${e.idx}" onclick="_projListPick('${e.kind}',${e.idx})"><td class="pl-name" style="font-weight:500;color:var(--text)">${lead}${escHtml(e._name)}</td><td>${escHtml(e._client)}</td><td>${sp(e._status)}</td><td class="pl-date">${d?escHtml(_fmtDate(d)):'—'}</td></tr>`;});
+  sorted.forEach(e=>{const r=e.row,isP=e.kind==='p';const lead=isP?arCoin(r):'<span class="search-result-chip i" style="margin-right:6px">Invoice</span>';h+=`<tr data-row="${e.kind}:${e.idx}" onclick="_projListPick('${e.kind}',${e.idx})"><td class="pl-name" data-copy="${escAttr(e._name)}" style="font-weight:500;color:var(--text)">${lead}${escHtml(e._name)}</td><td>${escHtml(e._client)}</td><td>${sp(e._status)}</td><td class="pl-amt" data-copy="${_amtCopy(e._amt)}">${e._amt?fmt(e._amt):'—'}</td></tr>`;});
   h+=`</tbody></table></div>`;
   box.innerHTML=h;
+  const _tbl=box.querySelector('table'),_head=box.querySelector('.proj-list-head');
+  if(_tbl&&_head){const _b=_makeCopyBtnInline(_tbl);_b.style.marginRight='8px';_head.insertBefore(_b,_head.querySelector('.am-close-btn'));}
 }
 function _projListPick(kind,i){
   document.querySelectorAll('#projListContent tbody tr').forEach(tr=>tr.classList.toggle('active',tr.dataset.row===kind+':'+i));
