@@ -3,7 +3,7 @@
   "defaultCSV": "20260623_AMBD_Universe_Raw.enc",
   "lastWeekCSV": "20260616_AMBD_Universe_Raw.enc",
   "targetCSV": "targets.enc",
-  "arCSV": "ar20260616_ar.enc",
+  "arCSV": "ar20260623_ar.enc",
   "currency": "PHP",
   "usdRate": 57,
   "showPDFBtn": false,

@@ -287,6 +287,8 @@ tbody tr:hover td{background:var(--surface2);color:var(--text)}tbody tr:last-chi
 .proj-list-modal td.pl-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
 .proj-list-modal td.pl-amt{white-space:nowrap}
 .proj-list-filters{display:flex;gap:8px;flex-wrap:wrap;padding:10px 18px 4px}
+.proj-list-copyrow{display:flex;justify-content:flex-end;padding:8px 18px 0}
+.pl-total{cursor:pointer;transition:color .12s}.pl-total:hover{color:var(--accent)!important}
 .proj-list-modal th.pl-sort{cursor:pointer;user-select:none;white-space:nowrap}
 .proj-list-modal th.pl-sort:hover{color:var(--text)}
 .am-view-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
@@ -975,16 +977,18 @@ function _plRender(){
   const cmp=cmps[st.sortKey]||cmps.amount;const sorted=[...ents].sort((a,b)=>cmp(a,b)*st.sortDir);
   const arrow=k=>st.sortKey===k?(st.sortDir<0?' ▼':' ▲'):'';
   const total=ents.reduce((s,e)=>s+(e._amt||0),0);
-  let h=`<div class="proj-list-head"><h3>${escHtml(st.title)} <span style="font-weight:500;color:var(--text-muted)">(${sorted.length})</span> <span style="font-weight:700;color:var(--text)">· ${fmt(total)}</span></h3><button class="am-close-btn" onclick="closeProjListModal()">✕</button></div>`;
+  let h=`<div class="proj-list-head"><h3>${escHtml(st.title)} <span style="font-weight:500;color:var(--text-muted)">(${sorted.length})</span> <span class="pl-total" data-copy="${_amtCopy(total)}" data-full="${escAttr(fmtF(total))}" style="font-weight:700;color:var(--text)" onmouseenter="_tip.textContent=this.dataset.full;_tip.classList.add('show');tipMv(event)" onmousemove="tipMv(event)" onmouseleave="tipOut()" onclick="_plCopyTotal(this,event)">· ${fmt(total)}</span></h3><button class="am-close-btn" onclick="closeProjListModal()">✕</button></div>`;
   if(st.years.length>1){h+=`<div class="proj-list-filters"><button class="ar-filter-pill${!st.year?' active':''}" onclick="_plSetYear('')">All</button>`+st.years.map(y=>`<button class="ar-filter-pill${st.year===y?' active':''}" onclick="_plSetYear('${escAttr(y)}')">${escHtml(y)}</button>`).join('')+`</div>`;}
+  h+=`<div class="proj-list-copyrow" id="plCopyRow"></div>`;
   h+=`<div class="proj-list-scroll"><table><thead><tr><th class="pl-sort" onclick="_plSort('name')">Name${arrow('name')}</th><th class="pl-sort" onclick="_plSort('client')">Client${arrow('client')}</th><th class="pl-sort" onclick="_plSort('status')">Status${arrow('status')}</th><th class="pl-sort" onclick="_plSort('amount')">Amount (VAT-Ex.)${arrow('amount')}</th></tr></thead><tbody>`;
   if(!sorted.length)h+='<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted)">No results</td></tr>';
   sorted.forEach(e=>{const r=e.row,isP=e.kind==='p';const lead=isP?arCoin(r):'<span class="search-result-chip i" style="margin-right:6px">Invoice</span>';h+=`<tr data-row="${e.kind}:${e.idx}" onclick="_projListPick('${e.kind}',${e.idx})"><td class="pl-name" data-copy="${escAttr(e._name)}" style="font-weight:500;color:var(--text)">${lead}${escHtml(e._name)}</td><td>${escHtml(e._client)}</td><td>${sp(e._status)}</td><td class="pl-amt" data-copy="${_amtCopy(e._amt)}">${e._amt?fmt(e._amt):'—'}</td></tr>`;});
   h+=`</tbody></table></div>`;
   box.innerHTML=h;
-  const _tbl=box.querySelector('table'),_head=box.querySelector('.proj-list-head');
-  if(_tbl&&_head){const _b=_makeCopyBtnInline(_tbl);_b.style.marginRight='8px';_head.insertBefore(_b,_head.querySelector('.am-close-btn'));}
+  const _tbl=box.querySelector('table'),_row=box.querySelector('#plCopyRow');
+  if(_tbl&&_row){_row.appendChild(_makeCopyBtnInline(_tbl));}
 }
+function _plCopyTotal(el,ev){const v=el.dataset.copy||'';if(v)navigator.clipboard.writeText(v);_tip.textContent='Copied: '+(el.dataset.full||v);_tip.classList.add('show');tipMv(ev);setTimeout(tipOut,1200);}
 function _projListPick(kind,i){
   document.querySelectorAll('#projListContent tbody tr').forEach(tr=>tr.classList.toggle('active',tr.dataset.row===kind+':'+i));
   const rp=document.getElementById('projListRight');
@@ -1015,6 +1019,9 @@ function _buildProjHtml(r,closeAction,ctx){
   // Project Code + PAR
   const par=r['PAR']||'';
   h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Code: <span style="color:var(--text);font-weight:600">${escHtml(r['Project Code']||'—')}</span>${par?` · PAR: <span style="color:var(--text);font-weight:600">${escHtml(par)}</span>`:''}</div>`;
+  // Project Description (omit if blank)
+  const projDesc=(r['Project Description']||'').trim();
+  if(projDesc)h+=`<div style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.5;white-space:pre-wrap">${escHtml(projDesc)}</div>`;
   // Numbers block
   h+=`<div class="proj-modal-grid" style="margin-bottom:0">`;
   h+=`<div class="proj-modal-field"><span class="fld-label">Amount (VAT-Ex.)</span><span class="fld-value">${amt>0?fmtF(amt):'—'}${wasTag(amt,pAmt,true)}</span></div>`;
