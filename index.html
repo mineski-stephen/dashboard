@@ -653,10 +653,24 @@ body.settings-open,body.modal-open{overflow:hidden}
 .prj-table .prj-col-hidden{display:none}
 .prj-colgrp-btn{display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-weight:700;cursor:pointer;font-size:11px;line-height:1;flex:0 0 auto;margin-right:3px}
 .prj-colgrp-btn:hover{background:var(--accent);color:#fff}
+/* collapsed row-group bar */
+.prj-table tr.prj-grpbar td{background:var(--surface3);color:var(--text-dim);font-size:11px;font-weight:600;font-style:italic;padding:0 12px;position:sticky;left:0}
+.prj-table tr.prj-grpbar .prj-grp-toggle{position:static;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border:1px solid var(--accent);border-radius:3px;color:var(--accent);font-weight:700;font-style:normal;margin-right:8px;transform:none}
+.prj-table tr.prj-grpbar:hover td{background:var(--surface2)}
 /* selection sum badge */
-.prj-sum-badge{position:fixed;bottom:18px;right:18px;z-index:120;background:var(--accent);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35);white-space:nowrap;pointer-events:none}
+.prj-sum-badge{position:fixed;bottom:18px;right:18px;z-index:120;background:var(--accent);color:#fff;padding:8px 10px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.35);white-space:nowrap}
 .prj-sum-badge .lbl{opacity:.75;font-weight:500}
-.prj-sum-badge .sep{opacity:.4;margin:0 8px}
+.prj-sum-badge .sep{opacity:.4;margin:0 4px}
+.prj-sum-badge .cpv{cursor:pointer;padding:2px 6px;border-radius:5px;transition:background .12s}
+.prj-sum-badge .cpv:hover{background:rgba(255,255,255,.22)}
+/* column picker menu */
+.prj-colmenu-item{display:flex;align-items:center;gap:8px;padding:5px 10px}
+.prj-colmenu-item label{flex:1;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prj-colmenu-ord{display:flex;gap:2px;flex:0 0 auto}
+.prj-colmenu-ord button{width:20px;height:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:4px;cursor:pointer;font-size:11px;line-height:1;padding:0;font-family:inherit}
+.prj-colmenu-ord button:disabled{opacity:.3;cursor:default}
+.prj-colmenu-ord button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.prj-colmenu-sep{padding:6px 10px 2px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:4px}
 </style></head><body>
 <!-- Project Detail Modal -->
 <div class="proj-modal" id="projModal" onclick="if(event.target===this)closeProjModal()">
@@ -781,6 +795,7 @@ body.settings-open,body.modal-open{overflow:hidden}
       <div class="prj-toolbar">
         <div class="card-title" style="margin:0"><div class="dot" style="background:var(--accent)"></div>Projections Spreadsheet</div>
         <div class="prj-toolbar-actions">
+          <button class="prj-tbtn" id="prjColBtn" onclick="prjOpenColMenu(this)">＋ Columns</button>
           <button class="prj-tbtn" id="prjMonthToggleBtn" onclick="prjTogglePastMonths()">Show Past Months</button>
           <button class="prj-tbtn" onclick="prjClearFilters()">Clear Filters &amp; Sort</button>
         </div>
@@ -3141,12 +3156,39 @@ const PRJ_STATUSES=['Fully Closed','For Closing','For Collection','Signed CE','W
 const PRJ_STATUS_ORDER={};PRJ_STATUSES.forEach((s,i)=>{PRJ_STATUS_ORDER[s]=i;});
 const PRJ_SLABEL={'Signed CE':'Won','Won - Awaiting CE Signature':'Won (Pending CE)','For Closing':'For Closing','Fully Closed':'Closed','For Collection':'For Collection','CE/Pitch Submitted':'CE Submitted','For CE/Pitch Creation':'For Submission','Talks In Progress':'In Progress','Stalled':'Stalled','Lost':'Lost','Archived':'Archived'};
 function prjStatusLabel(s){return PRJ_SLABEL[s]||s;}
-const PRJ={fields:[],fieldByCol:{},allRows:[],view:[],nData:0,edits:{},filters:{},sort:null,rowGroups:[],colGroups:[],colInit:false,sel:null,_collapsed:new Set(),_wired:false,_shown:false,_mx:0,_my:0};
-(function(){
-  PRJ.fields=[{col:'A',label:'',type:'info',w:36},{col:'B',label:'BD',type:'text',key:'BD',w:96},{col:'C',label:'AM',type:'text',key:'AM',w:96},{col:'D',label:'Client',type:'text',key:'Client',w:172},{col:'E',label:'Project',type:'proj',key:'Project',w:256},{col:'F',label:'Status',type:'status',key:'Status',w:150}];
-  for(let i=0;i<12;i++)PRJ.fields.push({col:String.fromCharCode(71+i),label:PRJ_MONTHS[i],type:'month',mi:i,w:118});
-  PRJ.fields.forEach(f=>{PRJ.fieldByCol[f.col]=f;});
-})();
+// Available data-backed columns the user can add via the Columns picker (info is fixed-first, months are always appended)
+const PRJ_WIDTHS={info:36,text:110,proj:256,status:150,amount:130,pct:84,month:118};
+const PRJ_AVAIL=[
+  {id:'info',label:'',type:'info'},
+  {id:'bd',label:'BD',type:'text',key:'BD'},
+  {id:'am',label:'AM',type:'text',key:'AM'},
+  {id:'client',label:'Client',type:'text',key:'Client'},
+  {id:'project',label:'Project',type:'proj',key:'Project'},
+  {id:'status',label:'Status',type:'status',key:'Status'},
+  {id:'pm',label:'PM',type:'text',key:'PM'},
+  {id:'mkt',label:'MKT',type:'text',key:'MKT'},
+  {id:'tribe',label:'Tribe',type:'text',key:'Tribe'},
+  {id:'code',label:'Project Code',type:'text',key:'Project Code'},
+  {id:'tier',label:'Pipeline Tier',type:'text',key:'Pipeline Tier'},
+  {id:'conf',label:'Confidence',type:'text',key:'Confidence'},
+  {id:'prio',label:'Priority',type:'text',key:'Priority'},
+  {id:'gppct',label:'GP%',type:'pct',key:'GP%'},
+  {id:'gp',label:'GP',type:'amount',key:'GP'},
+  {id:'amt',label:'Amount (VAT-Ex.)',type:'amount',key:'Amount (VAT-Ex.) (PHP)'},
+];
+const PRJ_AVAIL_BY_ID={};PRJ_AVAIL.forEach(f=>{PRJ_AVAIL_BY_ID[f.id]=f;});
+const PRJ={fields:[],fieldByCol:{},layout:['info','bd','am','client','project','status'],allRows:[],view:[],nData:0,edits:{},filters:{},sort:null,rowGroups:[],colGroups:[],colInit:false,rowInit:false,sel:null,_collapsed:new Set(),_wired:false,_shown:false,_mx:0,_my:0};
+function prjColLetter(i){let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;}
+function prjColIdx(letters){let n=0;for(const ch of letters.toUpperCase())n=n*26+(ch.charCodeAt(0)-64);return n-1;}
+function prjMonthBase(){return PRJ.layout.length;}
+function prjBuildFields(){
+  const fields=[];
+  PRJ.layout.forEach(id=>{const a=PRJ_AVAIL_BY_ID[id];if(a)fields.push({id:a.id,label:a.label,type:a.type,key:a.key,w:PRJ_WIDTHS[a.type]||120});});
+  for(let i=0;i<12;i++)fields.push({id:'m'+i,label:PRJ_MONTHS[i],type:'month',mi:i,w:PRJ_WIDTHS.month});
+  fields.forEach((f,i)=>{f.col=prjColLetter(i);});
+  PRJ.fields=fields;PRJ.fieldByCol={};fields.forEach(f=>{PRJ.fieldByCol[f.col]=f;});
+}
+prjBuildFields();
 function _prjNum(v){if(v===''||v==null||isNaN(v))return '';return Number(v).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:2});}
 function _r2(v){return Math.round((v+Number.EPSILON)*100)/100;}
 // Robust month-index parser handling "2026/07/01", "2026-07-01", "July", "Jul", "07 - July"
@@ -3176,8 +3218,8 @@ function prjBuildRows(){
   drs.sort((a,b)=>{const ma=prjSortMonth(a.r),mb=prjSortMonth(b.r);const na=ma<0?99:ma,nb=mb<0?99:mb;if(na!==nb)return na-nb;const sa=PRJ_STATUS_ORDER[a.r['Status']]??99,sb=PRJ_STATUS_ORDER[b.r['Status']]??99;if(sa!==sb)return sa-sb;return b.amt-a.amt;});
   PRJ.allRows=drs;
 }
-function prjFieldText(dr,f){if(f.type==='text')return dr.r[f.key]||'';if(f.type==='proj')return dr.r['Project']||'';if(f.type==='status')return dr.r['Status']||'';if(f.type==='month'){if(dr.mi===f.mi&&dr.amt!==0)return _prjNum(cx(dr.amt));return '';}return '';}
-function prjSortVal(dr,f){if(f.type==='status')return (PRJ_STATUS_ORDER[dr.r['Status']]??99);if(f.type==='month')return (dr.mi===f.mi?dr.amt:-1);return (prjFieldText(dr,f)||'').toString().toLowerCase();}
+function prjFieldText(dr,f){if(f.type==='text')return dr.r[f.key]||'';if(f.type==='proj')return dr.r['Project']||'';if(f.type==='status')return dr.r['Status']||'';if(f.type==='amount'){const v=pn(dr.r[f.key]);return v!==0?_prjNum(cx(v)):'';}if(f.type==='pct'){const v=pn(dr.r[f.key]);return v!==0?(v*100).toFixed(1)+'%':'';}if(f.type==='month'){if(dr.mi===f.mi&&dr.amt!==0)return _prjNum(cx(dr.amt));return '';}return '';}
+function prjSortVal(dr,f){if(f.type==='status')return (PRJ_STATUS_ORDER[dr.r['Status']]??99);if(f.type==='amount'||f.type==='pct')return pn(dr.r[f.key]);if(f.type==='month')return (dr.mi===f.mi?dr.amt:-1);return (prjFieldText(dr,f)||'').toString().toLowerCase();}
 function prjBuildView(){
   let rows=PRJ.allRows.slice();
   if(PRJ.sort){const f=PRJ.fieldByCol[PRJ.sort.col],d=PRJ.sort.dir;rows.sort((a,b)=>{const va=prjSortVal(a,f),vb=prjSortVal(b,f);return va<vb?-d:va>vb?d:0;});}
@@ -3187,16 +3229,16 @@ function prjBuildView(){
 }
 
 // ── cell model ──
-function prjDataCell(dr,f){switch(f.type){case 'info':return {kind:'info'};case 'text':return {kind:'text',text:dr.r[f.key]||''};case 'proj':return {kind:'proj',text:dr.r['Project']||''};case 'status':return {kind:'status',status:dr.r['Status']||''};case 'month':if(dr.mi===f.mi&&dr.amt!==0)return {kind:'num',num:dr.amt};return {kind:'blank'};}return {kind:'blank'};}
-function prjCellObj(c,ri){const f=PRJ.fields[c];const key=f.col+ri;if(PRJ.edits[key]!==undefined)return {kind:'edit',text:PRJ.edits[key]};if(ri<=PRJ.nData)return prjDataCell(PRJ.view[ri-1],f);return {kind:'blank'};}
+function prjDataCell(dr,f){switch(f.type){case 'info':return {kind:'info'};case 'text':return {kind:'text',text:dr.r[f.key]||''};case 'proj':return {kind:'proj',text:dr.r['Project']||''};case 'status':return {kind:'status',status:dr.r['Status']||''};case 'amount':{const v=pn(dr.r[f.key]);return v!==0?{kind:'num',num:v}:{kind:'blank'};}case 'pct':{const v=pn(dr.r[f.key]);return v!==0?{kind:'pct',val:v}:{kind:'blank'};}case 'month':if(dr.mi===f.mi&&dr.amt!==0)return {kind:'num',num:dr.amt};return {kind:'blank'};}return {kind:'blank'};}
+function prjCellObj(c,ri){const f=PRJ.fields[c];if(!f)return {kind:'blank'};const key=f.col+ri;if(PRJ.edits[key]!==undefined)return {kind:'edit',text:PRJ.edits[key]};if(ri<=PRJ.nData)return prjDataCell(PRJ.view[ri-1],f);return {kind:'blank'};}
 function prjEditable(c,ri){const o=prjCellObj(c,ri);return o.kind==='edit'||o.kind==='blank';}
-function prjCellNumeric(c,ri,seen){const o=prjCellObj(c,ri);if(o.kind==='num')return cx(o.num);if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='='){const k=c+'_'+ri;if(seen.has(k))return 0;seen.add(k);const v=prjEval(s.slice(1),seen);seen.delete(k);return v;}const n=parseFloat(s.replace(/,/g,''));return isNaN(n)?0:n;}return 0;}
-function prjCellCopy(c,ri){const o=prjCellObj(c,ri);if(o.kind==='num')return String(_r2(cx(o.num)));if(o.kind==='text')return o.text;if(o.kind==='proj')return o.text;if(o.kind==='status')return prjStatusLabel(o.status);if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='=')return String(_r2(prjEval(s.slice(1),new Set([c+'_'+ri]))));return o.text;}return '';}
+function prjCellNumeric(c,ri,seen){const o=prjCellObj(c,ri);if(o.kind==='num')return cx(o.num);if(o.kind==='pct')return o.val*100;if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='='){const k=c+'_'+ri;if(seen.has(k))return 0;seen.add(k);const v=prjEval(s.slice(1),seen);seen.delete(k);return v;}const n=parseFloat(s.replace(/,/g,''));return isNaN(n)?0:n;}return 0;}
+function prjCellCopy(c,ri){const o=prjCellObj(c,ri);if(o.kind==='num')return String(_r2(cx(o.num)));if(o.kind==='pct')return (o.val*100).toFixed(1);if(o.kind==='text')return o.text;if(o.kind==='proj')return o.text;if(o.kind==='status')return prjStatusLabel(o.status);if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='=')return String(_r2(prjEval(s.slice(1),new Set([c+'_'+ri]))));return o.text;}return '';}
 
-// ── formula parser: =SUM(), + - * /, parentheses, refs, ranges ──
-function prjTok(s){const out=[];let i=0;while(i<s.length){const c=s[i];if(/\s/.test(c)){i++;continue;}if(c==='('){out.push({t:'('});i++;continue;}if(c===')'){out.push({t:')'});i++;continue;}if(c===','){out.push({t:','});i++;continue;}if('+-*/'.includes(c)){out.push({t:c});i++;continue;}const rest=s.slice(i);let m=rest.match(/^SUM(?=\s*\()/i);if(m){out.push({t:'sum'});i+=3;continue;}m=rest.match(/^([A-R])(\d{1,4}):([A-R])(\d{1,4})/i);if(m){out.push({t:'range',v:m[0].toUpperCase()});i+=m[0].length;continue;}m=rest.match(/^([A-R])(\d{1,4})/i);if(m){out.push({t:'cell',v:m[0].toUpperCase()});i+=m[0].length;continue;}m=rest.match(/^\d+(\.\d+)?/);if(m){out.push({t:'num',v:parseFloat(m[0])});i+=m[0].length;continue;}i++;}return out;}
-function prjRefNum(ref,seen){const c=ref.charCodeAt(0)-65;const row=parseInt(ref.slice(1),10);if(c<0||c>17||row<1||row>1000)return 0;return prjCellNumeric(c,row,seen);}
-function prjRangeSum(ref,seen){const m=ref.match(/^([A-R])(\d+):([A-R])(\d+)$/);if(!m)return 0;let c1=m[1].charCodeAt(0)-65,r1=+m[2],c2=m[3].charCodeAt(0)-65,r2=+m[4];if(c1>c2){const t=c1;c1=c2;c2=t;}if(r1>r2){const t=r1;r1=r2;r2=t;}let tot=0;for(let c=c1;c<=c2;c++)for(let r=r1;r<=r2;r++)tot+=prjCellNumeric(c,r,seen);return tot;}
+// ── formula parser: =SUM(), + - * /, parentheses, refs, ranges (multi-letter cols) ──
+function prjTok(s){const out=[];let i=0;while(i<s.length){const c=s[i];if(/\s/.test(c)){i++;continue;}if(c==='('){out.push({t:'('});i++;continue;}if(c===')'){out.push({t:')'});i++;continue;}if(c===','){out.push({t:','});i++;continue;}if('+-*/'.includes(c)){out.push({t:c});i++;continue;}const rest=s.slice(i);let m=rest.match(/^SUM(?=\s*\()/i);if(m){out.push({t:'sum'});i+=3;continue;}m=rest.match(/^([A-Z]{1,2})(\d{1,4}):([A-Z]{1,2})(\d{1,4})/i);if(m){out.push({t:'range',v:m[0].toUpperCase()});i+=m[0].length;continue;}m=rest.match(/^([A-Z]{1,2})(\d{1,4})/i);if(m){out.push({t:'cell',v:m[0].toUpperCase()});i+=m[0].length;continue;}m=rest.match(/^\d+(\.\d+)?/);if(m){out.push({t:'num',v:parseFloat(m[0])});i+=m[0].length;continue;}i++;}return out;}
+function prjRefNum(ref,seen){const m=ref.match(/^([A-Z]{1,2})(\d+)$/i);if(!m)return 0;const c=prjColIdx(m[1]),row=+m[2];if(c<0||c>=PRJ.fields.length||row<1||row>1000)return 0;return prjCellNumeric(c,row,seen);}
+function prjRangeSum(ref,seen){const m=ref.match(/^([A-Z]{1,2})(\d+):([A-Z]{1,2})(\d+)$/i);if(!m)return 0;let c1=prjColIdx(m[1]),r1=+m[2],c2=prjColIdx(m[3]),r2=+m[4];if(c1>c2){const t=c1;c1=c2;c2=t;}if(r1>r2){const t=r1;r1=r2;r2=t;}let tot=0;for(let c=c1;c<=c2;c++)for(let r=r1;r<=r2;r++)tot+=prjCellNumeric(c,r,seen);return tot;}
 function prjEval(expr,seen){seen=seen||new Set();const toks=prjTok(expr);let pos=0;const peek=()=>toks[pos],next=()=>toks[pos++];
   function pExpr(){let v=pTerm();while(peek()&&(peek().t==='+'||peek().t==='-')){const op=next().t,r=pTerm();v=op==='+'?v+r:v-r;}return v;}
   function pTerm(){let v=pFac();while(peek()&&(peek().t==='*'||peek().t==='/')){const op=next().t,r=pFac();v=op==='*'?v*r:(r===0?0:v/r);}return v;}
@@ -3207,11 +3249,13 @@ function prjEval(expr,seen){seen=seen||new Set();const toks=prjTok(expr);let pos
 function prjRenderGrid(){
   const wrap=document.getElementById('prjGridWrap');if(!wrap)return;
   const flds=PRJ.fields,cur=new Date().getMonth();
-  prjInitCols();
-  PRJ._collapsed=new Set();PRJ.rowGroups.forEach(g=>{if(g.collapsed)for(let r=g.a+1;r<=g.b;r++)PRJ._collapsed.add(r);});
+  prjInitCols();prjInitRows();
+  PRJ._collapsed=new Set();PRJ.rowGroups.forEach(g=>{if(g.collapsed)for(let r=g.a;r<=g.b;r++)PRJ._collapsed.add(r);});
   const colHidden=prjColHidden;
   PRJ._colHidden=colHidden;PRJ._cur=cur;
-  PRJ._visRows=[];for(let r=1;r<=1000;r++){if(!PRJ._collapsed.has(r))PRJ._visRows.push(r);}
+  // visible sequence: a collapsed row group collapses to a single "bar" entry; other rows pass through
+  const seq=[];for(let r=1;r<=1000;){const cg=PRJ.rowGroups.find(g=>g.collapsed&&g.a===r);if(cg){seq.push({bar:cg});r=cg.b+1;continue;}if(PRJ._collapsed.has(r)){r++;continue;}seq.push(r);r++;}
+  PRJ._visSeq=seq;
   const NC=flds.length+1;
   const colMarkers=prjColMarkers();
   let cg='<colgroup><col style="width:46px">';
@@ -3229,13 +3273,13 @@ function prjRenderGrid(){
     h+=`<th data-c="${c}">${inner}</th>`;});
   h+=`</tr></thead><tbody id="prjBody"><tr id="prjSpTop"><td colspan="${NC}" style="padding:0;border:none;height:0"></td></tr><tr id="prjSpBot"><td colspan="${NC}" style="padding:0;border:none;height:0"></td></tr></tbody></table>`;
   wrap.innerHTML=h;
-  const btn=document.getElementById('prjMonthToggleBtn');if(btn){const pg=PRJ.colGroups.find(x=>x.a===6);btn.textContent=(pg&&pg.collapsed)?'Show Past Months':'Hide Past Months';}
+  const btn=document.getElementById('prjMonthToggleBtn');if(btn){const pg=PRJ.colGroups.find(x=>x.a===prjMonthBase());btn.textContent=(pg&&pg.collapsed)?'Show Past Months':'Hide Past Months';}
   PRJ.rowH=0;prjRenderWindow();
 }
 // Virtualized body: render only the visible row window (+buffer) to keep the DOM small for 1000 rows
 function prjRenderWindow(){
   const wrap=document.getElementById('prjGridWrap');const spTop=document.getElementById('prjSpTop'),spBot=document.getElementById('prjSpBot');if(!wrap||!spTop||!spBot)return;
-  const vis=PRJ._visRows,n=vis.length;
+  const vis=PRJ._visSeq||[],n=vis.length;
   const clearWin=()=>{let el=spTop.nextElementSibling;while(el&&el!==spBot){const nx=el.nextElementSibling;el.remove();el=nx;}};
   if(!PRJ.rowH){clearWin();const probe=Math.min(20,n);let hh='';for(let i=0;i<probe;i++)hh+=prjRowHtml(vis[i],PRJ._cur,PRJ._colHidden);spTop.insertAdjacentHTML('afterend',hh);const ft=spTop.nextElementSibling;PRJ.rowH=(ft&&ft.offsetHeight)||27;}
   const rowH=PRJ.rowH;
@@ -3252,8 +3296,9 @@ function prjRenderWindow(){
   prjApplySelUI();
 }
 let _prjScrollRAF=0;function prjOnScroll(){if(_prjScrollRAF)return;_prjScrollRAF=requestAnimationFrame(()=>{_prjScrollRAF=0;prjRenderWindow();});}
-function prjRowHtml(r,cur,colHidden){
-  const flds=PRJ.fields,isData=r<=PRJ.nData,dr=isData?PRJ.view[r-1]:null;
+function prjRowHtml(entry,cur,colHidden){
+  if(entry&&entry.bar){const g=entry.bar,span=PRJ.fields.length+1,nrow=g.b-g.a+1;return `<tr class="prj-grpbar" data-grpbar="${g.a}"><td colspan="${span}"><span class="prj-grp-toggle" data-grp="${g.a}">+</span>${nrow} row${nrow!==1?'s':''} hidden · rows ${g.a}–${g.b} · click ＋ to expand</td></tr>`;}
+  const r=entry,flds=PRJ.fields,isData=r<=PRJ.nData,dr=isData?PRJ.view[r-1]:null;
   const grp=PRJ.rowGroups.find(g=>g.a===r);
   let gut=String(r);if(grp)gut=`<span class="prj-grp-toggle" data-grp="${grp.a}">${grp.collapsed?'+':'−'}</span>${r}`;
   let tds=`<th class="prj-gutter" data-r="${r}">${gut}</th>`;
@@ -3264,6 +3309,7 @@ function prjRowHtml(r,cur,colHidden){
     else if(o.kind==='status'){inner=`<span class="prj-pill" data-c="${c}">${sp(o.status)}<span class="caret">▾</span></span>`;}
     else if(o.kind==='proj'){inner=`<span class="prj-cell prj-proj-cell" data-di="${dr.r._i}">${escHtml(o.text)}</span>`;}
     else if(o.kind==='num'){inner=`<span class="prj-cell num">${_prjNum(cx(o.num))}</span>`;}
+    else if(o.kind==='pct'){inner=`<span class="prj-cell num">${(o.val*100).toFixed(1)}%</span>`;}
     else if(o.kind==='text'){inner=`<span class="prj-cell">${escHtml(o.text)}</span>`;}
     else if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='='){inner=`<span class="prj-cell num">${_prjNum(prjEval(s.slice(1),new Set([c+'_'+r])))}</span>`;}else{const isNum=s!==''&&/^-?[\d.,]+$/.test(s);inner=`<span class="prj-cell${isNum?' num':''}">${escHtml(o.text)}</span>`;}}
     else{inner='<span class="prj-cell editable"></span>';}
@@ -3311,6 +3357,7 @@ function prjClick(e){
   const cgb=e.target.closest('.prj-colgrp-btn');if(cgb){const a=+cgb.dataset.colgrp,g=PRJ.colGroups.find(x=>x.a===a);if(g){g.collapsed=!g.collapsed;prjRenderGrid();prjApplySelUI();}return;}
   const info=e.target.closest('.prj-info-i');if(info){const di=+info.dataset.di;if(DATA[di])showProjModal(DATA[di]);return;}
   const grp=e.target.closest('.prj-grp-toggle');if(grp){const a=+grp.dataset.grp,g=PRJ.rowGroups.find(x=>x.a===a);if(g){g.collapsed=!g.collapsed;prjRenderGrid();prjApplySelUI();}return;}
+  const bar=e.target.closest('.prj-grpbar');if(bar){const a=+bar.dataset.grpbar,g=PRJ.rowGroups.find(x=>x.a===a);if(g){g.collapsed=false;prjRenderGrid();prjApplySelUI();}return;}
   const pill=e.target.closest('.prj-pill');if(pill){prjOpenPill(pill);return;}
   const fbtn=e.target.closest('.prj-fbtn');if(fbtn){prjOpenFilter(fbtn.dataset.fc,+fbtn.dataset.c,fbtn);return;}
 }
@@ -3327,11 +3374,14 @@ function prjColGroupOf(c){for(const g of PRJ.colGroups)if(c>=g.a&&c<=g.b)return 
 function prjColHidden(c){for(const g of PRJ.colGroups)if(g.collapsed&&c>=g.a&&c<=g.b)return true;return false;}
 // For a collapsed group, the visible column that carries its ＋ expand marker (first visible to the right, else to the left)
 function prjColMarkers(){const flds=PRJ.fields,map={};PRJ.colGroups.forEach(g=>{if(!g.collapsed)return;let m=g.b+1;while(m<flds.length&&prjColHidden(m))m++;if(m>=flds.length){m=g.a-1;while(m>=0&&prjColHidden(m))m--;}if(m>=0&&m<flds.length)(map[m]=map[m]||[]).push(g);});return map;}
-function prjInitCols(){if(PRJ.colInit)return;PRJ.colInit=true;const cur=new Date().getMonth();if(cur>0)PRJ.colGroups.push({a:6,b:6+cur-1,collapsed:true});}
-function prjTogglePastMonths(){const cur=new Date().getMonth();if(cur<=0)return;const a=6,b=6+cur-1;let g=PRJ.colGroups.find(x=>x.a===a);if(!g){PRJ.colGroups=PRJ.colGroups.filter(x=>x.b<a||x.a>b);g={a,b,collapsed:false};PRJ.colGroups.push(g);PRJ.colGroups.sort((x,y)=>x.a-y.a);}g.collapsed=!g.collapsed;prjRenderGrid();prjApplySelUI();}
+function prjInitCols(){if(PRJ.colInit)return;PRJ.colInit=true;const cur=new Date().getMonth(),base=prjMonthBase();if(cur>0)PRJ.colGroups.push({a:base,b:base+cur-1,collapsed:true});}
+// Auto-group rows whose effective month is a past month (e.g. in July, all Jan–Jun rows) into one collapsed group
+function prjInitRows(){if(PRJ.rowInit)return;PRJ.rowInit=true;const cur=new Date().getMonth();if(cur<=0)return;let k=0;for(const dr of PRJ.view){if(prjRowMonth(dr.r)<cur)k++;else break;}if(k>=1)PRJ.rowGroups.push({a:1,b:k,collapsed:true});}
+function prjTogglePastMonths(){const cur=new Date().getMonth();if(cur<=0)return;const base=prjMonthBase(),a=base,b=base+cur-1;let g=PRJ.colGroups.find(x=>x.a===a);if(!g){PRJ.colGroups=PRJ.colGroups.filter(x=>x.b<a||x.a>b);g={a,b,collapsed:false};PRJ.colGroups.push(g);PRJ.colGroups.sort((x,y)=>x.a-y.a);}g.collapsed=!g.collapsed;prjRenderGrid();prjApplySelUI();}
 // selection sum badge
-function prjCellNumOrNull(c,r){const o=prjCellObj(c,r);if(o.kind==='num')return cx(o.num);if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='=')return prjEval(s.slice(1),new Set([c+'_'+r]));if(s!==''&&/^-?[\d,]*\.?\d+$/.test(s))return parseFloat(s.replace(/,/g,''));}return null;}
-function prjUpdateSumBadge(){const b=document.getElementById('prjSumBadge');if(!b)return;if(!PRJ.sel){b.style.display='none';return;}const s=PRJ.sel,r1=Math.min(s.r1,s.r2),r2=Math.max(s.r1,s.r2),c1=Math.min(s.c1,s.c2),c2=Math.max(s.c1,s.c2);let sum=0,cnt=0;for(let r=r1;r<=r2;r++){if(PRJ._collapsed.has(r))continue;for(let c=c1;c<=c2;c++){if(prjColHidden(c))continue;const v=prjCellNumOrNull(c,r);if(v!==null){sum+=v;cnt++;}}}if(cnt<1){b.style.display='none';return;}const avg=sum/cnt;b.innerHTML=`<span class="lbl">Sum</span> ${cs()}${_prjNum(sum)}<span class="sep">|</span><span class="lbl">Count</span> ${cnt}<span class="sep">|</span><span class="lbl">Avg</span> ${cs()}${_prjNum(_r2(avg))}`;b.style.display='block';}
+function prjCellNumOrNull(c,r){const o=prjCellObj(c,r);if(o.kind==='num')return cx(o.num);if(o.kind==='pct')return o.val*100;if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='=')return prjEval(s.slice(1),new Set([c+'_'+r]));if(s!==''&&/^-?[\d,]*\.?\d+$/.test(s))return parseFloat(s.replace(/,/g,''));}return null;}
+function prjUpdateSumBadge(){const b=document.getElementById('prjSumBadge');if(!b)return;if(!PRJ.sel){b.style.display='none';return;}const s=PRJ.sel,r1=Math.min(s.r1,s.r2),r2=Math.max(s.r1,s.r2),c1=Math.min(s.c1,s.c2),c2=Math.max(s.c1,s.c2);let sum=0,cnt=0;for(let r=r1;r<=r2;r++){if(PRJ._collapsed.has(r))continue;for(let c=c1;c<=c2;c++){if(prjColHidden(c))continue;const v=prjCellNumOrNull(c,r);if(v!==null){sum+=v;cnt++;}}}if(cnt<1){b.style.display='none';return;}const avg=_r2(sum/cnt);b.innerHTML=`<span class="cpv" data-copy="${_r2(sum)}" title="Click to copy"><span class="lbl">Sum</span> ${cs()}${_prjNum(sum)}</span><span class="sep">|</span><span class="cpv" data-copy="${cnt}" title="Click to copy"><span class="lbl">Count</span> ${cnt}</span><span class="sep">|</span><span class="cpv" data-copy="${avg}" title="Click to copy"><span class="lbl">Avg</span> ${cs()}${_prjNum(avg)}</span>`;b.style.display='block';}
+function prjBadgeClick(e){const el=e.target.closest('.cpv');if(!el)return;const v=el.dataset.copy;navigator.clipboard.writeText(String(v));const b=document.getElementById('prjSumBadge');if(b){const prev=b.dataset.prev;/*flash*/}el.style.background='rgba(255,255,255,.4)';setTimeout(()=>{el.style.background='';},200);_tip.textContent='Copied '+v;_tip.classList.add('show');_tip.style.left=Math.min((PRJ._mx||e.clientX)+12,window.innerWidth-140)+'px';_tip.style.top=((PRJ._my||e.clientY)-28)+'px';clearTimeout(prjBadgeClick._t);prjBadgeClick._t=setTimeout(tipOut,1000);}
 function prjKey(e){const sec=document.getElementById('sec-projections');if(!sec||!sec.classList.contains('active'))return;if((e.ctrlKey||e.metaKey)&&(e.key==='c'||e.key==='C')){if(PRJ.sel){e.preventDefault();prjCopySel();}}}
 
 // ── menus (context / pill / filter+sort) ──
@@ -3362,7 +3412,13 @@ function prjRenderFilterList(){
 function prjClampMenu(m){const r=m.getBoundingClientRect();if(r.right>window.innerWidth-8)m.style.left=Math.max(8,window.innerWidth-r.width-8)+'px';if(r.bottom>window.innerHeight-8)m.style.top=Math.max(8,window.innerHeight-r.height-8)+'px';}
 function prjCloseMenus(){if(PRJ._menuEl){PRJ._menuEl.remove();PRJ._menuEl=null;}if(PRJ._ctxEl){PRJ._ctxEl.remove();PRJ._ctxEl=null;}PRJ._menu=null;}
 function prjClearFilters(){PRJ.filters={};PRJ.sort=null;PRJ.rowGroups=[];prjBuildView();prjRenderGrid();prjApplySelUI();}
-function prjWire(){if(PRJ._wired)return;const w=document.getElementById('prjGridWrap');if(!w)return;PRJ._wired=true;w.addEventListener('scroll',prjOnScroll);w.addEventListener('mousedown',prjMouseDown);w.addEventListener('mouseover',prjMouseOver);w.addEventListener('mouseout',prjMouseOut);w.addEventListener('mousemove',e=>{PRJ._mx=e.clientX;PRJ._my=e.clientY;});w.addEventListener('dblclick',prjDblClick);w.addEventListener('click',prjClick);w.addEventListener('contextmenu',prjContext);document.addEventListener('mouseup',()=>{PRJ._dragging=null;});document.addEventListener('keydown',prjKey);document.addEventListener('mousedown',e=>{if(!e.target.closest('.prj-menu')&&!e.target.closest('.prj-fbtn')&&!e.target.closest('.prj-pill')&&!e.target.closest('.prj-ctx'))prjCloseMenus();});}
+// ── column picker (add/remove/reorder data columns) ──
+function prjOpenColMenu(anchor){prjCloseMenus();const rect=anchor.getBoundingClientRect(),m=document.createElement('div');m.className='prj-menu';m.style.left=rect.left+'px';m.style.top=(rect.bottom+4)+'px';m.style.minWidth='250px';m.innerHTML=`<div style="padding:8px 10px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Columns — check to show · ↑↓ to reorder</div><div class="prj-menu-list" id="prjColList"></div>`;document.body.appendChild(m);PRJ._menuEl=m;prjRenderColMenu();prjClampMenu(m);}
+function prjRenderColMenu(){const list=document.getElementById('prjColList');if(!list)return;const active=PRJ.layout.filter(id=>id!=='info'),activeSet=new Set(PRJ.layout),inactive=PRJ_AVAIL.filter(a=>a.id!=='info'&&!activeSet.has(a.id)).map(a=>a.id);let h='';active.forEach((id,i)=>{const a=PRJ_AVAIL_BY_ID[id];h+=`<div class="prj-colmenu-item"><input type="checkbox" checked data-col="${id}"><label data-col="${id}">${escHtml(a.label||id)}</label><span class="prj-colmenu-ord"><button data-up="${id}"${i===0?' disabled':''}>↑</button><button data-down="${id}"${i===active.length-1?' disabled':''}>↓</button></span></div>`;});if(inactive.length)h+='<div class="prj-colmenu-sep">Add column</div>';inactive.forEach(id=>{const a=PRJ_AVAIL_BY_ID[id];h+=`<div class="prj-colmenu-item"><input type="checkbox" data-col="${id}"><label data-col="${id}">${escHtml(a.label||id)}</label></div>`;});list.innerHTML=h;list.onclick=(e)=>{const up=e.target.closest('[data-up]'),down=e.target.closest('[data-down]'),lab=e.target.closest('label[data-col]');if(up){prjMoveCol(up.dataset.up,-1);return;}if(down){prjMoveCol(down.dataset.down,1);return;}if(lab){const cb=lab.parentElement.querySelector('input[data-col]');if(cb){cb.checked=!cb.checked;prjToggleCol(cb.dataset.col,cb.checked);}return;}};list.onchange=(e)=>{const cb=e.target.closest('input[data-col]');if(!cb)return;prjToggleCol(cb.dataset.col,cb.checked);};}
+function prjToggleCol(id,on){if(on){if(!PRJ.layout.includes(id))PRJ.layout.push(id);}else PRJ.layout=PRJ.layout.filter(x=>x!==id);prjColLayoutChanged();}
+function prjMoveCol(id,dir){const arr=PRJ.layout,i=arr.indexOf(id);if(i<0)return;const j=i+dir;if(j<1||j>=arr.length)return;arr.splice(i,1);arr.splice(j,0,id);prjColLayoutChanged();}
+function prjColLayoutChanged(){prjBuildFields();PRJ.colGroups=[];PRJ.colInit=false;PRJ.filters={};PRJ.sort=null;PRJ.sel=null;prjBuildView();prjRenderGrid();prjApplySelUI();prjRenderColMenu();}
+function prjWire(){if(PRJ._wired)return;const w=document.getElementById('prjGridWrap');if(!w)return;PRJ._wired=true;w.addEventListener('scroll',prjOnScroll);w.addEventListener('mousedown',prjMouseDown);w.addEventListener('mouseover',prjMouseOver);w.addEventListener('mouseout',prjMouseOut);w.addEventListener('mousemove',e=>{PRJ._mx=e.clientX;PRJ._my=e.clientY;});w.addEventListener('dblclick',prjDblClick);w.addEventListener('click',prjClick);w.addEventListener('contextmenu',prjContext);document.addEventListener('mouseup',()=>{PRJ._dragging=null;});document.addEventListener('keydown',prjKey);document.addEventListener('mousedown',e=>{if(!e.target.closest('.prj-menu')&&!e.target.closest('.prj-fbtn')&&!e.target.closest('.prj-pill')&&!e.target.closest('.prj-ctx')&&!e.target.closest('#prjColBtn'))prjCloseMenus();});const badge=document.getElementById('prjSumBadge');if(badge)badge.addEventListener('click',prjBadgeClick);}
 function renderProjections(){if(!DATA.length)return;prjRenderSummary();prjBuildRows();prjBuildView();const active=document.getElementById('sec-projections')&&document.getElementById('sec-projections').classList.contains('active');if(PRJ._shown||active)prjRenderGrid();prjWire();prjApplySelUI();}
 function prjOnShow(){PRJ._shown=true;if(!DATA.length)return;prjBuildRows();prjBuildView();prjRenderGrid();prjApplySelUI();prjWire();}
 </script></body></html>
