@@ -1,9 +1,9 @@
 {
   "theme": "system",
-  "defaultCSV": "20260729_AMBD_Universe_Raw.enc",
-  "lastWeekCSV": "20260715_AMBD_Universe_Raw.enc",
+  "defaultCSV": "20260804_AMBD_Universe_Raw.enc",
+  "lastWeekCSV": "20260729_AMBD_Universe_Raw.enc",
   "targetCSV": "targets.enc",
-  "arCSV": "ar20260729_ar.enc",
+  "arCSV": "ar20260804_ar.enc",
   "currency": "PHP",
   "usdRate": 57,
   "showPDFBtn": false,
@@ -21,7 +21,8 @@
   "am": {
     "visible": true,
     "am-chart": true,
-    "am-detail": true
+    "am-detail": true,
+    "showPastAMs": false
   },
   "bd": {
     "visible": true,
@@ -54,6 +55,11 @@
     "poc-chart": true,
     "poc-table": true
   },
+  "projections": {
+    "visible": true,
+    "prj-summary": true,
+    "prj-grid": true
+  },
   "ar": {
     "visible": true,
     "ar-kpis": true,
@@ -61,7 +67,7 @@
     "ar-table": true
   },
   "encrypt": {
-    "visible": false
+    "visible": true
   },
   "debugKey": ""
 }
