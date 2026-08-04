@@ -577,6 +577,14 @@ body.settings-open,body.modal-open{overflow:hidden}
 .prj-le-tbl td.var-pos{color:var(--green)}.prj-le-tbl td.var-neg{color:var(--red)}
 .prj-le-tbl td.fyle{color:var(--accent)}
 .prj-le-tbl tr:last-child td{border-bottom:none}
+/* BTS breakdown table — highlighted key figures */
+.prj-bts-tbl td.dash{color:var(--text-muted)}
+.prj-bts-tbl td.hl-yellow{background:rgba(241,194,50,.20);color:#f1c232}
+.prj-bts-tbl td.hl-blue{background:rgba(59,130,246,.20);color:#3b82f6}
+.prj-bts-tbl td.hl-green{background:rgba(34,197,94,.18);color:var(--green)}
+.prj-bts-tbl td.hl-maroon{background:rgba(140,26,44,.24);color:#e05563}
+.prj-bts-tbl td.prj-bts-tag{text-align:left;font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--text-muted);white-space:nowrap}
+.prj-bts-tbl td.prj-bts-tag.hl-blue{color:#3b82f6}
 .prj-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .prj-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
 .prj-tbtn{padding:5px 12px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;transition:all .15s;font-family:inherit}
@@ -846,7 +854,7 @@ function splitPeople(raw){
   if(buf.trim())parts.push(buf.trim());
   return parts;
 }
-function bdNick(b){return BD_NICKS[b]||b.split(' ').slice(0,2).join(' ');}
+function bdNick(b){return BD_NICKS[b]||(b||'').trim().split(/\s+/)[0]||'';}
 const BD_SPECIAL_GOALS={'Jorge Luis Tesoro':10,'Vince':0}; // H has special goal of 10, Vince has no goal
 const BD_DEFAULT_GOAL=15; // All other BDs get 15
 function getBDGoal(bdKey){return bdKey in BD_SPECIAL_GOALS?BD_SPECIAL_GOALS[bdKey]:BD_DEFAULT_GOAL;}
@@ -1023,8 +1031,10 @@ function pct(v,t){return t>0?((v/t)*100).toFixed(1):'0.0';}
 function dv(c,p,sm){const k=sm?'delta-sm':'delta';if(p===null||p===undefined)return '';if(Math.abs(c-p)<0.01)return `<span class="${k} flat">—</span>`;if(c>p)return `<span class="${k} up">▲</span>`;return `<span class="${k} down">▼</span>`;}
 function sp(st){const m={'Signed CE':['Won','status-won'],'Won - Awaiting CE Signature':['Won (Pending CE)','status-won'],'For Closing':['For Closing','status-collection'],'Fully Closed':['Closed','status-collection'],'For Collection':['For Collection','status-collection'],'CE/Pitch Submitted':['CE Submitted','status-submitted'],'For CE/Pitch Creation':['For Submission','status-pitch'],'Talks In Progress':['In Progress','status-rfp'],'Talent Sourcing':['Talent Sourcing','status-rfp'],'Stalled':['Stalled','status-lost'],'Lost':['Lost','status-lost'],'Archived':['Archived','status-lost'],'Collected':['Collected','status-won'],'For Invoicing':['For Invoicing','status-submitted'],'For Approval':['For Approval','status-rfp'],'Pending Invoice Request Approval':['Pending Approval','status-rfp']};const[l,c]=m[st]||[st,''];return `<span class="status-pill ${c}">${l}</span>`;}
 function gw(){const d=new Date(),o=new Date(d.getFullYear(),0,1);return Math.ceil(((d-o)/864e5+o.getDay()+1)/7);}
-function twp(d){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
-function twpT(d,t){return d.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])&&r['Tribe']===t).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
+// A counted win: won status AND not IP-tagged. IP never contributes to win totals anywhere on the page.
+function isWin(r){return WS.includes(r['Status'])&&!isIPTag(r);}
+function twp(d){return d.filter(r=>r['Year']==='2026'&&isWin(r)).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
+function twpT(d,t){return d.filter(r=>r['Year']==='2026'&&isWin(r)&&r['Tribe']===t).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);}
 function hp(){return DATA_PREV.length>0;}
 function curLeadMonth(){const m=new Date().getMonth(),n=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return(m+1)+' - '+n[m];}
 function extractDate(n){const m=(n||'').match(/(\d{4})(\d{2})(\d{2})/);return m?new Date(+m[1],+m[2]-1,+m[3]):null;}
@@ -1629,9 +1639,9 @@ async function downloadPDF(){
         doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
         checkPage(10);doc.text('BD Wins — 2026',ml,y+4);y+=6;
         const bwd=window._bdWinsData;if(bwd){
-          const y2026=DATA.filter(r=>r['Year']==='2026'),won=y2026.filter(r=>WS.includes(r['Status'])&&(r['BD']||'').trim());
+          const y2026=DATA.filter(r=>r['Year']==='2026'),won=y2026.filter(r=>isWin(r)&&(r['BD']||'').trim());
           const rows=won.sort((a,b)=>{const da=a['Sign Date']||'',db=b['Sign Date']||'';if(da&&db)return da.localeCompare(db);if(da)return 1;if(db)return -1;return 0;}).map(r=>{
-            const bds=splitPeople(r['BD']).map(b=>BD_NICKS[b]||b.split(' ').slice(0,2).join(' ')).join(', ');
+            const bds=splitPeople(r['BD']).map(b=>bdNick(b)).join(', ');
             return[dm(r),bds,r['Project']||'—',r['Client']||'—',(r['Tribe']||'').replace('PDEI - ',''),fmtF(pn(r['Amount (VAT-Ex.) (PHP)']))];
           });
           doc.autoTable({startY:y,margin:{left:ml,right:mr},head:[['Month','BD','Project','Client','Tribe','Amount']],body:rows,
@@ -1706,7 +1716,7 @@ async function downloadPDF(){
       if(isSecVis('at-wonTable')){
         doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(dark);
         checkPage(10);doc.text('Projects Won',ml,y+4);y+=6;
-        const yd=DATA.filter(r=>r['Year']==='2026'),wp=yd.filter(r=>WS.includes(r['Status']));
+        const yd=DATA.filter(r=>r['Year']==='2026'),wp=yd.filter(isWin);
         const rows=wp.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)'])).map(r=>{
           const an=(r['AM']||'').split(',')[0],sn=Object.entries(AM_NICKS).find(([f])=>an.includes(f.split(' ')[0]));
           return[r['Project']||'—',r['Client']||'—',(r['Tribe']||'').replace('PDEI - ',''),r['Status']||'—',sn?sn[1]:an.split(' ').slice(0,2).join(' '),fmtF(pn(r['Amount (VAT-Ex.) (PHP)']))];});
@@ -1777,7 +1787,7 @@ const CAPTIONS={
   else t+='Additional lead generation effort is needed to meet targets. ';}return t;},
 'bd-wins':function(){const d=window._bdWinsData;if(!d)return'';const{sortedBDs,totalWon,totalAmt}=d;
   let t=`<strong>${totalWon} projects</strong> won in 2026 with BD involvement, totaling <strong>${fmtF(totalAmt)}</strong>. `;
-  if(sortedBDs.length>0){t+='BD contribution: ';t+=sortedBDs.map(([bd,info])=>{const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');return`<strong>${nick}</strong> ${info.count} win${info.count>1?'s':''} (${fmtF(info.amt)})`;}).join(', ')+'. ';}return t;},
+  if(sortedBDs.length>0){t+='BD contribution: ';t+=sortedBDs.map(([bd,info])=>{const nick=bdNick(bd);return`<strong>${nick}</strong> ${info.count} win${info.count>1?'s':''} (${fmtF(info.amt)})`;}).join(', ')+'. ';}return t;},
 'wr-count':function(){const d=window._wrData;if(!d)return'';const{tW,tL,wr,am,wm,lm}=d;
   let t=`Year-to-date win/loss count: <strong>${tW} wins vs ${tL} losses</strong>, for an overall win rate of <strong>${wr.toFixed(1)}%</strong>. `;
   if(am.length>0){const best=am.reduce((a,m)=>{const w=(wm[m]||{}).c||0,l=(lm[m]||{}).c||0;const r=(w+l)>0?w/(w+l)*100:0;return r>a.r?{m,r,w,l}:a;},{m:'',r:0,w:0,l:0});
@@ -1807,7 +1817,7 @@ const CAPTIONS={
 'at-ytdPipeline':function(){const d=window._ovData;if(!d)return'';const{tws,tpip}=d;const tribes=Object.keys(TRIBE_TARGETS);let t='This chart combines won revenue and active pipeline per tribe. ';
   tribes.forEach(tribe=>{const name=tribe.replace('PDEI - ',''),w=tws[tribe]||0,p=tpip[tribe]||0;
   t+=`<strong>${name}</strong>: ${fmt(w)} won + ${fmt(p)} pipeline. `;});return t;},
-'at-wonTable':function(){const d=window._atData;if(!d)return'';const{totalW}=d;const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(r=>WS.includes(r['Status']));return`<strong>${wp.length} won projects</strong> totaling ${fmtF(totalW)}. Filter by tribe to drill into specific team results.`;}
+'at-wonTable':function(){const d=window._atData;if(!d)return'';const{totalW}=d;const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(isWin);return`<strong>${wp.length} won projects</strong> totaling ${fmtF(totalW)}. Filter by tribe to drill into specific team results.`;}
 };
 
 // ═══ 7. POC ═══
@@ -1993,7 +2003,7 @@ function toggleQDetail(i){
   if(_activeQ===i){_activeQ=-1;el.classList.remove('open');document.querySelectorAll('.q-item').forEach(s=>s.style.opacity='');if(ov){ov.classList.remove('show');ov.style.width='0';}return;}
   _activeQ=i;
   const q=Q_TARGETS_USD[i],qTarget=q.amount*USD_RATE;
-  const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(r=>WS.includes(r['Status']));
+  const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(isWin);
   const ytd=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const pipStatuses=['CE/Pitch Submitted','For CE/Pitch Creation'];
   const pipTotal=y.filter(r=>pipStatuses.includes(r['Status'])).reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
@@ -2017,7 +2027,7 @@ function toggleQDetail(i){
   el.classList.add('open');
 }
 function renderOverview(cw){
-  const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(r=>WS.includes(r['Status']));
+  const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(isWin);
   const tw=won.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0),tt=Object.values(TRIBE_TARGETS).reduce((a,b)=>a+b,0);
   const ce=y.filter(r=>r['Status']==='CE/Pitch Submitted'),ceT=ce.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const fs=y.filter(r=>r['Status']==='For CE/Pitch Creation'),fsT=fs.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
@@ -2064,8 +2074,8 @@ function renderOverview(cw){
 // ═══ 2. PIPELINE (GP + 30% gross) ═══
 function renderPipeline(cw){
   const y=DATA.filter(r=>r['Year']==='2026');
-  const rw=y.filter(r=>WS.includes(r['Status'])&&r['Week Number']==String(cw)),rwT=rw.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
-  const lw=y.filter(r=>WS.includes(r['Status'])&&r['Week Number']==String(cw-1)),lwT=lw.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
+  const rw=y.filter(r=>isWin(r)&&r['Week Number']==String(cw)),rwT=rw.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
+  const lw=y.filter(r=>isWin(r)&&r['Week Number']==String(cw-1)),lwT=lw.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const ce=y.filter(r=>r['Status']==='CE/Pitch Submitted'),ceT=ce.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const fs=y.filter(r=>{if(r['Status']!=='For CE/Pitch Creation')return false;const w=parseInt(r['RFPR-WeekNum']);return isNaN(w)||w<=cw-2;}),fsT=fs.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
   const rfps=y.filter(r=>{const w=parseInt(r['RFPR-WeekNum']);return w>=cw-1&&w<=cw&&r['Status']==='For CE/Pitch Creation';}),rfpT=rfps.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
@@ -2298,13 +2308,13 @@ function renderBD(){const months=[...new Set(DATA.filter(r=>r['Lead Month']).map
 let _bdWinsFilter=null;
 function toggleBDWinsFilter(bd){_bdWinsFilter=_bdWinsFilter===bd?null:bd;renderBDWins();}
 function renderBDWins(){
-  const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(r=>WS.includes(r['Status'])&&(r['BD']||'').trim());
+  const y=DATA.filter(r=>r['Year']==='2026'),won=y.filter(r=>isWin(r)&&(r['BD']||'').trim());
   // Group by BD
   const bdTotals={};won.forEach(r=>{const bds=splitPeople(r['BD']);bds.forEach(bd=>{if(!bdTotals[bd])bdTotals[bd]={count:0,amt:0};bdTotals[bd].count++;bdTotals[bd].amt+=pn(r['Amount (VAT-Ex.) (PHP)']);});});
   const sortedBDs=Object.entries(bdTotals).sort((a,b)=>b[1].amt-a[1].amt);
   // Summary strip with clickable cards
   let h='<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">';
-  sortedBDs.forEach(([bd,info])=>{const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');const isActive=_bdWinsFilter===bd;h+=`<div onclick="toggleBDWinsFilter('${bd.replace(/'/g,"\\'")}')" style="cursor:pointer;background:${isActive?'var(--accent-glow)':'var(--surface2)'};border:2px solid ${isActive?'var(--accent)':'transparent'};border-radius:8px;padding:8px 14px;display:flex;flex-direction:column;align-items:center;transition:all .15s"><span style="font-size:11px;font-weight:600;color:var(--text-dim)">${nick}</span><span style="font-size:15px;font-weight:700;color:var(--text)">${fmtF(info.amt)}</span><span style="font-size:10px;color:var(--text-muted)">${info.count} win${info.count!==1?'s':''}</span></div>`;});
+  sortedBDs.forEach(([bd,info])=>{const nick=bdNick(bd);const isActive=_bdWinsFilter===bd;h+=`<div onclick="toggleBDWinsFilter('${bd.replace(/'/g,"\\'")}')" style="cursor:pointer;background:${isActive?'var(--accent-glow)':'var(--surface2)'};border:2px solid ${isActive?'var(--accent)':'transparent'};border-radius:8px;padding:8px 14px;display:flex;flex-direction:column;align-items:center;transition:all .15s"><span style="font-size:11px;font-weight:600;color:var(--text-dim)">${nick}</span><span style="font-size:15px;font-weight:700;color:var(--text)">${fmtF(info.amt)}</span><span style="font-size:10px;color:var(--text-muted)">${info.count} win${info.count!==1?'s':''}</span></div>`;});
   h+='</div>';
   // Filter by selected BD
   const filtered=_bdWinsFilter?won.filter(r=>(r['BD']||'').includes(_bdWinsFilter)):won;
@@ -2313,7 +2323,7 @@ function renderBDWins(){
   const sorted=[...filtered].sort((a,b)=>{const ia=mo.indexOf(dm(a)),ib=mo.indexOf(dm(b));if(ia!==ib)return ia-ib;const da=a['Sign Date']||'',db=b['Sign Date']||'';if(da&&db)return da.localeCompare(db);if(da)return 1;if(db)return -1;return pn(a['Amount (VAT-Ex.) (PHP)'])-pn(b['Amount (VAT-Ex.) (PHP)']);});
   h+=`<table><thead><tr><th>Month</th><th>BD</th><th>Project</th><th>Client</th><th>Tribe</th><th>Status</th><th class="amt">Amount</th></tr></thead><tbody>`;
   let lastM='';
-  sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),bds=splitPeople(r['BD']),bdNicks=bds.map(b=>BD_NICKS[b]||b.split(' ').slice(0,2).join(' ')).join(', ');
+  sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),bds=splitPeople(r['BD']),bdNicks=bds.map(b=>bdNick(b)).join(', ');
     const m=dm(r),showM=m!==lastM;lastM=m;
     h+=`<tr style="cursor:pointer" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:${showM?'700':'400'};color:${showM?'var(--text)':'transparent'}">${m}</td><td style="font-weight:600">${bdNicks}</td><td style="font-weight:500;color:var(--text)">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(r['Tribe']||'—').replace('PDEI - ','')}</td><td>${sp(r['Status'])}</td><td class="amt">${fmtF(amt)}</td></tr>`;});
   const totalAmt=filtered.reduce((s,r)=>s+pn(r['Amount (VAT-Ex.) (PHP)']),0);
@@ -2333,26 +2343,26 @@ function renderBDDoorsChart(){
   const y=DATA.filter(r=>r['Year']==='2026'&&(r['BD']||'').trim()&&r['Status']!=='Talks In Progress'&&r['Status']!=='Talent Sourcing');
   const archivedSt=['Lost','Stalled','Archived'];
   const wonSt=WS;
-  const totals={};y.forEach(r=>{const st=r['Status']||'',bds=splitPeople(r['BD']);let grp='other';if(archivedSt.includes(st))grp='archived';else if(st==='For CE/Pitch Creation')grp='forSub';else if(st==='CE/Pitch Submitted')grp='ceSub';else if(wonSt.includes(st))grp='won';bds.forEach(bd=>{if(!totals[bd])totals[bd]={archived:0,forSub:0,ceSub:0,won:0,total:0,count:0};totals[bd][grp]=(totals[bd][grp]||0)+pn(r['Amount (VAT-Ex.) (PHP)']);totals[bd].total+=pn(r['Amount (VAT-Ex.) (PHP)']);totals[bd].count++;});});
+  const totals={};y.forEach(r=>{const st=r['Status']||'',bds=splitPeople(r['BD']);let grp='other';if(archivedSt.includes(st))grp='archived';else if(st==='For CE/Pitch Creation')grp='forSub';else if(st==='CE/Pitch Submitted')grp='ceSub';else if(wonSt.includes(st))grp=isIPTag(r)?'other':'won';bds.forEach(bd=>{if(!totals[bd])totals[bd]={archived:0,forSub:0,ceSub:0,won:0,total:0,count:0};totals[bd][grp]=(totals[bd][grp]||0)+pn(r['Amount (VAT-Ex.) (PHP)']);totals[bd].total+=pn(r['Amount (VAT-Ex.) (PHP)']);totals[bd].count++;});});
   _bdDoorsData=totals;
   const allBDs=Object.keys(totals).sort((a,b)=>totals[b].total-totals[a].total);
   if(_bdDoorsChartSel===null){
     _bdDoorsChartSel=new Set();allBDs.forEach(bd=>{const nick=BD_NICKS[bd]||'';if(['Ella','Kewen','H','Moki'].includes(nick)||['Ella','Kewen','H','Moki'].includes(bd))_bdDoorsChartSel.add(bd);});
   }
   const filterEl=document.getElementById('bdDoorsChartFilter');
-  if(filterEl){let fh='<span class="filter-label">BDs</span>';allBDs.forEach(bd=>{const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');const on=_bdDoorsChartSel.has(bd);fh+=`<button class="filter-btn ${on?'active':''}" onclick="toggleBDDoorsChart('${bd.replace(/'/g,"\\'")}')">${nick}</button>`;});filterEl.innerHTML=fh;}
+  if(filterEl){let fh='<span class="filter-label">BDs</span>';allBDs.forEach(bd=>{const nick=bdNick(bd);const on=_bdDoorsChartSel.has(bd);fh+=`<button class="filter-btn ${on?'active':''}" onclick="toggleBDDoorsChart('${bd.replace(/'/g,"\\'")}')">${nick}</button>`;});filterEl.innerHTML=fh;}
   const sel=allBDs.filter(bd=>_bdDoorsChartSel.has(bd));
   const mx=Math.max(...sel.map(bd=>totals[bd].total),1)*1.1;
   let h='';let idx=0;
-  sel.forEach(bd=>{const d=totals[bd],nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' '),sc=mx;
+  sel.forEach(bd=>{const d=totals[bd],nick=bdNick(bd),sc=mx;
     const wW=(d.won/sc*100).toFixed(2),ceW=(d.ceSub/sc*100).toFixed(2),fsW=(d.forSub/sc*100).toFixed(2),arW=(d.archived/sc*100).toFixed(2);
     h+=`<div class="am-bar-row anim-fade" style="animation-delay:${(idx*0.08).toFixed(2)}s" onclick="expandBDDoor('${bd.replace(/'/g,"\\'")}')"><div class="am-bar-name">${nick} <span style="font-size:11px;font-weight:400;color:var(--text-muted)">(${d.count})</span></div><div class="am-bar-container"><div class="am-bar-bg"><div class="am-bar-seg" style="width:${wW}%;background:#f1c232" onmouseenter="amSegIn(event,'Won',${d.won})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg" style="width:${ceW}%;background:#3b82f6" onmouseenter="amSegIn(event,'CE Submitted',${d.ceSub})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg" style="width:${fsW}%;background:#f59e0b" onmouseenter="amSegIn(event,'For Submission',${d.forSub})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div><div class="am-bar-seg" style="width:${arW}%;background:rgba(100,116,139,.4)" onmouseenter="amSegIn(event,'Archived',${d.archived})" onmousemove="amSegMv(event)" onmouseleave="amSegOut()"></div></div></div><div class="am-bar-values"><div class="val" style="color:var(--text)">${fmt(d.total)}</div></div></div><div id="bdDoorExp_${nick}" style="display:none"></div>`;idx++;});
   container.innerHTML=h;
   _bdDoorsExpanded=null;document.getElementById('bdDoorsDrawer').classList.remove('visible');
 }
-function expandBDDoor(bd){const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');const el=document.getElementById('bdDoorExp_'+nick);
+function expandBDDoor(bd){const nick=bdNick(bd);const el=document.getElementById('bdDoorExp_'+nick);
   if(_bdDoorsExpanded===bd){el.style.display='none';_bdDoorsExpanded=null;document.getElementById('bdDoorsDrawer').classList.remove('visible');return;}
-  if(_bdDoorsExpanded){const pNick=BD_NICKS[_bdDoorsExpanded]||_bdDoorsExpanded.split(' ').slice(0,2).join(' ');const pe=document.getElementById('bdDoorExp_'+pNick);if(pe)pe.style.display='none';document.getElementById('bdDoorsDrawer').classList.remove('visible');}
+  if(_bdDoorsExpanded){const pNick=bdNick(_bdDoorsExpanded);const pe=document.getElementById('bdDoorExp_'+pNick);if(pe)pe.style.display='none';document.getElementById('bdDoorsDrawer').classList.remove('visible');}
   _bdDoorsExpanded=bd;const d=_bdDoorsData[bd]||{won:0,ceSub:0,forSub:0,archived:0,total:0,count:0};
   el.innerHTML=`<div class="am-expand"><div class="am-expand-grid">
     <div class="am-expand-item"><div class="phase-color" style="background:#f1c232"></div><span class="phase-name">Won</span><span class="phase-val" style="color:#f1c232">${fmtF(d.won)}</span></div>
@@ -2361,7 +2371,7 @@ function expandBDDoor(bd){const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join
     <div class="am-expand-item"><div class="phase-color" style="background:rgba(100,116,139,.6)"></div><span class="phase-name">Archived</span><span class="phase-val" style="color:var(--text-muted)">${fmtF(d.archived)}</span></div>
   </div><div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-muted)">Total: <strong style="color:var(--text)">${fmtF(d.total)}</strong> · ${d.count} door${d.count!==1?'s':''}</div></div>`;
   el.style.display='block';showBDDoorAccounts(bd);}
-function showBDDoorAccounts(bd){const dr=document.getElementById('bdDoorsDrawer');const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');
+function showBDDoorAccounts(bd){const dr=document.getElementById('bdDoorsDrawer');const nick=bdNick(bd);
   const y=DATA.filter(r=>r['Year']==='2026'&&(r['BD']||'').includes(bd)&&r['Status']!=='Talks In Progress'&&r['Status']!=='Talent Sourcing');
   const _doorGrp=s=>{if(WS.includes(s))return 0;if(s==='CE/Pitch Submitted')return 1;if(s==='For CE/Pitch Creation')return 2;return 3;};
   const sorted=[...y].sort((a,b)=>{const ga=_doorGrp(a['Status']),gb=_doorGrp(b['Status']);if(ga!==gb)return ga-gb;return pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']);});
@@ -2376,14 +2386,14 @@ function getBDLeads(bd){return DATA.filter(r=>r['BD']&&r['BD'].includes(bd)&&r['
 function getAllBDLeads(bd){return DATA.filter(r=>r['BD']&&r['BD'].includes(bd)&&r['Lead Month']&&r['Status']!=='Lost');}
 function renderBDCharts(){
   // Determine active BDs for current filter
-  const activeBDs=getActiveBDsForMonth(bdState.month).sort((a,b)=>(BD_NICKS[a]||a).localeCompare(BD_NICKS[b]||b));
+  const activeBDs=getActiveBDsForMonth(bdState.month).sort((a,b)=>bdNick(a).localeCompare(bdNick(b)));
   // For bar chart, show all BDs that have data in the selected period
   const labels=[],qualData=[],fqData=[],goals=[];let totalLeads=0;
   activeBDs.forEach(bd=>{
     const leads=getBDLeads(bd);
     const q=leads.filter(r=>(r['Lead Progress']||'').startsWith('[QUALIFIED]')).length;
     const fq=leads.length-q;
-    const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');
+    const nick=bdNick(bd);
     const bdGoal=getBDGoal(bd);
     // If "All" months, scale goal by number of months this BD has data
     let goalForBar=bdGoal;
@@ -2415,7 +2425,7 @@ function renderBDCharts(){
     plugins:[{id:'centerTxt',afterDraw(chart){const{ctx,chartArea:{width:w,height:h,top:t,left:l}}=chart;const style=getComputedStyle(document.documentElement);ctx.save();ctx.textAlign='center';ctx.fillStyle=style.getPropertyValue('--text').trim();ctx.font='700 32px DM Sans';ctx.fillText(pctD.toFixed(0)+'%',l+w/2,t+h/2);ctx.fillStyle=style.getPropertyValue('--text-muted').trim();ctx.font='500 12px DM Sans';ctx.fillText(donutTL+' / '+donutG,l+w/2,t+h/2+20);ctx.restore();}}]});
   window._bdData={totalLeads,totalGoal:donutGoal,month:bdState.month,activeBDs};}
 function renderBDCards(){
-  const activeBDs=getActiveBDsForMonth(bdState.month).sort((a,b)=>(BD_NICKS[a]||a).localeCompare(BD_NICKS[b]||b));
+  const activeBDs=getActiveBDsForMonth(bdState.month).sort((a,b)=>bdNick(a).localeCompare(bdNick(b)));
   let h='';let bdIdx=0;activeBDs.forEach(bd=>{
     const leads=getBDLeads(bd);
     if(leads.length===0)return;
@@ -2423,7 +2433,7 @@ function renderBDCards(){
     const bdGoal=getBDGoal(bd);
     let g=bdGoal;
     if(bdState.month==='all'){const bdMonths=[...new Set(DATA.filter(r=>r['BD']&&r['BD'].includes(bd)&&r['Lead Month']&&r['Status']!=='Lost').map(r=>r['Lead Month']))];g=bdGoal*Math.max(bdMonths.length,1);}
-    const nick=BD_NICKS[bd]||bd.split(' ').slice(0,2).join(' ');
+    const nick=bdNick(bd);
     const hasGoal=g>0;const p=hasGoal?Math.min((leads.length/g)*100,100):100,c=hasGoal?(p>=70?'green':p>=40?'amber':'red'):'green';
     h+=`<div class="bd-card anim-fade ${bdState.activeBD===bd?'active':''}" style="animation-delay:${(bdIdx*0.08).toFixed(2)}s" onclick="selectBD('${bd.replace(/'/g,"\\'")}')"><div class="bd-card-header"><div><div class="bd-card-name">${nick}</div><div class="bd-card-sub">${bd.split(' ').slice(0,2).join(' ')}</div></div><div style="text-align:right"><div class="bd-card-count">${leads.length}</div><div class="bd-card-sub">${hasGoal?'of '+g+' goal':'no goal'}</div></div></div>${hasGoal?`<div style="margin-bottom:10px"><div class="progress-bar" style="height:8px"><div class="progress-fill ${c}" style="width:${p}%"></div></div></div>`:''}<div class="bd-stats"><div>Qualified: <span class="num" style="color:#f1c232">${q.length}</span></div><div>For Qualification: <span class="num" style="color:#3a74d0">${fq}</span></div></div></div>`;bdIdx++;});
   document.getElementById('bdGrid').innerHTML=h;if(bdState.activeBD&&!activeBDs.includes(bdState.activeBD)){bdState.activeBD=null;document.getElementById('bdDetail').classList.remove('visible');}else if(bdState.activeBD)renderBDDetail(bdState.activeBD);else document.getElementById('bdDetail').classList.remove('visible');}
@@ -2433,7 +2443,7 @@ function renderBDDetail(bd){const leads=getBDLeads(bd),po={'4 - ITQ/RFQ/RFP':0,'
   const monthIdx=m=>{const p=(m||'').split(' - ');return p.length>1?mo.indexOf(p[1]):99;};
   const isAll=bdState.month==='all';
   const sorted=leads.sort((a,b)=>{const ph=(po[a['Lead Phase']]??9)-(po[b['Lead Phase']]??9);if(ph!==0)return ph;if(isAll){const mi=monthIdx(b['Lead Month'])-monthIdx(a['Lead Month']);if(mi!==0)return mi;}return pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']);});
-  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-size:16px;font-weight:700">${BD_NICKS[bd]} — Lead Details</div><button class="am-close-btn" onclick="bdState.activeBD=null;document.getElementById('bdDetail').classList.remove('visible');document.querySelectorAll('.bd-card').forEach(c=>c.classList.remove('active'))">✕</button></div><div class="table-wrap"><table style="table-layout:fixed;width:100%"><thead><tr><th style="width:20%">Door (Client)</th><th style="width:${isAll?'22%':'28%'}">Project</th><th style="width:14%">Lead Phase</th><th style="width:${isAll?'20%':'24%'}">Lead Progress</th><th class="amt" style="width:12%">Budget</th>${isAll?'<th style="width:12%">Month</th>':''}</tr></thead><tbody>`;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-size:16px;font-weight:700">${bdNick(bd)} — Lead Details</div><button class="am-close-btn" onclick="bdState.activeBD=null;document.getElementById('bdDetail').classList.remove('visible');document.querySelectorAll('.bd-card').forEach(c=>c.classList.remove('active'))">✕</button></div><div class="table-wrap"><table style="table-layout:fixed;width:100%"><thead><tr><th style="width:20%">Door (Client)</th><th style="width:${isAll?'22%':'28%'}">Project</th><th style="width:14%">Lead Phase</th><th style="width:${isAll?'20%':'24%'}">Lead Progress</th><th class="amt" style="width:12%">Budget</th>${isAll?'<th style="width:12%">Month</th>':''}</tr></thead><tbody>`;
   sorted.forEach(r=>{const pr=(r['Lead Progress']||'').replace('[QUALIFIED] ',''),isQ=(r['Lead Progress']||'').startsWith('[QUALIFIED]'),amt=pn(r['Amount (VAT-Ex.) (PHP)']);h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()" style="cursor:pointer${isQ?';background:rgba(241,194,50,.12)':''}"><td style="font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis">${r['Client']||'—'}</td><td style="overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td><span style="color:${pc[r['Lead Phase']]||'var(--text-dim)'};font-weight:600;font-size:11px">${(r['Lead Phase']||'—').replace(/^\d+ - /,'')}</span></td><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${isQ?'<span style="color:var(--green);font-weight:600;font-size:10px">✓ Q</span> ':''}${pr||'—'}</td><td class="amt">${amt>0?fmt(amt):'—'}</td>${isAll?`<td>${r['Lead Month']||'—'}</td>`:''}</tr>`;});
   h+='</tbody></table></div>';document.getElementById('bdDetail').innerHTML=h;document.getElementById('bdDetail').classList.add('visible');}
 
@@ -2442,7 +2452,7 @@ let wrState={month:'all'};
 function dm(r,useSignDate){const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];if(useSignDate){const sd=r['Sign Date']||'';const d=new Date(sd);if(!isNaN(d))return mn[d.getMonth()];}const m=r['Month'];if(m){for(let i=0;i<12;i++){const mm=String(i+1).padStart(2,'0');if(m.startsWith(mm))return mn[i];}return m;}const lu=r['Last Updated']||r['RFP Received Date']||'';for(let i=0;i<12;i++){const mm=String(i+1).padStart(2,'0');if(lu.includes('2026/'+mm)||lu.includes('2026-'+mm))return mn[i];}return'Unknown';}
 // Loss month: prefer "Loss Month" column for lost projects, fallback to dm()
 function lossM(r){const raw=(r['Loss Month']||'').trim();if(raw){const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];for(let i=0;i<12;i++){if(raw.includes(mn[i]))return mn[i];}for(let i=0;i<12;i++){const mm=String(i+1).padStart(2,'0');if(raw.startsWith(mm))return mn[i];}}return dm(r);}
-function renderWinRate(){const y=DATA.filter(r=>r['Year']==='2026'),wins=y.filter(r=>WS.includes(r['Status'])),losses=y.filter(r=>r['Status']==='Lost'),mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],wm={},lm={};
+function renderWinRate(){const y=DATA.filter(r=>r['Year']==='2026'&&!isIPTag(r)),wins=y.filter(isWin),losses=y.filter(r=>r['Status']==='Lost'),mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],wm={},lm={};
   // Read live theme colors for canvas
   const sty=getComputedStyle(document.documentElement);
   const cGreen=sty.getPropertyValue('--green').trim()||'#10B981';
@@ -2463,7 +2473,7 @@ function setWRM(m){wrState.month=m;
   // Only re-render filter buttons and table, not charts
   const y=DATA.filter(r=>r['Year']==='2026'),losses=y.filter(r=>r['Status']==='Lost');
   const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],wm={},lm={};
-  y.filter(r=>WS.includes(r['Status'])).forEach(r=>{const mm=dm(r);wm[mm]=1;});losses.forEach(r=>{lm[lossM(r)]=1;});
+  y.filter(isWin).forEach(r=>{const mm=dm(r);wm[mm]=1;});losses.forEach(r=>{lm[lossM(r)]=1;});
   const am=mo.filter(mm=>wm[mm]||lm[mm]);
   let fH='<span class="filter-label">Month</span>';fH+=`<button class="filter-btn ${wrState.month==='all'?'active':''}" onclick="setWRM('all')">All</button>`;am.forEach(mm=>{fH+=`<button class="filter-btn ${wrState.month===mm?'active':''}" onclick="setWRM('${mm}')">${mm}</button>`;});
   document.getElementById('winrateMonthFilter').innerHTML=fH;renderLT(losses);}
@@ -2491,11 +2501,11 @@ function renderAttainment(){const y=DATA.filter(r=>r['Year']==='2026'),tw={},tp=
     th+=`<tr><td style="font-weight:600;color:var(--text)">IP <span style="font-size:10px;font-weight:500;color:var(--text-muted)">· tag · excl. total</span></td><td class="amt"><span style="color:var(--text-muted)">—</span></td><td class="amt" style="color:var(--green);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('wins','${teip}')">${fmtF(ipW)}</td><td class="amt" style="color:var(--purple);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('pipeline','${teip}')">${fmtF(ipP)}</td><td class="amt" style="color:var(--text-muted)">—</td><td><span style="color:var(--text-muted)">—</span></td></tr>`;}
   const totalGap=totalT-totalW;
   th+=`<tr style="border-top:2px solid var(--border)"><td style="font-weight:700;color:var(--text)">TOTAL</td><td class="amt" style="font-weight:700">${fmtF(totalT)}</td><td class="amt" style="font-weight:700;color:var(--green)">${fmtF(totalW)}</td><td class="amt" style="font-weight:700;color:var(--purple);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px" onclick="toggleOvTribeDetail('pipeline','__all__')">${fmtF(totalP)}</td><td class="amt" style="font-weight:700;color:${totalGap<0?'var(--green)':'var(--red)'}">${fmtGap(totalGap)}</td><td style="font-weight:700;color:var(--amber)">${(totalW/totalT*100).toFixed(1)}%</td></tr></tbody></table>`;document.getElementById('tribeTable').innerHTML=th;document.getElementById('ovTribeDetail').innerHTML='';
-  const wp=y.filter(r=>WS.includes(r['Status'])),tl=[...new Set(wp.map(r=>r['Tribe']).filter(Boolean))].sort();let tf='<span class="filter-label">Tribe</span>';tf+=`<button class="filter-btn ${tribeWinsState.tribe==='all'?'active':''}" onclick="setTWF('all')">All</button>`;tl.forEach(t=>{tf+=`<button class="filter-btn ${tribeWinsState.tribe===t?'active':''}" onclick="setTWF('${t}')">${t.replace('PDEI - ','')}</button>`;});document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);
+  const wp=y.filter(isWin),tl=[...new Set(wp.map(r=>r['Tribe']).filter(Boolean))].sort();let tf='<span class="filter-label">Tribe</span>';tf+=`<button class="filter-btn ${tribeWinsState.tribe==='all'?'active':''}" onclick="setTWF('all')">All</button>`;tl.forEach(t=>{tf+=`<button class="filter-btn ${tribeWinsState.tribe===t?'active':''}" onclick="setTWF('${t}')">${t.replace('PDEI - ','')}</button>`;});document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);
   window._atData={tw,tp,totalW,totalT,totalP};}
 function setTWF(t){tribeWinsState.tribe=t;
   // Only re-render filter buttons and table, not charts
-  const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(r=>WS.includes(r['Status']));
+  const y=DATA.filter(r=>r['Year']==='2026'),wp=y.filter(isWin);
   const tl=[...new Set(wp.map(r=>r['Tribe']).filter(Boolean))].sort();
   let tf='<span class="filter-label">Tribe</span>';tf+=`<button class="filter-btn ${tribeWinsState.tribe==='all'?'active':''}" onclick="setTWF('all')">All</button>`;tl.forEach(tr=>{tf+=`<button class="filter-btn ${tribeWinsState.tribe===tr?'active':''}" onclick="setTWF('${tr}')">${tr.replace('PDEI - ','')}</button>`;});
   document.getElementById('tribeWinsFilter').innerHTML=tf;renderTWT(wp);}
@@ -2647,19 +2657,19 @@ function _tgRowMatches(r,acct){if(!acct)return false;const tags=String(r['Tags']
 // Sum of 2026 WS-status Amounts where any Tag contains Account.
 function tgCalcWon(card){
   if(!DATA||!DATA.length)return 0;const acct=_tgNorm(card.account);if(!acct)return 0;
-  let s=0;for(const r of DATA){if(r['Year']!=='2026')continue;if(!WS.includes(r['Status']))continue;if(_tgRowMatches(r,acct))s+=pn(r['Amount (VAT-Ex.) (PHP)']);}
+  let s=0;for(const r of DATA){if(r['Year']!=='2026')continue;if(!isWin(r))continue;if(_tgRowMatches(r,acct))s+=pn(r['Amount (VAT-Ex.) (PHP)']);}
   return s;
 }
 // List of rows contributing to a card's Won (for modal drill-down).
 function tgCalcWonList(acct){
   const out=[];if(!DATA||!DATA.length||!acct)return out;
-  for(const r of DATA){if(r['Year']!=='2026')continue;if(!WS.includes(r['Status']))continue;if(_tgRowMatches(r,acct))out.push(r);}
+  for(const r of DATA){if(r['Year']!=='2026')continue;if(!isWin(r))continue;if(_tgRowMatches(r,acct))out.push(r);}
   return out.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
 }
 // Sum of 2026 pipeline rows (non-Lost, non-Won) tagged with Account — current raised RFP.
 function tgCalcRFP(card){
   if(!DATA||!DATA.length)return 0;const acct=_tgNorm(card.account);if(!acct)return 0;
-  let s=0;for(const r of DATA){if(r['Year']!=='2026')continue;const st=r['Status'];if(st==='Lost'||WS.includes(st))continue;if(_tgRowMatches(r,acct))s+=pn(r['Amount (VAT-Ex.) (PHP)']);}
+  let s=0;for(const r of DATA){if(r['Year']!=='2026'||isIPTag(r))continue;const st=r['Status'];if(st==='Lost'||WS.includes(st))continue;if(_tgRowMatches(r,acct))s+=pn(r['Amount (VAT-Ex.) (PHP)']);}
   return s;
 }
 // Tooltip for table rows: show stacked BD + AM remarks (last line of each).
@@ -2667,7 +2677,7 @@ function tgRowTipIn(e,cardId){const r=_tgFindCard(cardId);if(!r)return;const bd=
 // List of pipeline rows contributing to a card's RFP (for modal drill-down).
 function tgCalcRFPList(acct){
   const out=[];if(!DATA||!DATA.length||!acct)return out;
-  for(const r of DATA){if(r['Year']!=='2026')continue;const st=r['Status'];if(st==='Lost'||WS.includes(st))continue;if(_tgRowMatches(r,acct))out.push(r);}
+  for(const r of DATA){if(r['Year']!=='2026'||isIPTag(r))continue;const st=r['Status'];if(st==='Lost'||WS.includes(st))continue;if(_tgRowMatches(r,acct))out.push(r);}
   return out.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
 }
 function _tgLastLine(s){if(!s)return '';const parts=String(s).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);return parts.length?parts[parts.length-1]:'';}
@@ -2766,7 +2776,7 @@ function renderTargetWins(){
   const accountKeys=[];
   TG_STATE.groups.forEach(g=>g.cards.forEach(c=>{const a=_tgNorm(c.account);if(a)accountKeys.push(a);}));
   const matchesTag=(rawTags)=>{if(!accountKeys.length)return false;const tags=String(rawTags||'').split(',').map(t=>_tgNorm(t)).filter(Boolean);return tags.some(tag=>accountKeys.some(k=>tag.includes(k)));};
-  const wins=DATA.filter(r=>r['Year']==='2026'&&WS.includes(r['Status'])).map(r=>({idx:r._i!=null?r._i:-1,client:r['Client']||'—',project:r['Project']||'—',tribe:r['Tribe']||'',tags:r['Tags']||'',amt:pn(r['Amount (VAT-Ex.) (PHP)'])})).sort((a,b)=>b.amt-a.amt);
+  const wins=DATA.filter(r=>r['Year']==='2026'&&isWin(r)).map(r=>({idx:r._i!=null?r._i:-1,client:r['Client']||'—',project:r['Project']||'—',tribe:r['Tribe']||'',tags:r['Tags']||'',amt:pn(r['Amount (VAT-Ex.) (PHP)'])})).sort((a,b)=>b.amt-a.amt);
   if(!wins.length){el.innerHTML='<div class="tg-empty" style="grid-column:unset">No 2026 wins in dataset</div>';return;}
   el.innerHTML=wins.map(w=>{
     const hi=matchesTag(w.tags);
@@ -3176,16 +3186,25 @@ function arRenderTable(rows){
 // ═══ PROJECTIONS TAB (spreadsheet) ═══
 const PRJ_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const PRJ_MONTHS_FULL=['january','february','march','april','may','june','july','august','september','october','november','december'];
-const PRJ_STATUSES=['Fully Closed','For Closing','For Collection','Signed CE','Won - Awaiting CE Signature','CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress','Stalled','Lost','Archived'];
+// "Talks In Progress" is intentionally excluded from the Projections sheet.
+const PRJ_STATUSES=['Fully Closed','For Closing','For Collection','Signed CE','Won - Awaiting CE Signature','CE/Pitch Submitted','For CE/Pitch Creation','Stalled','Lost','Archived'];
 const PRJ_STATUS_ORDER={};PRJ_STATUSES.forEach((s,i)=>{PRJ_STATUS_ORDER[s]=i;});
 const PRJ_SLABEL={'Signed CE':'Won','Won - Awaiting CE Signature':'Won (Pending CE)','For Closing':'For Closing','Fully Closed':'Closed','For Collection':'For Collection','CE/Pitch Submitted':'CE Submitted','For CE/Pitch Creation':'For Submission','Talks In Progress':'In Progress','Stalled':'Stalled','Lost':'Lost','Archived':'Archived'};
 function prjStatusLabel(s){return PRJ_SLABEL[s]||s;}
+// Projections-only status display: the five won states collapse to "WON", and rows matching the Sales
+// tab's New RFP rule (RFP received this week or last, still awaiting CE/pitch creation) show as "New RFPs".
+function prjIsNewRFP(r){const w=parseInt(r['RFPR-WeekNum']);if(isNaN(w))return false;const cw=gw();return w>=cw-1&&w<=cw&&r['Status']==='For CE/Pitch Creation';}
+function prjDispStatus(r){if(WS.includes(r['Status']))return 'WON';if(prjIsNewRFP(r))return 'New RFPs';return r['Status']||'';}
+const PRJ_DISP_ORDER={};['WON','CE/Pitch Submitted','For CE/Pitch Creation','New RFPs','Stalled','Lost','Archived'].forEach((s,i)=>{PRJ_DISP_ORDER[s]=i;});
+function prjSp(lbl){if(lbl==='WON')return '<span class="status-pill status-won">WON</span>';if(lbl==='New RFPs')return '<span class="status-pill status-rfp">New RFPs</span>';return sp(lbl);}
 // Available data-backed columns the user can add via the Columns picker (info is fixed-first, months are always appended)
 const PRJ_WIDTHS={info:36,text:110,proj:256,status:150,amount:130,pct:84,month:118};
+// Nickname if we have one, otherwise just the first name. Handles fields listing several people.
+function prjPeople(raw,NICKS){return splitPeople(raw).map(n=>NICKS[n]||n.split(/\s+/)[0]||'').filter(Boolean).join(', ');}
 const PRJ_AVAIL=[
   {id:'info',label:'',type:'info'},
-  {id:'bd',label:'BD',type:'text',key:'BD'},
-  {id:'am',label:'AM',type:'text',key:'AM'},
+  {id:'bd',label:'BD',type:'text',key:'BD',fmt:v=>prjPeople(v,BD_NICKS)},
+  {id:'am',label:'AM',type:'text',key:'AM',fmt:v=>prjPeople(v,AM_NICKS)},
   {id:'client',label:'Client',type:'text',key:'Client'},
   {id:'project',label:'Project',type:'proj',key:'Project'},
   {id:'status',label:'Status',type:'status',key:'Status'},
@@ -3201,19 +3220,22 @@ const PRJ_AVAIL=[
   {id:'amt',label:'Amount (VAT-Ex.)',type:'amount',key:'Amount (VAT-Ex.) (PHP)'},
 ];
 const PRJ_AVAIL_BY_ID={};PRJ_AVAIL.forEach(f=>{PRJ_AVAIL_BY_ID[f.id]=f;});
-const PRJ={fields:[],fieldByCol:{},layout:['info','bd','am','client','project','status'],allRows:[],view:[],nData:0,edits:{},filters:{},sort:null,rowGroups:[],colGroups:[],colInit:false,rowInit:false,sel:null,_collapsed:new Set(),_wired:false,_shown:false,_mx:0,_my:0};
+const PRJ={fields:[],fieldByCol:{},layout:['info','bd','am','client','code','project','status'],allRows:[],view:[],nData:0,edits:{},filters:{},sort:null,rowGroups:[],colGroups:[],colInit:false,rowInit:false,sel:null,_collapsed:new Set(),_wired:false,_shown:false,_mx:0,_my:0};
 function prjColLetter(i){let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;}
 function prjColIdx(letters){let n=0;for(const ch of letters.toUpperCase())n=n*26+(ch.charCodeAt(0)-64);return n-1;}
 function prjMonthBase(){return PRJ.layout.length;}
 function prjBuildFields(){
   const fields=[];
-  PRJ.layout.forEach(id=>{const a=PRJ_AVAIL_BY_ID[id];if(a)fields.push({id:a.id,label:a.label,type:a.type,key:a.key,w:PRJ_WIDTHS[a.type]||120});});
+  PRJ.layout.forEach(id=>{const a=PRJ_AVAIL_BY_ID[id];if(a)fields.push({id:a.id,label:a.label,type:a.type,key:a.key,fmt:a.fmt,w:PRJ_WIDTHS[a.type]||120});});
   for(let i=0;i<12;i++)fields.push({id:'m'+i,label:PRJ_MONTHS[i],type:'month',mi:i,w:PRJ_WIDTHS.month});
   fields.forEach((f,i)=>{f.col=prjColLetter(i);});
   PRJ.fields=fields;PRJ.fieldByCol={};fields.forEach(f=>{PRJ.fieldByCol[f.col]=f;});
 }
 prjBuildFields();
 function _prjNum(v){if(v===''||v==null||isNaN(v))return '';return Number(v).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:2});}
+// Source data contains stray line breaks (e.g. Project Code "\n2026TEG-P0015"). Left in place they split a
+// tab-separated row when pasted into Sheets/Excel, shifting every later column onto a new line.
+function _prjClean(s){return (s==null?'':String(s)).replace(/[\r\n\t]+/g,' ').replace(/\s{2,}/g,' ').trim();}
 function _r2(v){return Math.round((v+Number.EPSILON)*100)/100;}
 // Robust month-index parser handling "2026/07/01", "2026-07-01", "July", "Jul", "07 - July"
 function _prjMoIdx(s){s=(s||'').toString().trim();if(!s)return -1;let m=s.match(/^(\d{4})[\/\-.](\d{1,2})/);if(m){const n=+m[2];if(n>=1&&n<=12)return n-1;}m=s.match(/^(\d{1,2})[\/\-.]\d{1,2}[\/\-.](\d{4})/);if(m){const n=+m[1];if(n>=1&&n<=12)return n-1;}const low=s.toLowerCase();for(let i=0;i<12;i++)if(low.includes(PRJ_MONTHS_FULL[i]))return i;for(let i=0;i<12;i++)if(new RegExp('\\b'+PRJ_MONTHS[i].toLowerCase()+'\\b').test(low))return i;m=s.match(/^(\d{1,2})\b/);if(m){const n=+m[1];if(n>=1&&n<=12)return n-1;}return -1;}
@@ -3221,29 +3243,54 @@ function _prjMoIdx(s){s=(s||'').toString().trim();if(!s)return -1;let m=s.match(
 function prjRowMonth(r){const lm=_prjMoIdx(r['Loss Month']);if(lm>=0)return lm;let i=_prjMoIdx(r['Month']);if(i>=0)return i;return _prjMoIdx(r['Project Start']);}
 function prjSortMonth(r){return prjRowMonth(r);}
 
+const PRJ_BTS_TARGET=120000000;      // 2H BTS target (D)
+const PRJ_FY_LE_ORIGINAL=370500000;  // Original FY LE
+// Shared figures behind both summary tables. Letters match the BTS table (A–I).
+function prjFigures(){
+  const WSset=new Set(WS),PIPEset=new Set(['CE/Pitch Submitted','For CE/Pitch Creation']);
+  let A=0,C=0,E=0;
+  DATA.forEach(r=>{
+    if(r['Year']!=='2026'||isIPTag(r))return;
+    const m=prjRowMonth(r);if(m<0)return;
+    const amt=pn(r['Amount (VAT-Ex.) (PHP)']),st=r['Status'],won=WSset.has(st);
+    if(m<=5){if(won)A+=amt;return;}
+    if(won)C+=amt;
+    if(won||PIPEset.has(st))E+=amt;
+  });
+  const D=PRJ_BTS_TARGET,F=twp(DATA),G=A+D,H=F-G,I=E*0.3,B=H*3*-1;
+  return {A,B,C,D,E,F,G,H,I};
+}
 function prjRenderSummary(){
   const el=document.getElementById('prjSummary');if(!el)return;
-  const ytd=twp(DATA);
-  const WSset=new Set(WS);
-  const H2set=new Set([...WS,'CE/Pitch Submitted','For CE/Pitch Creation','Talks In Progress']);
-  let oneH=0,twoH=0;
-  DATA.forEach(r=>{if(r['Year']!=='2026'||isIPTag(r))return;const m=prjRowMonth(r);if(m<0)return;const amt=pn(r['Amount (VAT-Ex.) (PHP)']),st=r['Status'];if(m<=5&&WSset.has(st))oneH+=amt;if(m>=6&&H2set.has(st))twoH+=amt;});
-  const fyle=ytd+125000000;
-  const rows=[{name:'WR100%',h1:oneH,h2:twoH},{name:'WR30%',h1:oneH,h2:oneH*0.3}];
-  let h=`<div class="prj-sum-wrap"><div class="prj-ytd"><div class="prj-ytd-lbl">YTD Sales</div><div class="prj-ytd-val">${fmtF(ytd)}</div></div><div class="prj-le"><div class="prj-le-title">Latest Estimate</div><table class="prj-le-tbl"><thead><tr><th></th><th>1H</th><th>2H</th><th>FY Target</th><th>FY LE</th><th>+/- Var</th></tr></thead><tbody>`;
-  rows.forEach(rw=>{const fyt=rw.h1+rw.h2,varv=fyt-fyle;h+=`<tr><td>${rw.name}</td><td>${fmtF(rw.h1)}</td><td>${fmtF(rw.h2)}</td><td>${fmtF(fyt)}</td><td class="fyle">${fmtF(fyle)}</td><td class="${varv>=0?'var-pos':'var-neg'}">${varv>=0?'+':'−'}${fmtF(Math.abs(varv))}</td></tr>`;});
-  h+=`</tbody></table></div></div>`;el.innerHTML=h;
+  const f=prjFigures();
+  const money=v=>fmtF(v);
+  const sv=v=>`<td class="${v>=0?'var-pos':'var-neg'}">${v>=0?'+':'−'}${fmtF(Math.abs(v))}</td>`;
+  // ── Latest Estimate ──
+  const le=[
+    {name:'ORIGINAL',c1:f.A,c2:f.C,c4:PRJ_FY_LE_ORIGINAL},
+    {name:'2HBTS 120M',c1:f.A,c2:f.I,c4:f.G}
+  ];
+  let h=`<div class="prj-sum-wrap"><div class="prj-ytd"><div class="prj-ytd-lbl">YTD Sales</div><div class="prj-ytd-val">${money(f.F)}</div></div><div class="prj-le"><div class="prj-le-title">Latest Estimate</div><table class="prj-le-tbl"><thead><tr><th></th><th>1H</th><th>2H</th><th>FY Target</th><th>FY LE</th><th>+/- Var</th></tr></thead><tbody>`;
+  le.forEach(rw=>{const c3=rw.c1+rw.c2,c5=c3-rw.c4;h+=`<tr><td>${rw.name}</td><td>${money(rw.c1)}</td><td>${money(rw.c2)}</td><td>${money(c3)}</td><td class="fyle">${money(rw.c4)}</td>${sv(c5)}</tr>`;});
+  h+=`</tbody></table>`;
+  // ── BTS table ──
+  h+=`<div class="prj-le-title" style="margin-top:16px">BTS Breakdown</div><table class="prj-le-tbl prj-bts-tbl"><thead><tr><th></th><th>Won</th><th>BTS Target</th><th>Variance</th><th>Pipeline x3</th><th></th></tr></thead><tbody>`;
+  h+=`<tr><td>YTD Jun</td><td>${money(f.A)}</td><td>${money(f.A)}</td><td class="dash">—</td><td>${money(f.B)}</td><td class="prj-bts-tag">HUNT</td></tr>`;
+  h+=`<tr><td>2H Act</td><td>${money(f.C)}</td><td class="hl-yellow">${money(f.D)}</td>${sv(f.C-f.D)}<td class="hl-blue">${money(f.E)}</td><td class="prj-bts-tag hl-blue">LIVE</td></tr>`;
+  h+=`<tr><td>LE</td><td class="hl-green">${money(f.F)}</td><td>${money(f.G)}</td><td class="hl-maroon">${f.H>=0?'+':'−'}${fmtF(Math.abs(f.H))}</td><td>${money(f.I)}</td><td class="prj-bts-tag">WR30</td></tr>`;
+  h+=`</tbody></table></div></div>`;
+  el.innerHTML=h;
 }
 
 function prjBuildRows(){
   const inc=new Set(PRJ_STATUSES);
   // 2026 + target statuses, exclude IP tribe, exclude rows with no Month/Project Start/Loss Month
   const drs=DATA.filter(r=>r['Year']==='2026'&&inc.has(r['Status'])&&!isIPTag(r)&&prjSortMonth(r)>=0).map(r=>({r,mi:prjRowMonth(r),amt:pn(r['Amount (VAT-Ex.) (PHP)'])}));
-  drs.sort((a,b)=>{const ma=prjSortMonth(a.r),mb=prjSortMonth(b.r);const na=ma<0?99:ma,nb=mb<0?99:mb;if(na!==nb)return na-nb;const sa=PRJ_STATUS_ORDER[a.r['Status']]??99,sb=PRJ_STATUS_ORDER[b.r['Status']]??99;if(sa!==sb)return sa-sb;return b.amt-a.amt;});
+  drs.sort((a,b)=>{const ma=prjSortMonth(a.r),mb=prjSortMonth(b.r);const na=ma<0?99:ma,nb=mb<0?99:mb;if(na!==nb)return na-nb;const sa=PRJ_DISP_ORDER[prjDispStatus(a.r)]??99,sb=PRJ_DISP_ORDER[prjDispStatus(b.r)]??99;if(sa!==sb)return sa-sb;return b.amt-a.amt;});
   PRJ.allRows=drs;
 }
-function prjFieldText(dr,f){if(f.type==='text')return dr.r[f.key]||'';if(f.type==='proj')return dr.r['Project']||'';if(f.type==='status')return dr.r['Status']||'';if(f.type==='amount'){const v=pn(dr.r[f.key]);return v!==0?_prjNum(cx(v)):'';}if(f.type==='pct'){const v=pn(dr.r[f.key]);return v!==0?(v*100).toFixed(1)+'%':'';}if(f.type==='month'){if(dr.mi===f.mi&&dr.amt!==0)return _prjNum(cx(dr.amt));return '';}return '';}
-function prjSortVal(dr,f){if(f.type==='status')return (PRJ_STATUS_ORDER[dr.r['Status']]??99);if(f.type==='amount'||f.type==='pct')return pn(dr.r[f.key]);if(f.type==='month')return (dr.mi===f.mi?dr.amt:-1);return (prjFieldText(dr,f)||'').toString().toLowerCase();}
+function prjFieldText(dr,f){if(f.type==='text'){const v=_prjClean(dr.r[f.key]);return f.fmt?f.fmt(v):v;}if(f.type==='proj')return _prjClean(dr.r['Project']);if(f.type==='status')return prjDispStatus(dr.r);if(f.type==='amount'){const v=pn(dr.r[f.key]);return v!==0?_prjNum(cx(v)):'';}if(f.type==='pct'){const v=pn(dr.r[f.key]);return v!==0?(v*100).toFixed(1)+'%':'';}if(f.type==='month'){if(dr.mi===f.mi&&dr.amt!==0)return _prjNum(cx(dr.amt));return '';}return '';}
+function prjSortVal(dr,f){if(f.type==='status')return (PRJ_DISP_ORDER[prjDispStatus(dr.r)]??99);if(f.type==='amount'||f.type==='pct')return pn(dr.r[f.key]);if(f.type==='month')return (dr.mi===f.mi?dr.amt:-1);return (prjFieldText(dr,f)||'').toString().toLowerCase();}
 function prjBuildView(){
   let rows=PRJ.allRows.slice();
   if(PRJ.sort){const f=PRJ.fieldByCol[PRJ.sort.col],d=PRJ.sort.dir;rows.sort((a,b)=>{const va=prjSortVal(a,f),vb=prjSortVal(b,f);return va<vb?-d:va>vb?d:0;});}
@@ -3251,17 +3298,19 @@ function prjBuildView(){
   if(fcols.length)rows=rows.filter(dr=>fcols.every(col=>PRJ.filters[col].has(prjFieldText(dr,PRJ.fieldByCol[col]))));
   PRJ.view=rows;PRJ.nData=rows.length;
 }
+// Sheet always adds a fresh block of 10 past the data (232 rows -> 240, 565 -> 570, 230 -> 240).
+function prjRowCount(){return (Math.floor(PRJ.nData/10)+1)*10;}
 
 // ── cell model ──
-function prjDataCell(dr,f){switch(f.type){case 'info':return {kind:'info'};case 'text':return {kind:'text',text:dr.r[f.key]||''};case 'proj':return {kind:'proj',text:dr.r['Project']||''};case 'status':return {kind:'status',status:dr.r['Status']||''};case 'amount':{const v=pn(dr.r[f.key]);return v!==0?{kind:'num',num:v}:{kind:'blank'};}case 'pct':{const v=pn(dr.r[f.key]);return v!==0?{kind:'pct',val:v}:{kind:'blank'};}case 'month':if(dr.mi===f.mi&&dr.amt!==0)return {kind:'num',num:dr.amt};return {kind:'blank'};}return {kind:'blank'};}
+function prjDataCell(dr,f){switch(f.type){case 'info':return {kind:'info'};case 'text':{const v=_prjClean(dr.r[f.key]);return {kind:'text',text:f.fmt?f.fmt(v):v};}case 'proj':return {kind:'proj',text:_prjClean(dr.r['Project'])};case 'status':return {kind:'status',status:prjDispStatus(dr.r)};case 'amount':{const v=pn(dr.r[f.key]);return v!==0?{kind:'num',num:v}:{kind:'blank'};}case 'pct':{const v=pn(dr.r[f.key]);return v!==0?{kind:'pct',val:v}:{kind:'blank'};}case 'month':if(dr.mi===f.mi&&dr.amt!==0)return {kind:'num',num:dr.amt};return {kind:'blank'};}return {kind:'blank'};}
 function prjCellObj(c,ri){const f=PRJ.fields[c];if(!f)return {kind:'blank'};const key=f.col+ri;if(PRJ.edits[key]!==undefined)return {kind:'edit',text:PRJ.edits[key]};if(ri<=PRJ.nData)return prjDataCell(PRJ.view[ri-1],f);return {kind:'blank'};}
 function prjEditable(c,ri){const o=prjCellObj(c,ri);return o.kind==='edit'||o.kind==='blank';}
 function prjCellNumeric(c,ri,seen){const o=prjCellObj(c,ri);if(o.kind==='num')return cx(o.num);if(o.kind==='pct')return o.val*100;if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='='){const k=c+'_'+ri;if(seen.has(k))return 0;seen.add(k);const v=prjEval(s.slice(1),seen);seen.delete(k);return v;}const n=parseFloat(s.replace(/,/g,''));return isNaN(n)?0:n;}return 0;}
-function prjCellCopy(c,ri){const o=prjCellObj(c,ri);if(o.kind==='num')return String(_r2(cx(o.num)));if(o.kind==='pct')return (o.val*100).toFixed(1);if(o.kind==='text')return o.text;if(o.kind==='proj')return o.text;if(o.kind==='status')return prjStatusLabel(o.status);if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='=')return String(_r2(prjEval(s.slice(1),new Set([c+'_'+ri]))));return o.text;}return '';}
+function prjCellCopy(c,ri){const o=prjCellObj(c,ri);if(o.kind==='num')return String(_r2(cx(o.num)));if(o.kind==='pct')return (o.val*100).toFixed(1);if(o.kind==='text')return _prjClean(o.text);if(o.kind==='proj')return _prjClean(o.text);if(o.kind==='status')return _prjClean(prjStatusLabel(o.status));if(o.kind==='edit'){const s=o.text.trim();if(s[0]==='=')return String(_r2(prjEval(s.slice(1),new Set([c+'_'+ri]))));return _prjClean(o.text);}return '';}
 
 // ── formula parser: =SUM(), + - * /, parentheses, refs, ranges (multi-letter cols) ──
 function prjTok(s){const out=[];let i=0;while(i<s.length){const c=s[i];if(/\s/.test(c)){i++;continue;}if(c==='('){out.push({t:'('});i++;continue;}if(c===')'){out.push({t:')'});i++;continue;}if(c===','){out.push({t:','});i++;continue;}if('+-*/'.includes(c)){out.push({t:c});i++;continue;}const rest=s.slice(i);let m=rest.match(/^SUM(?=\s*\()/i);if(m){out.push({t:'sum'});i+=3;continue;}m=rest.match(/^([A-Z]{1,2})(\d{1,4}):([A-Z]{1,2})(\d{1,4})/i);if(m){out.push({t:'range',v:m[0].toUpperCase()});i+=m[0].length;continue;}m=rest.match(/^([A-Z]{1,2})(\d{1,4})/i);if(m){out.push({t:'cell',v:m[0].toUpperCase()});i+=m[0].length;continue;}m=rest.match(/^\d+(\.\d+)?/);if(m){out.push({t:'num',v:parseFloat(m[0])});i+=m[0].length;continue;}i++;}return out;}
-function prjRefNum(ref,seen){const m=ref.match(/^([A-Z]{1,2})(\d+)$/i);if(!m)return 0;const c=prjColIdx(m[1]),row=+m[2];if(c<0||c>=PRJ.fields.length||row<1||row>1000)return 0;return prjCellNumeric(c,row,seen);}
+function prjRefNum(ref,seen){const m=ref.match(/^([A-Z]{1,2})(\d+)$/i);if(!m)return 0;const c=prjColIdx(m[1]),row=+m[2];if(c<0||c>=PRJ.fields.length||row<1||row>prjRowCount())return 0;return prjCellNumeric(c,row,seen);}
 function prjRangeSum(ref,seen){const m=ref.match(/^([A-Z]{1,2})(\d+):([A-Z]{1,2})(\d+)$/i);if(!m)return 0;let c1=prjColIdx(m[1]),r1=+m[2],c2=prjColIdx(m[3]),r2=+m[4];if(c1>c2){const t=c1;c1=c2;c2=t;}if(r1>r2){const t=r1;r1=r2;r2=t;}let tot=0;for(let c=c1;c<=c2;c++)for(let r=r1;r<=r2;r++)tot+=prjCellNumeric(c,r,seen);return tot;}
 function prjEval(expr,seen){seen=seen||new Set();const toks=prjTok(expr);let pos=0;const peek=()=>toks[pos],next=()=>toks[pos++];
   function pExpr(){let v=pTerm();while(peek()&&(peek().t==='+'||peek().t==='-')){const op=next().t,r=pTerm();v=op==='+'?v+r:v-r;}return v;}
@@ -3278,7 +3327,7 @@ function prjRenderGrid(){
   const colHidden=prjColHidden;
   PRJ._colHidden=colHidden;PRJ._cur=cur;
   // visible sequence: a collapsed row group collapses to a single "bar" entry; other rows pass through
-  const seq=[];for(let r=1;r<=1000;){const cg=PRJ.rowGroups.find(g=>g.collapsed&&g.a===r);if(cg){seq.push({bar:cg});r=cg.b+1;continue;}if(PRJ._collapsed.has(r)){r++;continue;}seq.push(r);r++;}
+  const seq=[];for(let r=1,_rc=prjRowCount();r<=_rc;){const cg=PRJ.rowGroups.find(g=>g.collapsed&&g.a===r);if(cg){seq.push({bar:cg});r=cg.b+1;continue;}if(PRJ._collapsed.has(r)){r++;continue;}seq.push(r);r++;}
   PRJ._visSeq=seq;
   const NC=flds.length+1;
   const colMarkers=prjColMarkers();
@@ -3300,7 +3349,7 @@ function prjRenderGrid(){
   const btn=document.getElementById('prjMonthToggleBtn');if(btn){const pg=PRJ.colGroups.find(x=>x.a===prjMonthBase());btn.textContent=(pg&&pg.collapsed)?'Show Past Months':'Hide Past Months';}
   PRJ.rowH=0;prjRenderWindow();
 }
-// Virtualized body: render only the visible row window (+buffer) to keep the DOM small for 1000 rows
+// Virtualized body: render only the visible row window (+buffer) to keep the DOM small
 function prjRenderWindow(){
   const wrap=document.getElementById('prjGridWrap');const spTop=document.getElementById('prjSpTop'),spBot=document.getElementById('prjSpBot');if(!wrap||!spTop||!spBot)return;
   const vis=PRJ._visSeq||[],n=vis.length;
@@ -3332,7 +3381,7 @@ function prjRowHtml(entry,cur,colHidden){
     if(colHidden(c)){tds+=`<td data-c="${c}" data-r="${r}" class="prj-col-hidden"></td>`;continue;}
     const f=flds[c],o=prjCellObj(c,r);let inner='';
     if(o.kind==='info'){inner=`<span class="prj-info-i" data-di="${dr.r._i}">i</span>`;}
-    else if(o.kind==='status'){inner=`<span class="prj-pill" data-c="${c}">${sp(o.status)}<span class="caret">▾</span></span>`;}
+    else if(o.kind==='status'){inner=`<span class="prj-pill" data-c="${c}">${prjSp(o.status)}<span class="caret">▾</span></span>`;}
     else if(o.kind==='proj'){inner=`<span class="prj-cell prj-proj-cell" data-di="${dr.r._i}">${escHtml(o.text)}</span>`;}
     else if(o.kind==='num'){inner=`<span class="prj-cell num">${_prjNum(cx(o.num))}</span>`;}
     else if(o.kind==='pct'){inner=`<span class="prj-cell num">${(o.val*100).toFixed(1)}%</span>`;}
@@ -3366,7 +3415,7 @@ function prjMouseDown(e){
   const gut=e.target.closest('th.prj-gutter');
   if(gut){e.preventDefault();const r=+gut.dataset.r;if(e.shiftKey&&PRJ.sel&&PRJ.sel.mode==='row'){PRJ.sel.r2=r;}else PRJ.sel={mode:'row',r1:r,r2:r,c1:0,c2:PRJ.fields.length-1};PRJ._dragging='row';prjApplySelUI();return;}
   const colh=e.target.closest('.prj-colrow th[data-c]');
-  if(colh){e.preventDefault();const c=+colh.dataset.c;if(e.shiftKey&&PRJ.sel&&PRJ.sel.mode==='col'){PRJ.sel.c2=c;}else PRJ.sel={mode:'col',r1:1,r2:1000,c1:c,c2:c};PRJ._dragging='col';prjApplySelUI();return;}
+  if(colh){e.preventDefault();const c=+colh.dataset.c;if(e.shiftKey&&PRJ.sel&&PRJ.sel.mode==='col'){PRJ.sel.c2=c;}else PRJ.sel={mode:'col',r1:1,r2:prjRowCount(),c1:c,c2:c};PRJ._dragging='col';prjApplySelUI();return;}
   const td=e.target.closest('td[data-c]');
   if(td){const c=+td.dataset.c,r=+td.dataset.r;if(e.shiftKey&&PRJ.sel){PRJ.sel.r2=r;PRJ.sel.c2=c;PRJ.sel.mode='cell';}else PRJ.sel={mode:'cell',r1:r,c1:c,r2:r,c2:c};PRJ._dragging='cell';prjApplySelUI();}
 }
@@ -3389,7 +3438,7 @@ function prjClick(e){
 }
 function prjContext(e){
   const gut=e.target.closest('th.prj-gutter'),colh=e.target.closest('.prj-colrow th[data-c]'),td=e.target.closest('td[data-c]');if(!gut&&!colh&&!td)return;e.preventDefault();prjCloseMenus();const items=[];
-  if(colh){const c=+colh.dataset.c;if(!(PRJ.sel&&PRJ.sel.mode==='col'&&c>=Math.min(PRJ.sel.c1,PRJ.sel.c2)&&c<=Math.max(PRJ.sel.c1,PRJ.sel.c2))){PRJ.sel={mode:'col',r1:1,r2:1000,c1:c,c2:c};prjApplySelUI();}const c1=Math.min(PRJ.sel.c1,PRJ.sel.c2),c2=Math.max(PRJ.sel.c1,PRJ.sel.c2),ex=prjColGroupOf(c);if(c2>c1)items.push({label:`Group columns ${PRJ.fields[c1].col}–${PRJ.fields[c2].col}`,fn:()=>prjAddColGroup(c1,c2)});if(ex)items.push({label:'Ungroup columns',fn:()=>{PRJ.colGroups=PRJ.colGroups.filter(g=>g!==ex);prjRenderGrid();prjApplySelUI();}});if(!items.length)items.push({label:'Select 2+ columns to group',disabled:true});}
+  if(colh){const c=+colh.dataset.c;if(!(PRJ.sel&&PRJ.sel.mode==='col'&&c>=Math.min(PRJ.sel.c1,PRJ.sel.c2)&&c<=Math.max(PRJ.sel.c1,PRJ.sel.c2))){PRJ.sel={mode:'col',r1:1,r2:prjRowCount(),c1:c,c2:c};prjApplySelUI();}const c1=Math.min(PRJ.sel.c1,PRJ.sel.c2),c2=Math.max(PRJ.sel.c1,PRJ.sel.c2),ex=prjColGroupOf(c);if(c2>c1)items.push({label:`Group columns ${PRJ.fields[c1].col}–${PRJ.fields[c2].col}`,fn:()=>prjAddColGroup(c1,c2)});if(ex)items.push({label:'Ungroup columns',fn:()=>{PRJ.colGroups=PRJ.colGroups.filter(g=>g!==ex);prjRenderGrid();prjApplySelUI();}});if(!items.length)items.push({label:'Select 2+ columns to group',disabled:true});}
   else if(gut){const r=+gut.dataset.r;if(!(PRJ.sel&&PRJ.sel.mode==='row'&&r>=Math.min(PRJ.sel.r1,PRJ.sel.r2)&&r<=Math.max(PRJ.sel.r1,PRJ.sel.r2))){PRJ.sel={mode:'row',r1:r,r2:r,c1:0,c2:PRJ.fields.length-1};prjApplySelUI();}const r1=Math.min(PRJ.sel.r1,PRJ.sel.r2),r2=Math.max(PRJ.sel.r1,PRJ.sel.r2),ex=PRJ.rowGroups.find(g=>g.a===r);if(r2>r1)items.push({label:'Group rows '+r1+'–'+r2,fn:()=>prjAddGroup(r1,r2)});if(ex)items.push({label:'Ungroup',fn:()=>{PRJ.rowGroups=PRJ.rowGroups.filter(g=>g!==ex);prjRenderGrid();prjApplySelUI();}});items.push({label:'Copy',fn:prjCopySel});}
   else if(td){const c=+td.dataset.c,r=+td.dataset.r;if(!prjInSel(c,r)){PRJ.sel={mode:'cell',r1:r,c1:c,r2:r,c2:c};prjApplySelUI();}items.push({label:'Copy',fn:prjCopySel});if(prjEditable(c,r))items.push({label:'Edit',fn:()=>{const t=document.querySelector(`#prjGridWrap td[data-c="${c}"][data-r="${r}"]`);if(t)prjStartEdit(t,c,r);}});}
   prjShowMenu(e.clientX,e.clientY,items);
@@ -3412,8 +3461,8 @@ function prjKey(e){const sec=document.getElementById('sec-projections');if(!sec|
 
 // ── menus (context / pill / filter+sort) ──
 function prjShowMenu(x,y,items){const m=document.createElement('div');m.className='prj-ctx';m.innerHTML=items.map((it,i)=>it.sep?'<div class="prj-ctx-sep"></div>':`<div class="prj-ctx-item${it.disabled?' disabled':''}"${it.disabled?'':` data-i="${i}"`}>${escHtml(it.label)}</div>`).join('');document.body.appendChild(m);m.style.left=x+'px';m.style.top=y+'px';prjClampMenu(m);m.onclick=(e)=>{const el=e.target.closest('.prj-ctx-item[data-i]');if(!el)return;const it=items[+el.dataset.i];prjCloseMenus();if(it&&it.fn)it.fn();};PRJ._ctxEl=m;}
-function prjOpenPill(pill){prjCloseMenus();const uniq=[...new Set(PRJ.allRows.map(dr=>dr.r['Status']).filter(Boolean))].sort((a,b)=>(PRJ_STATUS_ORDER[a]??99)-(PRJ_STATUS_ORDER[b]??99));const rect=pill.getBoundingClientRect();const m=document.createElement('div');m.className='prj-menu';m.style.left=rect.left+'px';m.style.top=(rect.bottom+4)+'px';m.innerHTML='<div style="padding:8px 10px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Status options (view only)</div><div class="prj-menu-list">'+uniq.map(s=>`<div class="prj-menu-item" style="cursor:default">${sp(s)}</div>`).join('')+'</div>';document.body.appendChild(m);PRJ._menuEl=m;prjClampMenu(m);}
-function prjUnique(col){const f=PRJ.fieldByCol[col],seen=new Set(),out=[];PRJ.allRows.forEach(dr=>{const v=prjFieldText(dr,f);if(!seen.has(v)){seen.add(v);out.push({val:v});}});out.sort((a,b)=>{if(f.type==='status')return (PRJ_STATUS_ORDER[a.val]??99)-(PRJ_STATUS_ORDER[b.val]??99);if(f.type==='month')return (parseFloat(String(a.val).replace(/,/g,''))||0)-(parseFloat(String(b.val).replace(/,/g,''))||0);return String(a.val).localeCompare(String(b.val));});return out;}
+function prjOpenPill(pill){prjCloseMenus();const uniq=[...new Set(PRJ.allRows.map(dr=>prjDispStatus(dr.r)).filter(Boolean))].sort((a,b)=>(PRJ_DISP_ORDER[a]??99)-(PRJ_DISP_ORDER[b]??99));const rect=pill.getBoundingClientRect();const m=document.createElement('div');m.className='prj-menu';m.style.left=rect.left+'px';m.style.top=(rect.bottom+4)+'px';m.innerHTML='<div style="padding:8px 10px;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Status options (view only)</div><div class="prj-menu-list">'+uniq.map(s=>`<div class="prj-menu-item" style="cursor:default">${prjSp(s)}</div>`).join('')+'</div>';document.body.appendChild(m);PRJ._menuEl=m;prjClampMenu(m);}
+function prjUnique(col){const f=PRJ.fieldByCol[col],seen=new Set(),out=[];PRJ.allRows.forEach(dr=>{const v=prjFieldText(dr,f);if(!seen.has(v)){seen.add(v);out.push({val:v});}});out.sort((a,b)=>{if(f.type==='status')return (PRJ_DISP_ORDER[a.val]??99)-(PRJ_DISP_ORDER[b.val]??99);if(f.type==='month')return (parseFloat(String(a.val).replace(/,/g,''))||0)-(parseFloat(String(b.val).replace(/,/g,''))||0);return String(a.val).localeCompare(String(b.val));});return out;}
 function prjOpenFilter(col,c,anchor){
   prjCloseMenus();const f=PRJ.fieldByCol[col],uniq=prjUnique(col),curF=PRJ.filters[col];
   PRJ._menu={col,c,checked:new Set(curF?[...curF]:uniq.map(u=>u.val)),search:'',uniq};
@@ -3432,7 +3481,7 @@ function prjRenderFilterList(){
   const sugEl=m.querySelector('.prj-menu-sugg');
   if(s){const sug=PRJ._menu.uniq.find(u=>String(u.val).toLowerCase().startsWith(s))||PRJ._menu.uniq.find(u=>String(u.val).toLowerCase().includes(s));if(sug){const val=String(sug.val),idx=val.toLowerCase().indexOf(s);sugEl.innerHTML='Closest: '+escHtml(val.slice(0,idx))+'<b>'+escHtml(val.slice(idx,idx+s.length))+'</b>'+escHtml(val.slice(idx+s.length));}else sugEl.textContent='No match';}else sugEl.textContent='';
   const list=m.querySelector('.prj-menu-list');
-  list.innerHTML=vis.map(u=>{const disp=f.type==='status'?sp(u.val):(u.val===''?'<i style="color:var(--text-muted)">(blanks)</i>':escHtml(String(u.val)));return `<div class="prj-menu-item"><input type="checkbox" ${PRJ._menu.checked.has(u.val)?'checked':''} data-v="${escAttr(String(u.val))}"><label>${disp}</label></div>`;}).join('')||'<div style="padding:8px 10px;color:var(--text-muted)">No matches</div>';
+  list.innerHTML=vis.map(u=>{const disp=f.type==='status'?prjSp(u.val):(u.val===''?'<i style="color:var(--text-muted)">(blanks)</i>':escHtml(String(u.val)));return `<div class="prj-menu-item"><input type="checkbox" ${PRJ._menu.checked.has(u.val)?'checked':''} data-v="${escAttr(String(u.val))}"><label>${disp}</label></div>`;}).join('')||'<div style="padding:8px 10px;color:var(--text-muted)">No matches</div>';
   list.onchange=(ev)=>{const cb=ev.target.closest('input');if(!cb)return;const v=cb.dataset.v;if(cb.checked)PRJ._menu.checked.add(v);else PRJ._menu.checked.delete(v);};
 }
 function prjClampMenu(m){const r=m.getBoundingClientRect();if(r.right>window.innerWidth-8)m.style.left=Math.max(8,window.innerWidth-r.width-8)+'px';if(r.bottom>window.innerHeight-8)m.style.top=Math.max(8,window.innerHeight-r.height-8)+'px';}
