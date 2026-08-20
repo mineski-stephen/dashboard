@@ -75,6 +75,36 @@ body.settings-open,body.modal-open{overflow:hidden}
 .loading-box p{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px}
 .loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* ═══ LARK LIVE DATA — toast + overlay ═══ */
+.lk-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(16px);z-index:240;width:min(560px,92vw);background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 34px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;overflow:hidden}
+.lk-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.lk-toast-main{display:flex;align-items:center;gap:12px;padding:13px 14px}
+.lk-spin{width:18px;height:18px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+.lk-spin.done{animation:none;border:none;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--green)}
+.lk-spin.err{animation:none;border:none;font-size:15px;font-weight:700;color:var(--red);display:flex;align-items:center;justify-content:center}
+.lk-toast-txt{flex:1;min-width:0;cursor:pointer}
+.lk-toast-txt:hover .lk-toast-title,.lk-toast-txt:hover .lk-toast-sub{color:var(--accent)}
+.lk-caret{flex-shrink:0;cursor:pointer;font-size:12px;line-height:1;color:var(--text-muted);transition:transform .2s ease,color .15s;-webkit-user-select:none;user-select:none;padding:2px}
+.lk-caret:hover{color:var(--accent)}
+.lk-toast.logopen .lk-caret{transform:rotate(180deg);color:var(--accent)}
+.lk-toast-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk-toast-sub{font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk-btn{padding:5px 11px;font-size:11px;font-weight:600;border-radius:7px;border:1.5px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;font-family:'DM Sans',sans-serif}
+.lk-btn:hover{background:var(--accent);color:#fff}
+.lk-btn.ghost{border-color:var(--border);color:var(--text-muted)}
+.lk-btn.ghost:hover{background:var(--surface2);color:var(--text)}
+.lk-toast-log{max-height:0;overflow:hidden;transition:max-height .25s ease;border-top:0 solid var(--border);background:var(--surface2)}
+.lk-toast.logopen .lk-toast-log{max-height:190px;overflow-y:auto;border-top:1px solid var(--border)}
+.lk-log-line{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;line-height:1.6;color:var(--text-dim);padding:1px 14px;white-space:pre-wrap;word-break:break-word}
+.lk-log-line.ok{color:var(--green)}
+.lk-log-line.warn{color:var(--amber)}
+.lk-log-line.err{color:var(--red)}
+.lk-log-line.step{color:var(--text);font-weight:600}
+.lk-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:400;display:none;align-items:center;justify-content:center}
+.lk-overlay.show{display:flex}
+.lk-ov-box{text-align:center}
+.lk-ov-spin{width:54px;height:54px;border:4px solid rgba(255,255,255,.22);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 18px}
+.lk-ov-msg{font-size:15px;font-weight:600;color:#fff;letter-spacing:.3px}
 .csv-modal-box .csv-cols{font-size:11px;color:var(--text-muted);background:var(--surface2);border-radius:6px;padding:8px 12px;margin-bottom:16px;text-align:left;line-height:1.6}
 .pw-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;width:360px;max-width:90vw;text-align:center}
 .pw-box h3{font-size:16px;margin-bottom:8px}.pw-box p{font-size:12px;color:var(--text-dim);margin-bottom:16px}
@@ -99,6 +129,19 @@ body.settings-open,body.modal-open{overflow:hidden}
 .card-title .dot{width:8px;height:8px;border-radius:50%}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:1100px){.grid-2{grid-template-columns:1fr}}
 .chart-container{position:relative;height:300px}.chart-container.short{height:220px}.chart-container.tall{height:340px}
+.graph-trend-ctl{display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-weight:500;font-size:11px;color:var(--text-muted)}
+.graph-detail{margin-top:14px}
+.graph-drill-head{display:flex;align-items:center;justify-content:space-between;padding:4px 0 10px;font-weight:700;font-size:14px;color:var(--text)}
+.graph-drill-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.g-ctl-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.g-ctl-row+.g-ctl-row{margin-top:12px}
+.g-ctl-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);min-width:52px}
+.g-chip{padding:4px 11px;font-size:11px;font-weight:600;border-radius:6px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.g-chip:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.g-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.g-chip:disabled{opacity:.3;cursor:not-allowed}
+.g-ctl-hint{font-size:11px;color:var(--text-muted);font-style:italic}
+.g-legend-hint{font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--text-muted);font-style:italic}
 .sales-bar-wrap{padding:8px 0}.sales-bar-label-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px;flex-wrap:wrap;gap:8px}
 .sales-bar-slider{position:absolute;top:0;left:0;height:100%;animation:growBar 1.8s cubic-bezier(.16,1,.3,1) forwards;pointer-events:none;z-index:3;overflow:visible}
 .sales-val-in{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:16px;font-weight:700;color:#000;white-space:nowrap}
@@ -726,6 +769,27 @@ body.settings-open,body.modal-open{overflow:hidden}
     <div class="loading-spinner"></div>
   </div>
 </div>
+<!-- Lark live-data toast (bottom center) -->
+<div class="lk-toast" id="lkToast">
+  <div class="lk-toast-main">
+    <div class="lk-spin" id="lkSpin"></div>
+    <div class="lk-toast-txt" id="lkToastTxt" onclick="lkToggleLog()" title="Click to show the fetch log">
+      <div class="lk-toast-title" id="lkToastTitle">Fetching latest data...</div>
+      <div class="lk-toast-sub" id="lkToastSub"></div>
+    </div>
+    <span class="lk-caret" id="lkCaret" onclick="lkToggleLog()" title="Click to show the fetch log">&#9662;</span>
+    <button class="lk-btn" id="lkActionBtn" onclick="larkToastAction()">&#8635; Refresh</button>
+    <button class="lk-btn ghost" onclick="lkToastHide()" title="Dismiss">&#10005;</button>
+  </div>
+  <div class="lk-toast-log" id="lkToastLog"></div>
+</div>
+<!-- Lark reload overlay -->
+<div class="lk-overlay" id="lkOverlay">
+  <div class="lk-ov-box">
+    <div class="lk-ov-spin"></div>
+    <div class="lk-ov-msg" id="lkOverlayMsg">Loading latest database</div>
+  </div>
+</div>
 <!-- Password Modal -->
 <div class="pw-modal" id="pwModal">
   <div class="pw-box">
@@ -748,7 +812,7 @@ body.settings-open,body.modal-open{overflow:hidden}
   </div>
   <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)toggleSettings()"><div class="settings-panel" id="settingsPanel"></div></div>
   <div class="nav-tabs" id="navTabs">
-    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="target">Targets</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="projections">Projections</button><button class="nav-tab" data-tab="ar">Collections</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
+    <button class="nav-tab active" data-tab="overview">Overview</button><button class="nav-tab" data-tab="pipeline">Sales</button><button class="nav-tab" data-tab="am">AM Performance</button><button class="nav-tab" data-tab="bd">BD Performance</button><button class="nav-tab" data-tab="winrate">Win Rate</button><button class="nav-tab" data-tab="graphs">Graphs</button><button class="nav-tab" data-tab="attainment">Tribe Attainment</button><button class="nav-tab" data-tab="target">Targets</button><button class="nav-tab" data-tab="poc">POC</button><button class="nav-tab" data-tab="projections">Projections</button><button class="nav-tab" data-tab="ar">Collections</button><button class="nav-tab" data-tab="encrypt">Encrypt</button>
   </div>
   <div class="section active" id="sec-overview"><div class="kpi-strip vis-section" data-vis="ov-kpis" id="kpiStrip"></div><div class="card vis-section" data-vis="ov-totalSales"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Year-to-Date (YTD) Sales</div><div id="totalSalesBar"></div></div><div class="card vis-section" data-vis="ov-tribeAtt"><div class="card-title"><div class="dot" style="background:var(--gold)"></div>Sales Attainment by Tribe</div><div id="tribeAttBars"></div></div><div class="card vis-section" data-vis="ov-table"><div class="card-title"><div class="dot" style="background:var(--accent)"></div>2026 YTD Breakdown</div><div class="table-wrap" id="tribeTable"></div><div id="ovTribeDetail" style="margin-top:12px"></div></div><div class="card vis-section" data-vis="ov-winsTable" id="ovWinsCard"><div class="card-title"><div class="dot" style="background:var(--green)"></div>All Wins — 2026</div><div class="table-wrap" id="ovWinsTable"></div></div></div>
   <div class="section" id="sec-pipeline"><div class="kpi-strip vis-section" data-vis="pl-kpis" id="pipelineKpis"></div><div class="card" style="margin-top:20px"><div class="card-title"><div class="dot" style="background:var(--purple)"></div>Monthly Pipeline</div><div style="position:relative"><div style="height:300px"><canvas id="monthlyPipeChart"></canvas></div><div id="qtrPipeBars" style="position:relative;height:24px;margin-top:2px"></div></div><div id="monthlyPipeDetail" style="margin-top:12px"></div><div id="qtrPipeDetail" style="margin-top:12px"></div></div><div class="pipeline-cols" id="pipelineCols"></div></div>
@@ -812,6 +876,17 @@ body.settings-open,body.modal-open{overflow:hidden}
       <div class="prj-hint">Select cells then <b>Ctrl/⌘+C</b> to copy (sum shows bottom-right) · <b>Right-click</b> for menu · blank cells are editable (type <code>=SUM(G2:G9)</code> or <code>=G2+G3</code>) · right-click row <b>numbers</b> to group rows, column <b>letters</b> to group columns · <b>＋/−</b> expands or collapses a group</div>
     </div>
     <div class="prj-sum-badge" id="prjSumBadge" style="display:none"></div>
+  </div>
+  <!-- GRAPHS TAB -->
+  <div class="section" id="sec-graphs">
+    <div class="card">
+      <div class="g-ctl-row"><span class="g-ctl-label">Months</span><div class="g-ctl-row" id="gMonthChips" style="gap:6px"></div></div>
+      <div class="g-ctl-row"><span class="g-ctl-label">Bars</span><div class="currency-toggle"><button class="currency-toggle-btn active" id="gViewStacked" onclick="_gSetStacked(true)">Stacked</button><button class="currency-toggle-btn" id="gViewGrouped" onclick="_gSetStacked(false)">Side by side</button></div><span class="g-ctl-hint">Click a legend name to show / hide that series · click a bar to list its projects</span></div>
+    </div>
+    <div class="card"><div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:#f1c232"></span>Won vs Lost — Monthly <span class="g-legend-hint">(click legend to filter)</span></span><span class="graph-trend-ctl"><span>Trend line</span><label class="toggle"><input type="checkbox" checked onchange="_toggleGraphTrend('gWinLoss',this.checked)"><span class="slider"></span></label></span></div><div class="chart-container tall"><canvas id="gWinLoss"></canvas></div><div id="gWinLossDetail" class="graph-detail"></div></div>
+    <div class="card"><div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:#f1c232"></span>Won vs GP — Monthly <span class="g-legend-hint">(click legend to filter)</span></span><span class="graph-trend-ctl"><span>Trend line</span><label class="toggle"><input type="checkbox" checked onchange="_toggleGraphTrend('gGP',this.checked)"><span class="slider"></span></label></span></div><div class="chart-container tall"><canvas id="gGP"></canvas></div><div id="gGPDetail" class="graph-detail"></div></div>
+    <div class="card"><div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:#3b82f6"></span>Won by BD — Monthly <span class="g-legend-hint">(click legend to filter)</span></span><span class="graph-trend-ctl"><span>Trend line</span><label class="toggle"><input type="checkbox" checked onchange="_toggleGraphTrend('gBD',this.checked)"><span class="slider"></span></label></span></div><div class="chart-container tall"><canvas id="gBD"></canvas></div><div id="gBDDetail" class="graph-detail"></div></div>
+    <div class="card"><div class="card-title" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:#22c55e"></span>Won by Tribe — Monthly <span class="g-legend-hint">(click legend to filter)</span></span><span class="graph-trend-ctl"><span>Trend line</span><label class="toggle"><input type="checkbox" checked onchange="_toggleGraphTrend('gTribe',this.checked)"><span class="slider"></span></label></span></div><div class="chart-container tall"><canvas id="gTribe"></canvas></div><div id="gTribeDetail" class="graph-detail"></div></div>
   </div>
   <!-- ENCRYPT TAB -->
   <div class="section" id="sec-encrypt"><div class="card"><div class="card-title"><div class="dot" style="background:var(--red)"></div>File Encryption / Decryption</div>
@@ -947,8 +1022,8 @@ async function doEncAction(){
 // ═══ SETTINGS CONFIG ═══
 const VIS_DEFS={'ov-kpis':'KPI Cards','ov-totalSales':'Total Sales YTD','ov-tribeAtt':'Tribe Attainment Bars','ov-table':'Tribe Breakdown','ov-winsTable':'All Wins Table','pl-kpis':'KPI Cards','am-chart':'Performance Chart','am-actual':'Actual Collection Chart','am-detail':'Accounts Drawer','bd-charts':'Attainment Charts','bd-doors-chart':'Doors Opened Bar Chart','bd-filter':'Month Filter + BD Grid','bd-wins':'BD Wins Table','bd-doors':'Doors Opened Table','wr-kpis':'KPI Cards','wr-count':'Win vs Loss Count','wr-value':'Win vs Loss Value','wr-trend':'Win Rate Trend','wr-tribe':'Win Rate by Tribe','wr-table':'Lost Projects Table','at-kpis':'KPI Cards','at-attChart':'Attainment Chart','at-ytdPipe':'YTD vs Pipeline','at-ytdPipeline':'YTD + Pipeline Chart','at-wonTable':'Projects Won','tg-summary':'Summary Bar','tg-groups':'Groups & Cards','tg-wins':'Wins List','poc-info':'Phase Reference','poc-chart':'POC Chart','poc-table':'Completion Table','ar-kpis':'AR KPI Cards','ar-chart':'Collections Chart','ar-table':'AR Detail Table','prj-summary':'Summary (YTD + Latest Estimate)','prj-grid':'Projections Spreadsheet'};
 const TAB_SECTIONS={overview:['ov-kpis','ov-totalSales','ov-tribeAtt','ov-table','ov-winsTable'],pipeline:['pl-kpis'],am:['am-chart','am-actual','am-detail'],bd:['bd-charts','bd-doors-chart','bd-filter','bd-wins'],winrate:['wr-kpis','wr-count','wr-value','wr-trend','wr-tribe','wr-table'],attainment:['at-kpis','at-attChart','at-ytdPipe','at-ytdPipeline','at-wonTable'],target:['tg-summary','tg-groups','tg-wins'],poc:['poc-info','poc-chart','poc-table'],projections:['prj-summary','prj-grid'],ar:['ar-kpis','ar-chart','ar-table']};
-const TAB_NAMES={overview:'Overview',pipeline:'Sales',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',attainment:'Tribe Attainment',target:'Targets',poc:'POC',projections:'Projections',ar:'Collections',encrypt:'Encrypt/Decrypt'};
-const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',targetCSV:'targets.csv',arCSV:'ar.csv',currency:'PHP',usdRate:57,showPDFBtn:false,
+const TAB_NAMES={overview:'Overview',pipeline:'Sales',am:'AM Performance',bd:'BD Leads',winrate:'Win Rate',graphs:'Graphs',attainment:'Tribe Attainment',target:'Targets',poc:'POC',projections:'Projections',ar:'Collections',encrypt:'Encrypt/Decrypt'};
+const DEFAULT_CFG={theme:'system',defaultCSV:'',lastWeekCSV:'',targetCSV:'targets.csv',arCSV:'ar.csv',currency:'PHP',usdRate:57,showPDFBtn:false,larkAutoRefresh:true,
   overview:{visible:true,'ov-kpis':true,'ov-totalSales':true,'ov-tribeAtt':true,'ov-table':true,'ov-winsTable':true},
   pipeline:{visible:true,'pl-kpis':true},am:{visible:true,'am-chart':true,'am-actual':true,'am-detail':true,showPastAMs:false},
   bd:{visible:true,'bd-charts':true,'bd-doors-chart':true,'bd-filter':true,'bd-wins':true,'bd-doors':true},
@@ -971,6 +1046,11 @@ function renderSettings(){
   const p=document.getElementById('settingsPanel');let h=`<h2>Settings <button onclick="toggleSettings()">✕</button></h2>`;
   // Theme as buttons
   h+=`<div class="settings-section"><div class="settings-section-header">Appearance</div><div class="setting-row"><span class="setting-label">Theme</span><div class="theme-btns"><button class="theme-btn ${CFG.theme==='system'?'active':''}" onclick="CFG.theme='system';applyTheme();renderSettings()">System</button><button class="theme-btn ${CFG.theme==='dark'?'active':''}" onclick="CFG.theme='dark';applyTheme();renderSettings()">Dark</button><button class="theme-btn ${CFG.theme==='light'?'active':''}" onclick="CFG.theme='light';applyTheme();renderSettings()">Light</button></div></div></div>`;
+  // Live Data (Lark Base)
+  h+=`<div class="settings-section"><div class="settings-section-header">Live Data (Lark Base)</div>`;
+  h+=`<div class="setting-row"><span class="setting-label">Auto-refresh from Lark<br><span style="font-size:10px;color:var(--text-muted);font-weight:400">Apply newer records automatically on load</span></span><label class="toggle"><input type="checkbox" ${CFG.larkAutoRefresh!==false?'checked':''} onchange="CFG.larkAutoRefresh=this.checked;renderSettings()"><span class="slider"></span></label></div>`;
+  h+=`<div class="setting-row" style="flex-direction:column;align-items:stretch;gap:6px"><button class="config-btn" onclick="toggleSettings();larkForceRefresh()">↻ Force refresh from Lark</button><span style="font-size:10px;color:var(--text-muted)">Re-fetches every record even if nothing changed.</span></div>`;
+  h+=`</div>`;
   // Data Sources
   h+=`<div class="settings-section"><div class="settings-section-header">Data Sources</div>`;
   h+=`<div class="setting-row" style="flex-direction:column;align-items:stretch;gap:6px"><span class="setting-label">Upload files directly</span>`;
@@ -1067,10 +1147,288 @@ function reconcile(){
   else if(csvSlots[2]){DATA=csvSlots[2].data;DATA_PREV=[];}
   else{DATA=[];DATA_PREV=[];}
   // Normalize legacy statuses → "For Collection"
-  [DATA,DATA_PREV].forEach(d=>d.forEach(r=>{const s=r['Status'];if(s==='For Collection - Invoice Sent'||s==='For Collection - For Invoicing')r['Status']='For Collection';}));
+  [DATA,DATA_PREV].forEach(d=>d.forEach(r=>{const s=r['Status'];if(s==='For Collection - Invoice Sent'||s==='For Collection - For Invoicing')r['Status']='For Collection';
+    // Blank tribe would silently drop revenue out of the YTD Breakdown; Lark itself
+    // uses this literal for unassigned rows, so make them visible instead.
+    if(!(r['Tribe']||'').trim())r['Tribe']='NO TRIBE ASSIGNED';}));
   DATA.forEach((r,i)=>r._i=i);
   invalidatePrevMap();
   renderAll();}
+
+// ═══════════════════════════════════════════════════════════════════════
+// LARK BASE (BITABLE) LIVE DATA
+// Reads the live Lark Base through the CORS proxy and converts the API's rich
+// field objects into the same flat column schema the CSV pipeline uses, so every
+// existing renderer keeps working untouched.
+// ═══════════════════════════════════════════════════════════════════════
+const LARK_CFG={
+  proxy:'https://lark-proxy-dwiw.onrender.com',
+  appToken:'NP7TbjwHNaTyLOsWafelN9wNgEd',
+  tableId:'tblEmWYOXoAF70uf',
+  pageSize:500,maxPages:200,pageDelay:120
+};
+const _LK_COLD_EST=28;   // seconds — typical Render free-tier cold start
+const _LK_TZ_MIN=480;    // Lark base renders its dates in UTC+8
+
+// Lark sends every date as epoch-ms, so the only safe way to tell a date from a
+// plain number is an explicit field list.
+const _LK_DATE_ONLY=new Set(['Sign Date','RFP Received Date','Project Start','Project End','Preparation Date','Execution Date','Closure Date','Completion Date']);
+const _LK_DATETIME=new Set(['Last Updated','Date Created']);
+const _LK_MONTHDAY=new Set(['Month','Loss Month']);
+const _LK_CUR={'Amount (VAT-Ex.) (USD)':'$','Weighted Amount (PHP)':'₱'};
+const _LK_COMMA=new Set(['Amount (VAT-Inc.)','GP','Amount Collected (PHP)','Amount Invoiced (PHP)','Preparation Amount (PHP)','Execution Amount (PHP)','Closure Amount (PHP)','Completion Amount (PHP)','Weighted Pitch Phase (PHP)','Weighted Awarded Phase (PHP)','Weighted Collection Phase (PHP)','Weighted Completed Cycle (PHP)']);
+const _LK_PCT=new Set(['AM Weight']);
+
+function _lkPad(n){return n<10?'0'+n:''+n;}
+function _lkDate(ms,kind){
+  const d=new Date(ms+_LK_TZ_MIN*60000);
+  const Y=d.getUTCFullYear(),M=_lkPad(d.getUTCMonth()+1),D=_lkPad(d.getUTCDate());
+  if(kind==='d')return Y+'/'+M+'/'+D;
+  if(kind==='dt')return Y+'/'+M+'/'+D+' '+_lkPad(d.getUTCHours())+':'+_lkPad(d.getUTCMinutes());
+  return M+'-'+D;
+}
+function _lkNum(v){return Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function _lkPct(v){return (v*100).toFixed(4).replace(/0+$/,'').replace(/\.$/,'')+'%';}
+function _lkPlain(v){return (Math.abs(v)>=1e15)?Number(v).toFixed(2):String(v);}
+
+// Flatten one Lark field value into the string the CSV would have carried.
+function _lkFlat(name,v){
+  if(v===null||v===undefined||v==='')return '';
+  if(Array.isArray(v)&&!v.length)return '';
+  // Formula / lookup / rollup wrapper: {type, value}
+  if(typeof v==='object'&&!Array.isArray(v)&&'type' in v&&'value' in v){
+    const t=v.type;let val=v.value;
+    if(!Array.isArray(val))val=[val];
+    if(!val.length)return '';
+    if(t===1)return val.map(x=>(x&&x.text)||'').join('');
+    if(t===2)v=val[0];
+    else return val.map(x=>(x&&x.text!==undefined)?x.text:String(x)).join(',');
+  }
+  // URL field: {link, text, type}
+  if(typeof v==='object'&&!Array.isArray(v))return v.link||v.text||'';
+  if(Array.isArray(v)){
+    if(v[0]&&typeof v[0]==='object'){
+      const k=v[0];
+      if(('id' in k)&&('name' in k))return v.map(x=>x.name||'').join(',');   // person
+      if('file_token' in k)return v.map(x=>x.name||'').join(',');            // attachment
+      if('text' in k)return v.map(x=>x.text||'').join('');                   // rich-text segments
+      return v.map(x=>JSON.stringify(x)).join(',');
+    }
+    return v.map(x=>String(x)).join(',');
+  }
+  if(typeof v==='number'){
+    if(_LK_DATE_ONLY.has(name))return _lkDate(v,'d');
+    if(_LK_DATETIME.has(name))return _lkDate(v,'dt');
+    if(_LK_MONTHDAY.has(name))return _lkDate(v,'md');
+    if(_LK_PCT.has(name))return _lkPct(v);
+    if(_LK_CUR[name])return _LK_CUR[name]+_lkNum(v);
+    if(_LK_COMMA.has(name))return _lkNum(v);
+    return _lkPlain(v);
+  }
+  if(typeof v==='boolean')return v?'TRUE':'';
+  return String(v);
+}
+function larkFlattenRecords(items){
+  return items.map(it=>{
+    const f=it.fields||{},r={};
+    for(const k in f)r[k]=_lkFlat(k,f[k]);
+    if(it.record_id)r['record_id']=it.record_id;
+    return r;
+  });
+}
+function _lkMaxUpdated(rows){
+  let mx=0;
+  for(const r of (rows||[])){const d=_parseDateLoose(r['Last Updated']);if(d&&d.getTime()>mx)mx=d.getTime();}
+  return mx;
+}
+
+// ─── toast / overlay ───
+let _lkBusy=false,_lkPending=null,_lkActionMode='refresh';
+function larkLog(msg,cls){
+  const box=document.getElementById('lkToastLog');
+  if(box){
+    const line=document.createElement('div');
+    line.className='lk-log-line'+(cls?' '+cls:'');
+    line.textContent='['+new Date().toLocaleTimeString('en',{hour12:false})+'] '+msg;
+    box.appendChild(line);box.scrollTop=box.scrollHeight;
+  }
+  const st=cls==='err'?'color:#ef4444':cls==='ok'?'color:#22c55e':cls==='warn'?'color:#f59e0b':cls==='step'?'color:#3b82f6;font-weight:700':'color:#94a3b8';
+  console.log('%c[Lark] '+msg,st);
+}
+function lkTitle(s){const e=document.getElementById('lkToastTitle');if(e)e.textContent=s;}
+function lkSub(s){const e=document.getElementById('lkToastSub');if(e)e.textContent=s||'';}
+function lkSpinState(cls,glyph){const sp=document.getElementById('lkSpin');if(sp){sp.className='lk-spin'+(cls?' '+cls:'');sp.textContent=glyph||'';}}
+function lkToastShow(title,sub){
+  const t=document.getElementById('lkToast');if(!t)return;
+  const log=document.getElementById('lkToastLog');if(log)log.innerHTML='';
+  lkTitle(title);lkSub(sub||'');lkSpinState('','');
+  t.classList.add('show');t.classList.remove('logopen');
+}
+function lkDone(title,sub){lkTitle(title);lkSub(sub||'');lkSpinState('done','✓');}
+function lkErr(title,sub){lkTitle(title);lkSub(sub||'');lkSpinState('err','!');}
+function lkToastHide(){const t=document.getElementById('lkToast');if(t)t.classList.remove('show');}
+function lkToggleLog(){
+  const t=document.getElementById('lkToast');if(!t)return;
+  t.classList.toggle('logopen');
+}
+function lkAction(mode){
+  const b=document.getElementById('lkActionBtn');if(!b)return;
+  _lkActionMode=mode;
+  if(mode==='hide'){b.style.display='none';return;}
+  b.style.display='';
+  b.textContent=mode==='apply'?'Apply now':mode==='retry'?'Retry':'↻ Refresh';
+}
+function larkToastAction(){
+  if(_lkActionMode==='apply'&&_lkPending){const rows=_lkPending;_lkPending=null;lkAction('hide');larkApply(rows,null);return;}
+  larkForceRefresh();
+}
+function lkOverlayShow(msg){
+  const o=document.getElementById('lkOverlay');if(!o)return;
+  const m=document.getElementById('lkOverlayMsg');if(m)m.textContent=msg||'Loading latest database';
+  o.classList.add('show');
+}
+function lkOverlayHide(){const o=document.getElementById('lkOverlay');if(o)o.classList.remove('show');}
+
+// Cold-start watcher: no answer in 2s almost always means a sleeping free-tier
+// instance, so surface a live estimate instead of an unexplained hang.
+function _lkColdWatch(){
+  const t0=Date.now();let fired=false,iv=null;
+  const to=setTimeout(()=>{
+    fired=true;
+    larkLog('No answer in 2s - the proxy is likely cold-starting (free tier sleeps after 15 min idle)','warn');
+    iv=setInterval(()=>{
+      const el=Math.round((Date.now()-t0)/1000),rem=Math.max(0,_LK_COLD_EST-el);
+      lkSub(rem>0?('Proxy waking from cold start - about '+rem+'s remaining (elapsed '+el+'s)')
+                 :('Proxy waking from cold start - taking longer than usual (elapsed '+el+'s)'));
+    },1000);
+  },2000);
+  return {stop(){clearTimeout(to);if(iv)clearInterval(iv);return fired;}};
+}
+
+async function larkApply(rows,meta){
+  lkOverlayShow('Loading latest database');
+  await new Promise(r=>setTimeout(r,1000));
+  csvSlots[1]={name:'Lark live data',data:rows,date:new Date()};
+  reconcile();
+  lkOverlayHide();
+  larkLog('Applied '+rows.length+' records to the dashboard'+(meta&&meta.ms?' (total '+meta.ms+'ms)':''),'ok');
+  lkDone('Latest data loaded','• '+rows.length+' records from Lark');
+  lkAction('refresh');
+}
+
+async function larkForceRefresh(){
+  if(_lkBusy){larkLog('Fetch already in progress','warn');return;}
+  lkOverlayShow('Refreshing from Lark');
+  await new Promise(r=>setTimeout(r,1000));
+  lkOverlayHide();
+  larkFetch({force:true});
+}
+
+async function larkFetch(opts){
+  opts=opts||{};
+  if(_lkBusy){larkLog('A fetch is already running - ignoring duplicate request','warn');return;}
+  _lkBusy=true;_lkPending=null;
+  lkToastShow('Fetching latest data...','Contacting proxy');
+  lkAction('hide');
+  const T0=performance.now();
+  try{
+    larkLog('===== Lark sync started'+(opts.force?' (forced)':'')+' =====','step');
+    larkLog('proxy     : '+LARK_CFG.proxy);
+    larkLog('app_token : '+LARK_CFG.appToken);
+    larkLog('table_id  : '+LARK_CFG.tableId);
+
+    // Step 1 — app access token
+    lkSub('Step 1/4 - authenticating');
+    larkLog('Step 1/4 - GET /token (the proxy supplies the app credentials)','step');
+    const cold=_lkColdWatch();let tRes,tTxt;const t1=performance.now();
+    try{
+      tRes=await fetch(LARK_CFG.proxy+'/token',{method:'GET'});
+      tTxt=await tRes.text();
+    }finally{
+      if(cold.stop())larkLog('Proxy finished waking after '+Math.round((performance.now()-t1)/1000)+'s','ok');
+    }
+    larkLog('HTTP '+tRes.status+' '+tRes.statusText+' in '+Math.round(performance.now()-t1)+'ms');
+    let tj=null;try{tj=JSON.parse(tTxt);}catch(e){}
+    if(!tj)throw new Error('Token response was not JSON: '+String(tTxt).slice(0,110));
+    if(tj.code!==0)throw new Error('Lark token error '+tj.code+' - '+(tj.msg||''));
+    const token=tj.app_access_token||tj.tenant_access_token;
+    if(!token)throw new Error('No app_access_token in the token response');
+    larkLog('Token acquired ('+String(token).slice(0,8)+'...), valid for '+(tj.expire||'?')+'s','ok');
+
+    // Step 2 — paginate records/search
+    lkSub('Step 2/4 - reading records');
+    larkLog('Step 2/4 - POST /proxy -> bitable records/search, page_size='+LARK_CFG.pageSize,'step');
+    const items=[];let pageToken='',pages=0,hasMore=true,total=null,stopped=null;
+    while(hasMore&&pages<LARK_CFG.maxPages){
+      let target='https://open.larksuite.com/open-apis/bitable/v1/apps/'+encodeURIComponent(LARK_CFG.appToken)+
+                 '/tables/'+encodeURIComponent(LARK_CFG.tableId)+'/records/search?page_size='+LARK_CFG.pageSize;
+      if(pageToken)target+='&page_token='+encodeURIComponent(pageToken);
+      const pr=performance.now();
+      const res=await fetch(LARK_CFG.proxy+'/proxy?url='+encodeURIComponent(target),
+        {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:'{}'});
+      const txt=await res.text();
+      let j=null;try{j=JSON.parse(txt);}catch(e){}
+      if(!j){stopped='page '+(pages+1)+' response was not JSON';break;}
+      if(j.code!==0){
+        if(pages===0)throw new Error('Lark error '+j.code+' - '+(j.msg||''));
+        stopped='Lark code '+j.code+' ('+(j.msg||'')+') on page '+(pages+1);break;
+      }
+      const d=j.data||{};
+      const got=Array.isArray(d.items)?d.items.length:0;
+      if(got)items.push.apply(items,d.items);
+      if(typeof d.total==='number')total=d.total;
+      hasMore=!!d.has_more;pageToken=d.page_token||'';pages++;
+      larkLog('page '+pages+' - received '+got+' records (running total '+items.length+(total!=null?' of '+total:'')+') in '+Math.round(performance.now()-pr)+'ms');
+      lkSub('Step 2/4 - page '+pages+' - '+items.length.toLocaleString()+' records');
+      if(hasMore&&!pageToken){stopped='has_more was true but no page_token came back';break;}
+      if(hasMore)await new Promise(r=>setTimeout(r,LARK_CFG.pageDelay));
+    }
+    if(hasMore&&!stopped&&pages>=LARK_CFG.maxPages)stopped='hit the '+LARK_CFG.maxPages+'-page safety cap';
+    if(stopped)larkLog('Pagination stopped early: '+stopped,'warn');
+    larkLog('Fetched '+items.length+' records across '+pages+' request'+(pages===1?'':'s'),'ok');
+    if(!items.length)throw new Error('Lark returned no records');
+
+    // Step 3 — convert to the dashboard schema
+    lkSub('Step 3/4 - converting to dashboard schema');
+    larkLog('Step 3/4 - flattening Lark field objects into flat columns','step');
+    const rows=larkFlattenRecords(items);
+    const cols={};rows.forEach(r=>{for(const k in r)cols[k]=1;});
+    larkLog('Converted '+rows.length+' rows / '+Object.keys(cols).length+' columns','ok');
+    const miss=REQUIRED_COLS.filter(c=>!cols[c]);
+    if(miss.length)throw new Error('Converted data is missing required columns: '+miss.join(', '));
+    larkLog('Schema check passed - all required columns present','ok');
+
+    // Step 4 — freshness
+    lkSub('Step 4/4 - checking freshness');
+    larkLog('Step 4/4 - comparing against the currently loaded database','step');
+    const newMax=_lkMaxUpdated(rows),curMax=_lkMaxUpdated(DATA);
+    larkLog('Lark newest "Last Updated"   : '+(newMax?new Date(newMax).toLocaleString('en'):'n/a'));
+    larkLog('Loaded newest "Last Updated" : '+(curMax?new Date(curMax).toLocaleString('en'):'n/a'));
+    larkLog('Record count - Lark '+rows.length+' vs loaded '+DATA.length);
+    const fresher=newMax>curMax,sameCount=rows.length===DATA.length;
+    if(!opts.force&&!fresher&&sameCount){
+      larkLog('The loaded database is already current - nothing to apply','ok');
+      lkDone('Already up to date','• '+rows.length+' records · '+Math.round(performance.now()-T0)+'ms');
+      lkAction('refresh');return;
+    }
+    larkLog(opts.force?'Forced refresh - applying regardless of freshness':'Newer data found - applying','ok');
+    if(CFG.larkAutoRefresh!==false||opts.force){
+      await larkApply(rows,{ms:Math.round(performance.now()-T0)});
+    }else{
+      _lkPending=rows;
+      larkLog('Auto-refresh is off - holding '+rows.length+' records until you apply them','warn');
+      lkDone('Latest data ready','Auto-refresh is off — click Apply now');
+      lkAction('apply');
+    }
+  }catch(e){
+    const m=(e&&e.message)?e.message:String(e);
+    larkLog('FAILED: '+m,'err');
+    if(/Failed to fetch|NetworkError|load failed/i.test(m))
+      larkLog('Hint: the proxy may be unreachable or a cold start timed out. Press Retry.','warn');
+    lkErr('Could not fetch latest data',m.slice(0,90));
+    lkAction('retry');
+  }finally{_lkBusy=false;}
+}
 
 // ═══ PROJECT DETAIL MODAL & TOOLTIP ═══
 function getLastRemark(r){const qr=(r['Quick Remarks']||'').trim();if(!qr)return '';const lines=qr.split(/\r?\n/).filter(l=>l.trim());return lines.length?lines[lines.length-1].trim():'';}
@@ -1308,6 +1666,11 @@ async function initLoad(){
   // If enc files configured but no data loaded, password was wrong — retry
   if(hasEnc && !Object.keys(csvSlots).length && ENC_PW){
     showPWModal('Decryption Failed — please try again.');
+    return;
+  }
+  // Local database is up: start pulling the live Lark Base in the background.
+  if(Object.keys(csvSlots).length&&typeof larkFetch==='function'){
+    setTimeout(()=>{larkFetch({});},400);
   }
 }
 function showPWModal(errMsg){
@@ -1752,7 +2115,7 @@ function setCurrency(c){CURRENCY=c;CFG.currency=c;document.getElementById('btnPH
 document.getElementById('usdRateInput').addEventListener('change',function(){const v=parseFloat(this.value);if(v>0){USD_RATE=v;CFG.usdRate=v;rebuildTargets();if(DATA.length)renderAll();else if(typeof renderTarget==='function')renderTarget();}});
 document.getElementById('usdRateInput').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur();});
 function switchTab(name){const tab=document.querySelector(`.nav-tab[data-tab="${name}"]`);if(tab)tab.click();}
-document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');if(tab.dataset.tab==='target'){if(typeof renderTarget==='function')renderTarget();if(typeof tgPlayEntrance==='function')tgPlayEntrance();}if(tab.dataset.tab==='ar'){requestAnimationFrame(arRecenter);}if(tab.dataset.tab==='projections'){if(typeof prjOnShow==='function')prjOnShow();}});});
+document.querySelectorAll('.nav-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));tab.classList.add('active');document.getElementById('sec-'+tab.dataset.tab).classList.add('active');if(tab.dataset.tab==='target'){if(typeof renderTarget==='function')renderTarget();if(typeof tgPlayEntrance==='function')tgPlayEntrance();}if(tab.dataset.tab==='ar'){requestAnimationFrame(arRecenter);}if(tab.dataset.tab==='projections'){if(typeof prjOnShow==='function')prjOnShow();}if(tab.dataset.tab==='graphs'){if(typeof renderGraphs==='function')renderGraphs();}});});
 // ═══ VERBAL CAPTION DATA (used by PDF export) ═══
 const CAPTIONS={
 'ov-totalSales':function(){const d=window._ovData;if(!d)return'';const{tw,tt,ap,pw,won,ceT,fsT,pipT,tws,cw}=d;const gap=tt-tw;const hasPrev=hp();
@@ -1995,7 +2358,7 @@ function _makeCopyBtnInline(tbl){
   return btn;
 }
 
-function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});(function(){const _mru=_mostRecentUpdated();document.getElementById('statusTag').textContent=_mru?'Last Updated: '+_fmtDate(_mru):'● LIVE — '+DATA.length+' records';})();applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();renderAR();if(typeof renderProjections==='function')renderProjections();}
+function renderAll(){if(!DATA.length)return;const cw=gw();document.getElementById('weekTag').textContent='Week '+cw;document.getElementById('dateTag').textContent=new Date().toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'});(function(){const _mru=_mostRecentUpdated();document.getElementById('statusTag').textContent=_mru?'Last Updated: '+_fmtDate(_mru):'● LIVE — '+DATA.length+' records';})();applyVis();renderOverview(cw);renderPipeline(cw);renderAM();renderBD();renderWinRate();renderAttainment();renderPOC();if(typeof renderTarget==='function')renderTarget();renderAR();if(typeof renderProjections==='function')renderProjections();if(typeof renderGraphs==='function')renderGraphs();}
 
 // ═══ 1. OVERVIEW ═══
 let _activeQ=-1;
@@ -2483,6 +2846,100 @@ function setWRM(m){wrState.month=m;
   document.getElementById('winrateMonthFilter').innerHTML=fH;renderLT(losses);}
 function renderLT(losses){const f=wrState.month==='all'?losses:losses.filter(r=>lossM(r)===wrState.month),sorted=f.sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));let h=`<table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>Loss Month</th><th>Reason</th><th class="amt">Amount</th></tr></thead><tbody>`;if(!sorted.length)h+='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">No lost projects</td></tr>';sorted.forEach(r=>{const amt=pn(r['Amount (VAT-Ex.) (PHP)']),reason=r['Reason for Loss']||'';h+=`<tr data-di="${r._i}" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text);max-width:280px;overflow:hidden;text-overflow:ellipsis">${r['Project']||'—'}</td><td>${r['Client']||'—'}</td><td>${(tribeOf(r)||'—').replace('PDEI - ','')}</td><td>${lossM(r)}</td><td>${reason?`<span class="status-pill status-lost" style="font-size:10px">${escHtml(reason)}</span>`:'—'}</td><td class="amt">${amt>0?fmt(amt):'—'}</td></tr>`;});h+='</tbody></table>';document.getElementById('lossTable').innerHTML=h;_addCardCopyBtn(document.getElementById('wrLostCard'));}
 
+// ═══ GRAPHS TAB ═══
+const _graphTrend={};
+let _gState={months:null,stacked:true};let _gAmAll=[];
+const GCOLORS=['#f1c232','#3b82f6','#22c55e','#f59e0b','#a855f7','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#14b8a6','#8b5cf6','#eab308','#0ea5e9','#f43f5e','#10b981'];
+function _bdCat(r){return (r['BD']||'').trim();}
+function _bdLabel(cat){return BD_NICKS[cat]||cat.split(/[,;]/)[0].split(' ').slice(0,2).join(' ');}
+function _gMonthOn(m){return !_gState.months||_gState.months.has(m);}
+function _gToggleMonth(m){if(!_gState.months)_gState.months=new Set(_gAmAll);if(_gState.months.has(m))_gState.months.delete(m);else _gState.months.add(m);if(_gState.months.size===_gAmAll.length)_gState.months=null;renderGraphs();}
+function _gAllMonths(){_gState.months=null;renderGraphs();}
+function _gSetStacked(s){_gState.stacked=s;const a=document.getElementById('gViewStacked'),b=document.getElementById('gViewGrouped');if(a)a.classList.toggle('active',s);if(b)b.classList.toggle('active',!s);renderGraphs();}
+function _gRenderMonthChips(){
+  const el=document.getElementById('gMonthChips');if(!el)return;
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let h=`<button class="g-chip${!_gState.months?' active':''}" onclick="_gAllMonths()">All</button>`;
+  h+=mo.map(m=>{const has=_gAmAll.includes(m);return `<button class="g-chip${has&&_gMonthOn(m)?' active':''}"${has?` onclick="_gToggleMonth('${m}')"`:' disabled title="No data yet"'}>${m}</button>`;}).join('');
+  el.innerHTML=h;
+}
+function _toggleGraphTrend(key,checked){_graphTrend[key]=checked;_gSyncTrend(key);}
+// Recompute trend lines from the currently VISIBLE bar series. In stacked mode each line is the
+// running total up to its segment so it sits exactly on top of that segment; grouped mode uses raw values.
+function _gSyncTrend(key){
+  const ch=CHARTS[key];if(!ch||!ch.$g)return;const{cfg,nb,total,stacked}=ch.$g;const on=_graphTrend[key];
+  const vis=[];for(let i=0;i<nb;i++)vis.push(ch.isDatasetVisible(i));
+  const L=cfg.labels.length;
+  if(total){const d=[];for(let li=0;li<L;li++){let v=0;for(let i=0;i<nb;i++)if(vis[i])v+=cfg.bars[i].data[li]||0;d.push(cx(v));}
+    const ds=ch.data.datasets[nb];ds.data=d;ds.hidden=!on||!vis.some(Boolean);
+  }else{
+    for(let i=0;i<nb;i++){const ds=ch.data.datasets[nb+i];const d=[];
+      for(let li=0;li<L;li++){let v=0;if(stacked){for(let k=0;k<=i;k++){if(vis[k])v+=cfg.bars[k].data[li]||0;}}else{v=cfg.bars[i].data[li]||0;}d.push(cx(v));}
+      ds.data=d;ds.hidden=!on||!vis[i];}
+  }
+  ch.update();
+}
+function _graph(cfg){
+  const key=cfg.canvas;if(_graphTrend[key]===undefined)_graphTrend[key]=true;
+  const cvs=document.getElementById(key);if(!cvs)return;
+  if(CHARTS[key])CHARTS[key].destroy();
+  const stacked=_gState.stacked,nb=cfg.bars.length,total=cfg.trendMode==='total';
+  const barDs=cfg.bars.map(b=>{const d={label:b.label,data:b.data.map(v=>cx(v)),backgroundColor:b.color,borderWidth:0,borderRadius:2,order:2,maxBarThickness:64};if(stacked)d.stack='bars';return d;});
+  const trendDs=[];const tn=total?1:nb;
+  for(let i=0;i<tn;i++){const col=total?'#64748b':(cfg.bars[i].tcolor||cfg.bars[i].color);
+    trendDs.push({label:total?'Total trend':cfg.bars[i].label+' trend',data:[],type:'line',stack:'trend'+i,borderColor:col,backgroundColor:col,pointBackgroundColor:col,borderWidth:2.5,pointRadius:2,pointHoverRadius:4,tension:.4,fill:false,order:0,hidden:!_graphTrend[key]});}
+  const ch=new Chart(cvs,{type:'bar',data:{labels:cfg.labels,datasets:barDs.concat(trendDs)},options:{responsive:true,maintainAspectRatio:false,animation:false,
+    scales:{x:{stacked:stacked,grid:{display:false}},y:{stacked:stacked,beginAtZero:true,grid:{color:cfg.cBorder},ticks:{callback:v=>cs()+Number(v).toLocaleString('en',{maximumFractionDigits:0})}}},
+    plugins:{legend:{labels:{font:{family:'DM Sans',size:11},boxWidth:12,filter:(it,d)=>d.datasets[it.datasetIndex].type!=='line'},onClick:(e,it,lg)=>{const c=lg.chart;c.setDatasetVisibility(it.datasetIndex,!c.isDatasetVisible(it.datasetIndex));_gSyncTrend(key);}},
+      tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+cs()+Number(ctx.raw).toLocaleString('en',{maximumFractionDigits:0})}}},
+    onClick:(evt,els)=>{if(!els||!els.length)return;const e0=els[0];if(e0.datasetIndex>=nb)return;const b=cfg.bars[e0.datasetIndex],m=cfg.labels[e0.index];_graphDrill(cfg,m,b.label,(b.rows&&b.rows[m])||[]);}}});
+  ch.$g={cfg,nb,total,stacked};CHARTS[key]=ch;_gSyncTrend(key);
+}
+function _graphDrill(cfg,month,seriesLabel,rows){
+  const el=document.getElementById(cfg.detail);if(!el)return;
+  const sorted=[...rows].sort((a,b)=>pn(b['Amount (VAT-Ex.) (PHP)'])-pn(a['Amount (VAT-Ex.) (PHP)']));
+  let h=`<div class="graph-drill-head"><span>${escHtml(seriesLabel)} — ${escHtml(month)} <span style="color:var(--text-muted);font-weight:500">(${sorted.length})</span></span><span class="graph-drill-actions"><button class="am-close-btn" onclick="document.getElementById('${cfg.detail}').innerHTML=''">✕</button></span></div>`;
+  h+=`<div class="table-wrap"><table><thead><tr><th>Project</th><th>Client</th><th>Tribe</th><th>BD</th><th>Status</th><th class="amt">Amount</th><th class="amt">GP</th></tr></thead><tbody>`;
+  if(!sorted.length)h+='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted)">No projects</td></tr>';
+  let tA=0,tG=0;
+  sorted.forEach(r=>{const a=pn(r['Amount (VAT-Ex.) (PHP)']),g=pn(r['GP']);tA+=a;tG+=g;const bd=(r['BD']||'').trim();
+    h+=`<tr data-di="${r._i}" style="cursor:pointer" onclick="showProjModal(DATA[${r._i}])" onmouseenter="tipIn(event,${r._i})" onmousemove="tipMv(event)" onmouseleave="tipOut()"><td style="font-weight:500;color:var(--text)">${escHtml(r['Project']||'—')}</td><td>${escHtml(r['Client']||'—')}</td><td>${escHtml((tribeOf(r)||'—').replace('PDEI - ',''))}</td><td>${escHtml(bd?_bdLabel(bd):'—')}</td><td>${sp(r['Status'])}</td><td class="amt" data-copy="${_amtCopy(a)}">${a>0?fmtF(a):'—'}</td><td class="amt" data-copy="${_amtCopy(g)}">${g>0?fmtF(g):'—'}</td></tr>`;});
+  h+=`</tbody><tfoot><tr style="border-top:2px solid var(--border)"><td colspan="5" style="font-weight:700;color:var(--text)">Total — ${sorted.length}</td><td class="amt" data-copy="${_amtCopy(tA)}" style="font-weight:700;color:var(--green)">${fmtF(tA)}</td><td class="amt" data-copy="${_amtCopy(tG)}" style="font-weight:700;color:var(--green)">${fmtF(tG)}</td></tr></tfoot></table></div>`;
+  el.innerHTML=h;
+  const tbl=el.querySelector('table'),acts=el.querySelector('.graph-drill-actions');if(tbl&&acts){const bb=_makeCopyBtnInline(tbl);bb.style.margin='0';acts.insertBefore(bb,acts.firstChild);}
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderGraphs(){
+  if(!document.getElementById('gWinLoss')||!DATA.length)return;
+  const sty=getComputedStyle(document.documentElement),cBorder=sty.getPropertyValue('--border').trim()||'#2A3545';
+  const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const y=DATA.filter(r=>r['Year']==='2026'),wins=y.filter(isWin),lost=y.filter(r=>r['Status']==='Lost');
+  const A=r=>pn(r['Amount (VAT-Ex.) (PHP)']),G=r=>pn(r['GP']);
+  const mset={};wins.forEach(r=>mset[dm(r)]=1);lost.forEach(r=>mset[lossM(r)]=1);
+  _gAmAll=mo.filter(m=>mset[m]);_gRenderMonthChips();
+  const am=_gAmAll.filter(_gMonthOn);
+  const grp=(rows,mfn)=>{const o={};am.forEach(m=>o[m]=[]);rows.forEach(r=>{const m=mfn(r);if(o[m])o[m].push(r);});return o;};
+  const sum=(rowsBy,f)=>am.map(m=>rowsBy[m].reduce((s,r)=>s+f(r),0));
+  // 1) Won vs Lost
+  const wonBy=grp(wins,dm),lostBy=grp(lost,lossM);
+  _graph({canvas:'gWinLoss',detail:'gWinLossDetail',labels:am,cBorder,
+    bars:[{label:'Won',color:'#f1c232',tcolor:'#a67c00',data:sum(wonBy,A),rows:wonBy},{label:'Lost',color:'rgba(100,116,139,.55)',tcolor:'#475569',data:sum(lostBy,A),rows:lostBy}]});
+  // 2) Won vs GP (GP segment + remainder = total won)
+  _graph({canvas:'gGP',detail:'gGPDetail',labels:am,cBorder,
+    bars:[{label:'GP',color:'#f1c232',tcolor:'#a67c00',data:sum(wonBy,G),rows:wonBy},{label:'Revenue ex-GP',color:'rgba(100,116,139,.4)',tcolor:'#475569',data:sum(wonBy,r=>Math.max(0,A(r)-G(r))),rows:wonBy}]});
+  // 3) Won by BD (exclude projects with no BD)
+  const bdWins=wins.filter(r=>_bdCat(r));
+  const bdTot={};bdWins.forEach(r=>{const c=_bdCat(r);bdTot[c]=(bdTot[c]||0)+A(r);});
+  const bdCats=Object.keys(bdTot).sort((a,b)=>bdTot[b]-bdTot[a]);
+  const bdBars=bdCats.map((c,i)=>{const by=grp(bdWins.filter(r=>_bdCat(r)===c),dm);return{label:_bdLabel(c),color:GCOLORS[i%GCOLORS.length],data:sum(by,A),rows:by};});
+  _graph({canvas:'gBD',detail:'gBDDetail',labels:am,cBorder,bars:bdBars,trendMode:'total'});
+  // 4) Won by Tribe
+  const trWins=wins.filter(r=>tribeOf(r));
+  const trTot={};trWins.forEach(r=>{const c=tribeOf(r);trTot[c]=(trTot[c]||0)+A(r);});
+  const trCats=Object.keys(trTot).sort((a,b)=>trTot[b]-trTot[a]);
+  const trBars=trCats.map((c,i)=>{const by=grp(trWins.filter(r=>tribeOf(r)===c),dm);return{label:c.replace('PDEI - ',''),color:GCOLORS[i%GCOLORS.length],data:sum(by,A),rows:by};});
+  _graph({canvas:'gTribe',detail:'gTribeDetail',labels:am,cBorder,bars:trBars,trendMode:'total'});
+}
 // ═══ 6. ATTAINMENT (pipeline bar fix) ═══
 let tribeWinsState={tribe:'all'};
 const _TRIBE_TGT=[{rank:0,usd:982737.88,test:t=>/^TRIBE A\b/i.test(t)||t==='PDEI - Moonton'},{rank:1,usd:862996.28,test:t=>/^TRIBE B\b/i.test(t)||t==='PDEI - Tencent'},{rank:2,usd:516434.10,test:t=>/^TRIBE C\b/i.test(t)||t==='PDEI - Esports'},{rank:3,usd:4137831.73,test:t=>/^TRIBE D\b/i.test(t)||t==='PDEI - Marketing'}];
