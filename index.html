@@ -1148,9 +1148,9 @@ function reconcile(){
   else{DATA=[];DATA_PREV=[];}
   // Normalize legacy statuses → "For Collection"
   [DATA,DATA_PREV].forEach(d=>d.forEach(r=>{const s=r['Status'];if(s==='For Collection - Invoice Sent'||s==='For Collection - For Invoicing')r['Status']='For Collection';
-    // Blank tribe would silently drop revenue out of the YTD Breakdown; Lark itself
-    // uses this literal for unassigned rows, so make them visible instead.
-    if(!(r['Tribe']||'').trim())r['Tribe']='NO TRIBE ASSIGNED';}));
+    // A blank tribe would silently drop revenue out of the YTD Breakdown, so give it
+    // its own bucket. Kept distinct from Lark's own "NO TRIBE ASSIGNED" category.
+    if(!(r['Tribe']||'').trim())r['Tribe']='(No Tribe)';}));
   DATA.forEach((r,i)=>r._i=i);
   invalidatePrevMap();
   renderAll();}
